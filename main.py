@@ -1,6 +1,8 @@
 """ main module
 
 This module contains all of the logic to start up the Tornado server.
+Details which endpoints correspond to which objects in the presentation layer
+within data_server/
 
 Start with:
     python main.py
@@ -20,6 +22,7 @@ public_root = os.path.join(os.path.dirname(__file__), 'public')
 
 if __name__ == "__main__":
     tornado.options.parse_command_line()
+    #Set up endpoints
     app = tornado.web.Application(handlers=[
         (r"/", presentation.IndexHandler),
         (r"/model-data", presentation.ModelDataHandler),
@@ -41,6 +44,7 @@ if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(options.port)
 
+    #Make code exitable
     try:
         tornado.ioloop.IOLoop.instance().start()
     except KeyboardInterrupt:
