@@ -204,7 +204,14 @@ function DrawMatrix() {
     function GetOnDiagonalCellColor(d) {
         var rt = d3RightTextNodesArrayZoomed[d.c];
         if (rt.isMinimized) return COLLAPSED_COLOR;
-        if (rt.type === "param") return PARAM_COLOR;
+        if (rt.type === "param") {
+            if (hasInputConn(rt.absPathName)) {
+                return PARAM_COLOR;
+            }
+            else {
+                return UNCONNECTED_PARAM_COLOR;
+            }
+        }
         return (rt.implicit) ? UNKNOWN_IMPLICIT_COLOR : UNKNOWN_EXPLICIT_COLOR;
     }
 

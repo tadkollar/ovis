@@ -45,6 +45,17 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
     setN2Group();
     var pTreeGroup = svg.append("g");
 
+    function hasInputConnection(target) {
+        for(i = 0; i < conns.length; ++i) {
+            if(conns[i].tgt === target) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    hasInputConn = hasInputConnection;
+
     var n2BackgroundRectR0 = -1, n2BackgroundRectC0 = -1;
     var newConnsDict = {};
     function PrintConnects() {
@@ -1625,6 +1636,7 @@ var mouseOverOffDiagN2;
 var mouseOverOnDiagN2;
 var mouseOutN2;
 var mouseClickN2;
+var hasInputConn;
 var treeData, connectionList;
 var url = window.location.href;
 var url_split = url.split('/');

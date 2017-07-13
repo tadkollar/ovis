@@ -7,6 +7,7 @@ var CONNECTION_COLOR = "black",
     PARAM_COLOR = "Plum",
     GROUP_COLOR = "steelblue",
     COMPONENT_COLOR = "DeepSkyBlue",
+    UNCONNECTED_PARAM_COLOR = "#46CE48",
     COLLAPSED_COLOR = "#555";
 HIGHLIGHT_HOVERED_COLOR = "blue"
 
