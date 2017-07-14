@@ -27,8 +27,8 @@ function DoSearch(d, regexMatch, undoList) {
         }
     }
     if (d === zoomedElement) return didMatch;
-    if (!showParams && d.type === "param") return didMatch;
-    if (!didMatch && !d.children && (d.type === "param" || d.type === "unknown")) {
+    if (!showParams && (d.type === "param" || d.type === "unconnected_param")) return didMatch;
+    if (!didMatch && !d.children && (d.type === "param" || d.type === "unknown" || d.type === "unconnected_param")) {
         didMatch = regexMatch.test(d.absPathName);
         if (didMatch) {
             ++numMatches; //only params and unknowns can count as matches
@@ -48,20 +48,20 @@ function DoSearch(d, regexMatch, undoList) {
 
 function CountMatches() {
     searchCollapsedUndo.forEach(function (d) { //auto undo on successive searches
-        if (!d.children && (d.type === "param" || d.type === "unknown")) d.varIsHidden = false;
+        if (!d.children && (d.type === "param" || d.type === "unknown" || d.type === "unconnected_param")) d.varIsHidden = false;
         else d.isMinimized = false;
     });
     numMatches = 0;
     if (searchVals0.length != 0) DoSearch(zoomedElement, GetSearchRegExp(searchVals0), null);
     searchCollapsedUndo.forEach(function (d) { //auto undo on successive searches
-        if (!d.children && (d.type === "param" || d.type === "unknown")) d.varIsHidden = true;
+        if (!d.children && (d.type === "param" || d.type === "unknown" || d.type === "unconnected_param")) d.varIsHidden = true;
         else d.isMinimized = true;
     });
 }
 
 function SearchButtonClicked() {
     searchCollapsedUndo.forEach(function (d) { //auto undo on successive searches
-        if (!d.children && (d.type === "param" || d.type === "unknown")) d.varIsHidden = false;
+        if (!d.children && (d.type === "param" || d.type === "unknown" || d.type === "unconnected_param")) d.varIsHidden = false;
         else d.isMinimized = false;
     });
     numMatches = 0;
@@ -208,11 +208,11 @@ function PopulateAutoCompleteList(d) {
         }
     }
     if (d === zoomedElement) return;
-    if (!showParams && d.type === "param") return;
+    if (!showParams && (d.type === "param" || d.type === "unconnected_param")) return;
 
     var n = d.name;
     if (d.splitByColon && d.children && d.children.length > 0) n += ":";
-    if (d.type !== "param" && d.type !== "unknown") n += ".";
+    if (d.type !== "param" && d.type !== "unknown" && d.type !== "unconnected_param") n += ".";
     var namesToAdd = [n];
 
     if (d.splitByColon) namesToAdd.push(d.colonName + ((d.children && d.children.length > 0) ? ":" : ""));
