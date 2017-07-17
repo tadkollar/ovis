@@ -10,6 +10,8 @@ import json
 import data_server.logic.logic as logic
 import data_server.shared.collections as collections
 
+_TOKEN = 'squavy'
+
 class IndexHandler(web.RequestHandler):
     """ IndexHandler class
 
@@ -18,6 +20,13 @@ class IndexHandler(web.RequestHandler):
         view existing cases.
     """
     def get(self):
+        if self.request.headers.get('token') != _TOKEN:
+            ret = {}
+            ret['status'] = 'Failed'
+            ret['reasoning'] = 'Invalid token'
+            self.write(ret)
+            return
+
         self.render("../../public/index.html")
 
 class ModelDataHandler(web.RequestHandler):
@@ -28,6 +37,13 @@ class ModelDataHandler(web.RequestHandler):
         by getting the driver metadata.
     """
     def get(self):
+        if self.request.headers.get('token') != _TOKEN:
+            ret = {}
+            ret['status'] = 'Failed'
+            ret['reasoning'] = 'Invalid token'
+            self.write(ret)
+            return
+
         self.write(logic.get_model_data())
 
 class CaseHandler(web.RequestHandler):
@@ -39,6 +55,13 @@ class CaseHandler(web.RequestHandler):
     and deleting everything associated with a given case ID.
     """
     def get(self, *params):
+        if self.request.headers.get('token') != _TOKEN:
+            ret = {}
+            ret['status'] = 'Failed'
+            ret['reasoning'] = 'Invalid token'
+            self.write(ret)
+            return
+
         if len(params) == 0:
             #NOTE: should only get cases available to user
             self.write(logic.get_all_cases())
@@ -46,11 +69,25 @@ class CaseHandler(web.RequestHandler):
             self.render("../../public/index.html")
 
     def post(self):
+        if self.request.headers.get('token') != _TOKEN:
+            ret = {}
+            ret['status'] = 'Failed'
+            ret['reasoning'] = 'Invalid token'
+            self.write(ret)
+            return
+
         body = json.loads(self.request.body)
         ret = logic.create_case(body)
         self.write(ret)
 
     def delete(self, *params):
+        if self.request.headers.get('token') != _TOKEN:
+            ret = {}
+            ret['status'] = 'Failed'
+            ret['reasoning'] = 'Invalid token'
+            self.write(ret)
+            return
+
         ret = _get_ret()
         if logic.delete_case_with_id(params[0]):
             self.write(ret)
@@ -209,6 +246,13 @@ def _generic_get(collection_name, request_handler, case_id):
     Returns:
         None
     """
+    if request_handler.request.headers.get('token') != _TOKEN:
+        ret = {}
+        ret['status'] = 'Failed'
+        ret['reasoning'] = 'Invalid token'
+        request_handler.write(ret)
+        return
+
     request_handler.write(logic.generic_get(collection_name, case_id))
 
 def _generic_post(collection_name, request_handler, case_id):
@@ -225,6 +269,13 @@ def _generic_post(collection_name, request_handler, case_id):
     Returns:
         None
     """
+    if request_handler.request.headers.get('token') != _TOKEN:
+        ret = {}
+        ret['status'] = 'Failed'
+        ret['reasoning'] = 'Invalid token'
+        request_handler.write(ret)
+        return
+
     ret = _get_ret()
     body = json.loads(request_handler.request.body)
     if logic.generic_create(collection_name, body, case_id):
@@ -247,6 +298,13 @@ def _generic_delete(collection_name, request_handler, case_id):
     Returns:
         None
     """
+    if request_handler.request.headers.get('token') != _TOKEN:
+        ret = {}
+        ret['status'] = 'Failed'
+        ret['reasoning'] = 'Invalid token'
+        request_handler.write(ret)
+        return
+
     ret = _get_ret()
     if logic.generic_delete(collection_name, case_id):
         request_handler.write(ret)
