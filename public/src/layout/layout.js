@@ -22,8 +22,10 @@ var config = {
 
 var myLayout =  new GoldenLayout( config );
 myLayout.registerComponent('Partition Tree and N<sup>2</sup>', function(container, componentState) {
-    console.log("Registering component PartitionTree")
-    container.getElement().html('<h2>' + componentState.label + '</h2>');
+    http.get("components/partition_tree_n2.html", function(response) {
+        container.getElement().html(response);
+        ptn2.initializeTree();
+    });
 });
 
 myLayout.registerComponent('testComponent', function(container, componentState) {

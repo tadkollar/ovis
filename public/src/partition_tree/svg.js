@@ -1,16 +1,3 @@
-var CONNECTION_COLOR = "black",
-    UNKNOWN_IMPLICIT_COLOR = "orange",
-    UNKNOWN_EXPLICIT_COLOR = "#AAA",
-    N2_COMPONENT_BOX_COLOR = "#555",
-    N2_BACKGROUND_COLOR = "#eee",
-    N2_GRIDLINE_COLOR = "white",
-    PT_STROKE_COLOR = "#eee",
-    UNKNOWN_GROUP_COLOR = "#888",
-    PARAM_COLOR = "Plum",
-    PARAM_GROUP_COLOR = "Orchid",
-    GROUP_COLOR = "steelblue",
-    COMPONENT_COLOR = "DeepSkyBlue",
-    COLLAPSED_COLOR = "#555";
 
 function SaveSvg(parentDiv) {
     //get svg element.
@@ -41,48 +28,48 @@ function SaveSvg(parentDiv) {
 function UpdateSvgCss(svgStyleElement, FONT_SIZE_PX){
         var myCssText =
         "rect { " +
-        "    stroke: " + PT_STROKE_COLOR + "; " +
+        "    stroke: " + ptn2.PT_STROKE_COLOR + "; " +
         "} " +
         "g.unknown > rect { " +
-        "    fill: " + UNKNOWN_EXPLICIT_COLOR + "; " +
+        "    fill: " + ptn2.UNKNOWN_EXPLICIT_COLOR + "; " +
         "    fill-opacity: .8; " +
         "} " +
         "g.unknown_implicit > rect { " +
-        "    fill: " + UNKNOWN_IMPLICIT_COLOR + "; " +
+        "    fill: " + ptn2.UNKNOWN_IMPLICIT_COLOR + "; " +
         "    fill-opacity: .8; " +
         "} " +
         "g.param > rect { " +
-        "    fill: " + PARAM_COLOR + "; " +
+        "    fill: " + ptn2.PARAM_COLOR + "; " +
         "    fill-opacity: .8; " +
         "} " +
         "g.unconnected_param > rect { " +
-        "    fill: " + UNCONNECTED_PARAM_COLOR + "; " +
+        "    fill: " + ptn2.UNCONNECTED_PARAM_COLOR + "; " +
         "    fill-opacity: .8; " +
         "} " +
         "g.subsystem > rect { " +
         "    cursor: pointer; " +
         "    fill-opacity: .8; " +
-        "    fill: " + GROUP_COLOR + "; " +
+        "    fill: " + ptn2.GROUP_COLOR + "; " +
         "} " +
         "g.component > rect { " +
         "    cursor: pointer; " +
         "    fill-opacity: .8; " +
-        "    fill: " + COMPONENT_COLOR + "; " +
+        "    fill: " + ptn2.COMPONENT_COLOR + "; " +
         "} " +
         "g.param_group > rect { " +
         "    cursor: pointer; " +
         "    fill-opacity: .8; " +
-        "    fill: " + PARAM_GROUP_COLOR + "; " +
+        "    fill: " + ptn2.PARAM_GROUP_COLOR + "; " +
         "} " +
         "g.unknown_group > rect { " +
         "    cursor: pointer; " +
         "    fill-opacity: .8; " +
-        "    fill: " + UNKNOWN_GROUP_COLOR + "; " +
+        "    fill: " + ptn2.UNKNOWN_GROUP_COLOR + "; " +
         "} " +
         "g.minimized > rect { " +
         "    cursor: pointer; " +
         "    fill-opacity: .8; " +
-        "    fill: " + COLLAPSED_COLOR + "; " +
+        "    fill: " + ptn2.COLLAPSED_COLOR + "; " +
         "} " +
         "text { " +
         //"    dominant-baseline: middle; " +
@@ -96,7 +83,7 @@ function UpdateSvgCss(svgStyleElement, FONT_SIZE_PX){
         "} " +
         "/* n2 diagram*/  " +
         "g.component_box > rect { " +
-        "    stroke: " + N2_COMPONENT_BOX_COLOR + "; " +
+        "    stroke: " + ptn2.N2_COMPONENT_BOX_COLOR + "; " +
         "    stroke-width: 2; " +
         "    fill: none; " +
         "} " +
@@ -109,10 +96,10 @@ function UpdateSvgCss(svgStyleElement, FONT_SIZE_PX){
         "    pointer-events: none; " +
         "} " +
         ".background { " +
-        "    fill: " + N2_BACKGROUND_COLOR + "; " +
+        "    fill: " + ptn2.N2_BACKGROUND_COLOR + "; " +
         "} " +
         ".horiz_line, .vert_line { /*n2 gridlines*/ " +
-        "    stroke: " + N2_GRIDLINE_COLOR + "; " +
+        "    stroke: " + ptn2.N2_GRIDLINE_COLOR + "; " +
         "}";
 
         svgStyleElement.innerHTML = myCssText;

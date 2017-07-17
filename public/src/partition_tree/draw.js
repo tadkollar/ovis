@@ -4,7 +4,7 @@ var n2ElementsGroup, n2GridLinesGroup, n2ComponentBoxesGroup, n2ArrowsGroup, n2D
 var n2Group;
 var arrowMarker;
 
-var WIDTH_N2_PX = HEIGHT_PX;
+var WIDTH_N2_PX = ptn2.HEIGHT_PX;
 var PTREE_N2_GAP_PX = 10; //spacing between partition tree and n2 diagram
 var n2Dx = 0, n2Dy = 0, n2Dx0 = 0, n2Dy0 = 0;
 var d3NodesArray, d3RightTextNodesArrayZoomed = []
@@ -130,7 +130,7 @@ function DrawArrows(startIndex, endIndex) {
             var y2 = y1; //right y2
             var y3 = endIndex * n2Dy; //down y3
 
-            DrawPathTwoLines(x1, y1, x2, y2, x3, y3, GREEN_ARROW_COLOR, lineWidth, true);
+            DrawPathTwoLines(x1, y1, x2, y2, x3, y3, ptn2.GREEN_ARROW_COLOR, lineWidth, true);
         }
         else if (startIndex > endIndex) { //left up arrow
             var x1 = startI * n2Dx; //x1
@@ -141,7 +141,7 @@ function DrawArrows(startIndex, endIndex) {
             var y2 = y1; //left y2
             var y3 = (endIndex + boxEndDelta + 1) * n2Dy; //y1
 
-            DrawPathTwoLines(x1, y1, x2, y2, x3, y3, RED_ARROW_COLOR, lineWidth, true);
+            DrawPathTwoLines(x1, y1, x2, y2, x3, y3, ptn2.RED_ARROW_COLOR, lineWidth, true);
         }
     }
 }
@@ -178,7 +178,7 @@ function DrawArrowsParamView(startIndex, endIndex) {
             var y2 = y1; //right y2
             var y3 = endI * n2Dy; //down y3
 
-            DrawPathTwoLines(x1, y1, x2, y2, x3, y3, GREEN_ARROW_COLOR, lineWidth, true);
+            DrawPathTwoLines(x1, y1, x2, y2, x3, y3, ptn2.GREEN_ARROW_COLOR, lineWidth, true);
         }
         else if (startIndex > endIndex) { //left up arrow
             //alert("yes");
@@ -190,7 +190,7 @@ function DrawArrowsParamView(startIndex, endIndex) {
             var y2 = y1; //left y2
             var y3 = (endI + 1) * n2Dy; //y1
 
-            DrawPathTwoLines(x1, y1, x2, y2, x3, y3, RED_ARROW_COLOR, lineWidth, true);
+            DrawPathTwoLines(x1, y1, x2, y2, x3, y3, ptn2.RED_ARROW_COLOR, lineWidth, true);
         }
     }
 }
@@ -203,10 +203,10 @@ function DrawMatrix() {
 
     function GetOnDiagonalCellColor(d) {
         var rt = d3RightTextNodesArrayZoomed[d.c];
-        if (rt.isMinimized) return COLLAPSED_COLOR;
-        if (rt.type === "param") return PARAM_COLOR;
-        if (rt.type === "unconnected_param") return UNCONNECTED_PARAM_COLOR
-        return (rt.implicit) ? UNKNOWN_IMPLICIT_COLOR : UNKNOWN_EXPLICIT_COLOR;
+        if (rt.isMinimized) return ptn2.COLLAPSED_COLOR;
+        if (rt.type === "param") return ptn2.PARAM_COLOR;
+        if (rt.type === "unconnected_param") return ptn2.UNCONNECTED_PARAM_COLOR
+        return (rt.implicit) ? ptn2.UNKNOWN_IMPLICIT_COLOR : ptn2.UNKNOWN_EXPLICIT_COLOR;
     }
 
     var classes = ["cell_scalar", "cell_vector", "cell_group", "cell_scalarScalar", "cell_scalarVector", "cell_vectorScalar",
@@ -234,7 +234,7 @@ function DrawMatrix() {
                 }
                 alert("error: enter transform not found");
             });
-        drawFunctions[i](gEnter, u0, v0, (i < 3) ? GetOnDiagonalCellColor : CONNECTION_COLOR, false)
+        drawFunctions[i](gEnter, u0, v0, (i < 3) ? GetOnDiagonalCellColor : ptn2.CONNECTION_COLOR, false)
             .on("mouseover", (i < 3) ? mouseOverOnDiagN2 : mouseOverOffDiagN2)
             .on("mouseleave", mouseOutN2)
             .on("click", mouseClickN2);
@@ -244,7 +244,7 @@ function DrawMatrix() {
             .attr("transform", function (d) {
                 return "translate(" + (n2Dx * (d.c) + u) + "," + (n2Dy * (d.r) + v) + ")";
             });
-        drawFunctions[i](gUpdate, u, v, (i < 3) ? GetOnDiagonalCellColor : CONNECTION_COLOR, true);
+        drawFunctions[i](gUpdate, u, v, (i < 3) ? GetOnDiagonalCellColor : ptn2.CONNECTION_COLOR, true);
 
 
         var nodeExit = sel.exit().transition(sharedTransition)
@@ -258,7 +258,7 @@ function DrawMatrix() {
                 alert("error: exit transform not found");
             })
             .remove();
-        drawFunctions[i](nodeExit, u, v, (i < 3) ? GetOnDiagonalCellColor : CONNECTION_COLOR, true);
+        drawFunctions[i](nodeExit, u, v, (i < 3) ? GetOnDiagonalCellColor : ptn2.CONNECTION_COLOR, true);
     }
 
     {
@@ -318,14 +318,14 @@ function DrawMatrix() {
                 alert("error: enter transform not found");
             });
         gEnter.append("line")
-            .attr("x1", -HEIGHT_PX);
+            .attr("x1", -ptn2.HEIGHT_PX);
 
         var gUpdate = gEnter.merge(sel).transition(sharedTransition)
             .attr("transform", function (d) {
                 return "translate(" + (n2Dx * d.i) + ")rotate(-90)";
             });
         gUpdate.select("line")
-            .attr("x1", -HEIGHT_PX);
+            .attr("x1", -ptn2.HEIGHT_PX);
 
         var nodeExit = sel.exit().transition(sharedTransition)
             .attr("transform", function (d) {

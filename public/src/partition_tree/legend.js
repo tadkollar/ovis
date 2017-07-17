@@ -75,12 +75,12 @@ function SetupLegend(d3, d3ContentDiv) {
     //COLORS
     {
         var text = ["Group", "Component", "Unknown Explicit", "Unknown Implicit", "Collapsed", "Connection"];
-        var colors = [GROUP_COLOR, COMPONENT_COLOR, UNKNOWN_EXPLICIT_COLOR, UNKNOWN_IMPLICIT_COLOR, COLLAPSED_COLOR, CONNECTION_COLOR];
+        var colors = [ptn2.GROUP_COLOR, ptn2.COMPONENT_COLOR, ptn2.UNKNOWN_EXPLICIT_COLOR, ptn2.UNKNOWN_IMPLICIT_COLOR, ptn2.COLLAPSED_COLOR, ptn2.CONNECTION_COLOR];
         if (showParams) {
             text.splice(2, 0, "Param");
-            colors.splice(2, 0, PARAM_COLOR);
+            colors.splice(2, 0, ptn2.PARAM_COLOR);
             text.splice(3, 0, "Unconnected Param")
-            colors.splice(3, 0, UNCONNECTED_PARAM_COLOR)
+            colors.splice(3, 0, ptn2.UNCONNECTED_PARAM_COLOR)
         }
         for (var i = 0; i < text.length; ++i) {
             var el = svg_legend.append("g").attr("transform", "translate(" + (columnWidth * 0 + xOffset + u) + "," + (80 + 40 * i + v) + ")");
@@ -92,7 +92,7 @@ function SetupLegend(d3, d3ContentDiv) {
     //N2 SYMBOLS
     {
         var text = ["Scalar", "Vector", "Group"];
-        var colors = [UNKNOWN_EXPLICIT_COLOR, UNKNOWN_EXPLICIT_COLOR, UNKNOWN_EXPLICIT_COLOR];
+        var colors = [ptn2.UNKNOWN_EXPLICIT_COLOR, ptn2.UNKNOWN_EXPLICIT_COLOR, ptn2.UNKNOWN_EXPLICIT_COLOR];
         var shapeFunctions = [DrawScalar, DrawVector, DrawGroup];
         for (var i = 0; i < text.length; ++i) {
             var el = svg_legend.append("g").attr("transform", "translate(" + (columnWidth * 1 + xOffset + u) + "," + (80 + 40 * i + v) + ")");
