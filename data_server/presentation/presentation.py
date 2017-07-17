@@ -21,7 +21,7 @@ class IndexHandler(web.RequestHandler):
         self.render("../../public/index.html")
 
 class ModelDataHandler(web.RequestHandler):
-    """ ModelDataHandler
+    """ ModelDataHandler class
 
     Contains logic for getting the stored model/connections data.
     NOTE: this is completely temporary and should be replaced
@@ -74,7 +74,7 @@ class DriverIterationsHandler(web.RequestHandler):
         _generic_delete(collections.DRIVER_ITERATIONS, self, params[0])
 
 class DriverMetadataHandler(web.RequestHandler):
-    """ DriverMetadata
+    """ DriverMetadata class
 
     Contians logic to get/post/delete data in the driver_metadata
     collection.
