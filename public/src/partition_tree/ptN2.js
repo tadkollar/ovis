@@ -1682,6 +1682,6 @@ http.get("case/" + case_id + '/driver_metadata', function (response) {
     var data = JSON.parse(response)[0];
     treeData = JSON.parse(data['model_viewer_data'])
     zoomedElement = treeData['tree'];
-    var app = PtN2Diagram(document.getElementById("ptN2ContentDivId"), treeData['tree'], treeData['connections_list']);
+    // var app = PtN2Diagram(document.getElementById("ptN2ContentDivId"), treeData['tree'], treeData['connections_list']);
 })
 
