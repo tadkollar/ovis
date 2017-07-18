@@ -24,6 +24,7 @@ class IndexHandler(web.RequestHandler):
             ret = {}
             ret['status'] = 'Failed'
             ret['reasoning'] = 'Invalid token'
+            print('Received request with bad token')
             self.write(ret)
             return
 
@@ -41,6 +42,7 @@ class ModelDataHandler(web.RequestHandler):
             ret = {}
             ret['status'] = 'Failed'
             ret['reasoning'] = 'Invalid token'
+            print('Received request with bad token')
             self.write(ret)
             return
 
@@ -59,6 +61,7 @@ class CaseHandler(web.RequestHandler):
             ret = {}
             ret['status'] = 'Failed'
             ret['reasoning'] = 'Invalid token'
+            print('Received request with bad token')
             self.write(ret)
             return
 
@@ -73,6 +76,7 @@ class CaseHandler(web.RequestHandler):
             ret = {}
             ret['status'] = 'Failed'
             ret['reasoning'] = 'Invalid token'
+            print('Received request with bad token')
             self.write(ret)
             return
 
@@ -85,6 +89,7 @@ class CaseHandler(web.RequestHandler):
             ret = {}
             ret['status'] = 'Failed'
             ret['reasoning'] = 'Invalid token'
+            print('Received request with bad token')
             self.write(ret)
             return
 
@@ -250,6 +255,7 @@ def _generic_get(collection_name, request_handler, case_id):
         ret = {}
         ret['status'] = 'Failed'
         ret['reasoning'] = 'Invalid token'
+        print('Received request with bad token')
         request_handler.write(ret)
         return
 
@@ -273,6 +279,7 @@ def _generic_post(collection_name, request_handler, case_id):
         ret = {}
         ret['status'] = 'Failed'
         ret['reasoning'] = 'Invalid token'
+        print('Received request with bad token')
         request_handler.write(ret)
         return
 
@@ -302,6 +309,7 @@ def _generic_delete(collection_name, request_handler, case_id):
         ret = {}
         ret['status'] = 'Failed'
         ret['reasoning'] = 'Invalid token'
+        print('Received request with bad token')
         request_handler.write(ret)
         return
 
