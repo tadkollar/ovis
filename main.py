@@ -41,9 +41,9 @@ if __name__ == "__main__":
         ])
 
     options.port = 18403
-    print("Starting up OpenMDAO server on port: " + str(options.port))
+    print("Starting up OpenMDAO server on port: " + str(18403))
     http_server = tornado.httpserver.HTTPServer(app)
-    http_server.listen(options.port)
+    http_server.listen(18403)
 
     #Make code exitable
     try:
