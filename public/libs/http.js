@@ -4,7 +4,7 @@
  * Class HTTP - allows user to contact the server for any HTTP requests
  */
 function HTTP() {
-    this.baseURL = 'http://127.0.0.1:8000/'
+    this.baseURL = 'http://openmdao.org/visualization/'
     
     /**
      * function get - performs HTTP GET request at given address (after prepending
