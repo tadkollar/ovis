@@ -20,9 +20,9 @@ var config = {
     }]
 };
 
-var myLayout =  new GoldenLayout( config );
-myLayout.registerComponent('testComponent', function(container, componentState) {
-    container.getElement().html('<h2>' + componentState.label + '</h2>');
-});
+// var myLayout =  new GoldenLayout( config );
+// myLayout.registerComponent('testComponent', function(container, componentState) {
+//     container.getElement().html('<h2>' + componentState.label + '</h2>');
+// });
 
-myLayout.init();
+// myLayout.init();
