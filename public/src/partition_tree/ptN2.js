@@ -1677,7 +1677,7 @@ var hasInputConn;
 var treeData, connectionList;
 var url = window.location.href;
 var url_split = url.split('/');
-var case_id = url_split[4];
+var case_id = url_split[url_split.length - 1];
 http.get("case/" + case_id + '/driver_metadata', function (response) {
     var data = JSON.parse(response)[0];
     treeData = JSON.parse(data['model_viewer_data'])
