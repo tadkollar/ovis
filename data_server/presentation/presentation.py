@@ -57,15 +57,14 @@ class CaseHandler(web.RequestHandler):
     and deleting everything associated with a given case ID.
     """
     def get(self, *params):
-        if self.request.headers.get('token') != _TOKEN:
-            ret = {}
-            ret['status'] = 'Failed'
-            ret['reasoning'] = 'Invalid token'
-            print('Received request with bad token')
-            self.write(ret)
-            return
-
         if len(params) == 0:
+            if self.request.headers.get('token') != _TOKEN:
+                ret = {}
+                ret['status'] = 'Failed'
+                ret['reasoning'] = 'Invalid token'
+                print('Received request with bad token')
+                self.write(ret)
+                return
             #NOTE: should only get cases available to user
             self.write(logic.get_all_cases())
         else:

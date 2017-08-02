@@ -40,10 +40,9 @@ if __name__ == "__main__":
         (r"/(.*)", web.StaticFileHandler, {'path': public_root})
         ])
 
-    options.port = 18403
-    print("Starting up OpenMDAO server on port: " + str(18403))
+    print("Starting up OpenMDAO server on port: " + str(options.port))
     http_server = tornado.httpserver.HTTPServer(app)
-    http_server.listen(18403)
+    http_server.listen(options.port)
 
     #Make code exitable
     try:
