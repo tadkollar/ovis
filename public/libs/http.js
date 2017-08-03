@@ -15,17 +15,31 @@ function HTTP() {
      * @param error - the failure callback. Should have one input, the reason for error
      */
     this.get = function(path, success, error) {
-        var req = $.get(this.baseURL + path, function(response) {
-            if(success) {
-                success(response);
-            }
-        })
-        .fail(function(err) {
-            if(error) {
-                error(err);
-            }
+        
+        $.ajax({
+            url: this.baseURL + path,
+            type: 'GET',
+            beforeSend: function(xhr) { xhr.setRequestHeader('token', 'squavy') },
+            success: function(response) { success(response) }
         });
+
+        // var req = $.get(this.baseURL + path, function(response) {
+        //     if(success) {
+        //         success(response);
+        //     }
+        // })
+        // .fail(function(err) {
+        //     if(error) {
+        //         error(err);
+        //     }
+        // });
     };
 };
+
+// url: "http://localhost/PlatformPortal/Buyers/Account/SignIn",
+//          data: { signature: authHeader },
+//          type: "GET",
+//          beforeSend: function(xhr){xhr.setRequestHeader('X-Test-Header', 'test-value');},
+//          success: function() { alert('Success!' + authHeader); }
 
 var http = new HTTP();
