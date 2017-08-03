@@ -19,7 +19,7 @@ function HTTP() {
         $.ajax({
             url: this.baseURL + path,
             type: 'GET',
-            beforeSend: function(xhr) { xhr.setRequestHeader('token', 'squavy') },
+            headers: {'token': 'squavy'},
             success: function(response) { success(response) }
         });
 
