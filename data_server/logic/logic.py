@@ -23,20 +23,20 @@ def get_model_data():
     """
     return data.get_model_data()
 
-def get_all_cases():
+def get_all_cases(token):
     """ get_all_cases method
 
     Grabs all case documents from the data layer.
     NOTE: this should be altered to only grab case documents for a given user
 
     Args:
-        None
+        token (string): the token to be used for authentication
     Returns:
         JSON array of all case documents
     """
-    return data.get_all_cases()
+    return data.get_all_cases(token)
 
-def get_case_with_id(c_id):
+def get_case_with_id(c_id, token):
     """ get_case_with_id method
 
     Uses the data layer to query and return a case with the given
@@ -44,12 +44,13 @@ def get_case_with_id(c_id):
 
     Args:
         case_id (string || int): the associated case_id for querying
+        token (string): the token to be used for authentication
     Returns:
         JSON document of the case
     """
-    return data.get_case_with_id(c_id)
+    return data.get_case_with_id(c_id, token)
 
-def delete_case_with_id(c_id):
+def delete_case_with_id(c_id, token):
     """ delete_case_with_id method
 
     Deletes a case with the given ID. Returns true if it deleted anything
@@ -57,12 +58,13 @@ def delete_case_with_id(c_id):
 
     Args:
         case_id (string || int): the associated case_id for querying
+        token (string): the token to be used for authentication
     Returns:
         True if successfull, False otherwise
     """
-    return data.delete_case_with_id(c_id)
+    return data.delete_case_with_id(c_id, token)
 
-def create_case(body):
+def create_case(body, token):
     """ create_case method
 
     Adds the given case to the cases collection through the data layer
@@ -71,10 +73,11 @@ def create_case(body):
 
     Args:
         body (JSON): the body of the original POST request to be put in the collection
+        token (string): the token to be used for authentication
     Returns:
         Integer case_id to be used in all other HTTP requests
     """
-    c_id = data.create_case(body)
+    c_id = data.create_case(body, token)
     ret = {}
     ret['case_id'] = c_id
     ret['status'] = 'Success'
@@ -82,7 +85,7 @@ def create_case(body):
         ret['status'] = 'Failed to create ID'
     return ret
 
-def generic_get(collection_name, case_id):
+def generic_get(collection_name, case_id, token):
     """ generic_get method
 
     Performs the typical 'get' request, passing the case_id to the data layer
@@ -91,12 +94,13 @@ def generic_get(collection_name, case_id):
     Args:
         collection_name (string): the collection to be queried
         case_id (string || int): the case_id for querying
+        token (string): the token to be used for authentication
     Returns:
         Array of documents with the given case_id from the given collection
     """
-    return data.generic_get(collection_name, case_id)
+    return data.generic_get(collection_name, case_id, token)
 
-def generic_create(collection_name, body, case_id):
+def generic_create(collection_name, body, case_id, token):
     """ generic_create method
 
     Performs the typical 'post' request. Takes the body and case_id, passes
@@ -107,12 +111,13 @@ def generic_create(collection_name, body, case_id):
         collection_name (string): the collection to be queried
         body (json): document to be added to the collection
         case_id (string || int): the case_id for querying
+        token (string): the token to be used for authentication
     Returns:
         True if successfull, False otherwise
     """
-    return data.generic_create(collection_name, body, case_id)
+    return data.generic_create(collection_name, body, case_id, token)
 
-def generic_delete(collection_name, case_id):
+def generic_delete(collection_name, case_id, token):
     """ generic_delete method
 
     Performs the typical 'delete'. Passes the collection name and ID to the data layer.
@@ -122,10 +127,11 @@ def generic_delete(collection_name, case_id):
     Args:
         collection_name (string): the collection to be queried
         case_id (string || int): the case_id for querying
+        token (string): the token to be used for authentication
     Returns:
         True if successfull, False otherwise
     """
-    return data.generic_delete(collection_name, case_id)
+    return data.generic_delete(collection_name, case_id, token)
 
 def create_token(name):
     """ create_token method

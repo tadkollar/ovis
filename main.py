@@ -7,13 +7,13 @@ within data_server/
 Start with:
     python main.py
 """
-import data_server.presentation.presentation as presentation
-import tornado.httpserver
 import os
 import tornado.ioloop
 import tornado.options
 import tornado.web as web
+import tornado.httpserver
 import tornado.httpclient
+import data_server.presentation.presentation as presentation
 
 from tornado.options import define, options
 define("port", default=18403)

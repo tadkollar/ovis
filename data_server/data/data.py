@@ -62,34 +62,40 @@ def get_model_data():
     model_pickle = _CURSOR.fetchone()
     return pickle.loads(model_pickle[0])
 
-def get_all_cases():
+def get_all_cases(token):
     """ get_all_cases method
 
-    Returns all case documents from the cases collection.
+    Returns all case documents from the cases collection for which
+    the given token has access.
 
     Args:
-        None
+        token (string): 
     Returns:
         JSON array of case documents
     """
     cases_coll = _MDB[collections.CASES]
-    ret = cases_coll.find({}, {'_id': False})
+    ret = cases_coll.find({'users': token}, {'_id': False})
     return dumps(ret)
 
-def get_case_with_id(case_id):
+def get_case_with_id(case_id, token):
     """ get_case_with_id method
 
-    Returns the case document with the associated ID or 
+    Returns the case document with the associated ID or
     null if it does not exis in the DB.
 
     Args:
         case_id (string || int): ID to be used for querying
+        token (string): the token to be used for authentication
     Returns:
         JSON document corresponding to that case_id
     """
-    return _get(_MDB[collections.CASES], case_id, False)
+    case = _get(_MDB[collections.CASES], case_id, False)
+    if case and token in case['users']:
+        return _get(_MDB[collections.CASES], case_id, False)
+    else:
+        return { }
 
-def delete_case_with_id(case_id):
+def delete_case_with_id(case_id, token):
     """ delete_case_with_id method
 
     Deletes an entire case with the given case_id from *all* collections.
@@ -98,36 +104,39 @@ def delete_case_with_id(case_id):
 
     Args:
         case_id (string || int): ID to be used for querying
+        token (string): the token to be used for authentication
     Returns:
         True if anything was deleted, False otherwise.
     """
     #delete in all collections except 'cases'
-    generic_delete('driver_iterations', case_id)
-    generic_delete('driver_metadata', case_id)
-    generic_delete('global_iterations', case_id)
-    generic_delete('metadata', case_id)
-    generic_delete('solver_iterations', case_id)
-    generic_delete('solver_metadata', case_id)
-    generic_delete('system_iterations', case_id)
-    generic_delete('system_metadata', case_id)
+    generic_delete('driver_iterations', case_id, token)
+    generic_delete('driver_metadata', case_id, token)
+    generic_delete('global_iterations', case_id, token)
+    generic_delete('metadata', case_id, token)
+    generic_delete('solver_iterations', case_id, token)
+    generic_delete('solver_metadata', case_id, token)
+    generic_delete('system_iterations', case_id, token)
+    generic_delete('system_metadata', case_id, token)
 
     #delete the case in the 'cases' collection
     cases_coll = _MDB[collections.CASES]
-    queried = cases_coll.find({'case_id': int(case_id)})
+    queried = cases_coll.find({'$and': [{'case_id': int(case_id)}, {'users': token}]})
     if queried.count() == 0:
         return False
+
     cases_coll.delete_one({'case_id': int(case_id)})
     return True
 
-def create_case(body):
+def create_case(body, token):
     """ create_case method
 
     Creates a unique integer case_id, adds it to the given body,
-    and stores it in the cases collection in the DB. Returns the 
+    and stores it in the cases collection in the DB. Returns the
     new case_id. Returns -1 if the case was not successfully created.
 
     Args:
         case_id (string || int): ID to be used for querying
+        token (string): the token to be associated with this case
     Returns:
         Integer case_id. -1 if no case_id could be created.
     """
@@ -137,11 +146,12 @@ def create_case(body):
 
     body['case_id'] = case_id
     body['date'] = datetime.datetime.utcnow()
+    body['users'] = [token]
     cases_coll = _MDB[collections.CASES]
     cases_coll.insert_one(body)
     return case_id
 
-def generic_get(collection_name, case_id):
+def generic_get(collection_name, case_id, token):
     """ generic_get method
 
     Performs a generic 'get' request, which attempts to query and return
@@ -150,12 +160,13 @@ def generic_get(collection_name, case_id):
     Args:
         collection_name (string): the collection to query
         case_id (string || int): ID to be used for querying
+        token (string): the token to be used for authentication
     Returns:
         JSON array of documents returned from the query
     """
-    return _get(_MDB[collection_name], case_id)
+    return _get(_MDB[collection_name], case_id, token)
 
-def generic_create(collection_name, body, case_id):
+def generic_create(collection_name, body, case_id, token):
     """ generic_create method
 
     Performs a generic 'post' request, which takes the body,
@@ -166,12 +177,13 @@ def generic_create(collection_name, body, case_id):
         collection_name (string): the collection to query
         body (json): the document to be added to the collection
         case_id (string || int): ID to be used for querying
+        token (string): the token to be used for authentication
     Returns:
         True if successfull, False otherwise
     """
-    return _create(_MDB[collection_name], body, case_id)
+    return _create(_MDB[collection_name], body, case_id, token)
 
-def generic_delete(collection_name, case_id):
+def generic_delete(collection_name, case_id, token):
     """ generic_delete method
 
     Performs a generic 'delete' request, which attempts to delete all documents
@@ -181,10 +193,11 @@ def generic_delete(collection_name, case_id):
     Args:
         collection_name (string): the collection to query
         case_id (string || int): ID to be used for querying
+        token (string): the token to be used for authentication
     Returns:
         True if successfull, False otherwise
     """
-    return _delete(_MDB[collection_name], case_id)
+    return _delete(_MDB[collection_name], case_id, token)
 
 def user_exists(name):
     """ user_exists method
@@ -283,7 +296,7 @@ def _create_collections():
     if not 'users' in _MDB.collection_names():
         _MDB.create_collection('users')
 
-def _get(collection, case_id, get_many=True):
+def _get(collection, case_id, token, get_many=True):
     """ _get method
 
     Performs a generic 'get' request, which attempts to query and return
@@ -292,15 +305,18 @@ def _get(collection, case_id, get_many=True):
     Args:
         collection_name (string): the collection to query
         case_id (string || int): ID to be used for querying
+        token (string): the token to be used for authentication
+        get_many (bool): if true, finds all results. False finds only one.
+            Default true
     Returns:
         JSON array of documents returned from the query
     """
     if get_many:
-        return dumps(collection.find({'case_id': int(case_id)}, {'_id': False}))
+        return dumps(collection.find({'$and': [{'case_id': int(case_id)}, {'users': token}]}, {'_id': False}))
     else:
-        return dumps(collection.find_one({'case_id': int(case_id)}, {'_id': False}))
+        return dumps(collection.find_one({'$and': [{'case_id': int(case_id)}, {'users': token}]}, {'_id': False}))
 
-def _create(collection, body, case_id):
+def _create(collection, body, case_id, token):
     """ _create method
 
     Performs a generic 'post' request, which takes the body,
@@ -311,15 +327,17 @@ def _create(collection, body, case_id):
         collection_name (string): the collection to query
         body (json): the document to be added to the collection
         case_id (string || int): ID to be used for querying
+        token (string): the token to be used for authentication
     Returns:
         True if successfull, False otherwise
     """
     body['case_id'] = int(case_id)
     body['date'] = datetime.datetime.utcnow()
+    body['users'] = [token]
     collection.insert_one(body)
     return True
 
-def _delete(collection, case_id):
+def _delete(collection, case_id, token):
     """ _delete method
 
     Performs a generic 'delete' request, which attempts to delete all documents
@@ -329,13 +347,14 @@ def _delete(collection, case_id):
     Args:
         collection_name (string): the collection to query
         case_id (string || int): ID to be used for querying
+        token (string): the token to be used for authentication
     Returns:
         True if successfull, False otherwise
     """
-    queried = collection.find({'case_id': int(case_id)})
+    queried = collection.find({'$and': [{'case_id': int(case_id)}, {'users': token}]})
     if queried.count() == 0:
         return False
-    collection.delete_many({'case_id': int(case_id)})
+    collection.delete_many({'$and': [{'case_id': int(case_id)}, {'users': token}]})
     return True
 
 #endregion

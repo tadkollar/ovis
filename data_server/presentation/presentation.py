@@ -58,42 +58,18 @@ class CaseHandler(web.RequestHandler):
     """
     def get(self, *params):
         if len(params) == 0:
-            if self.request.headers.get('token') != _TOKEN:
-                ret = {}
-                ret['status'] = 'Failed'
-                ret['reasoning'] = 'Invalid token'
-                print('Received request with bad token')
-                self.write(ret)
-                return
-            #NOTE: should only get cases available to user
-            self.write(logic.get_all_cases())
+            self.write(logic.get_all_cases(self.request.headers.get('token')))
         else:
             self.render("../../public/dashboard.html")
 
     def post(self):
-        if self.request.headers.get('token') != _TOKEN:
-            ret = {}
-            ret['status'] = 'Failed'
-            ret['reasoning'] = 'Invalid token'
-            print('Received request with bad token')
-            self.write(ret)
-            return
-
         body = json.loads(self.request.body)
-        ret = logic.create_case(body)
+        ret = logic.create_case(body, self.request.headers.get('token'))
         self.write(ret)
 
     def delete(self, *params):
-        if self.request.headers.get('token') != _TOKEN:
-            ret = {}
-            ret['status'] = 'Failed'
-            ret['reasoning'] = 'Invalid token'
-            print('Received request with bad token')
-            self.write(ret)
-            return
-
         ret = _get_ret()
-        if logic.delete_case_with_id(params[0]):
+        if logic.delete_case_with_id(params[0], self.request.headers.get('token')):
             self.write(ret)
         else:
             ret['status'] = 'Failed'
@@ -134,7 +110,7 @@ class GlobalIterationsHandler(web.RequestHandler):
 
     Containslogic to get/post/delete data in the driver_metadata
     collection.
-    """    
+    """
     def get(self, *params):
         _generic_get(collections.GLOBAL_ITERATIONS, self, params[0])
 
@@ -234,6 +210,7 @@ class TokenHandler(web.RequestHandler):
         else:
             ret['token'] = token
         self.write(ret)
+
 #region private_methods
 
 def _get_ret():
@@ -265,20 +242,14 @@ def _generic_get(collection_name, request_handler, case_id):
     Returns:
         None
     """
-    if request_handler.request.headers.get('token') != _TOKEN:
-        ret = {}
-        ret['status'] = 'Failed'
-        ret['reasoning'] = 'Invalid token'
-        print('Received request with bad token')
-        request_handler.write(ret)
-        return
 
-    request_handler.write(logic.generic_get(collection_name, case_id))
+    request_handler.write(logic.generic_get(collection_name, case_id,
+                          request_handler.request.headers.get('token')))
 
 def _generic_post(collection_name, request_handler, case_id):
     """ _generic_post private method
 
-    Performs a typical 'post' request which adds the body of the 
+    Performs a typical 'post' request which adds the body of the
     POST request as a document to the given collection and responds
     with a status JSON object.
 
@@ -289,17 +260,11 @@ def _generic_post(collection_name, request_handler, case_id):
     Returns:
         None
     """
-    if request_handler.request.headers.get('token') != _TOKEN:
-        ret = {}
-        ret['status'] = 'Failed'
-        ret['reasoning'] = 'Invalid token'
-        print('Received request with bad token')
-        request_handler.write(ret)
-        return
 
     ret = _get_ret()
     body = json.loads(request_handler.request.body)
-    if logic.generic_create(collection_name, body, case_id):
+    if logic.generic_create(collection_name, body, case_id,
+                            request_handler.request.headers.get('token')):
         request_handler.write(ret)
     else:
         ret['status'] = 'Failed'
@@ -319,16 +284,10 @@ def _generic_delete(collection_name, request_handler, case_id):
     Returns:
         None
     """
-    if request_handler.request.headers.get('token') != _TOKEN:
-        ret = {}
-        ret['status'] = 'Failed'
-        ret['reasoning'] = 'Invalid token'
-        print('Received request with bad token')
-        request_handler.write(ret)
-        return
 
     ret = _get_ret()
-    if logic.generic_delete(collection_name, case_id):
+    if logic.generic_delete(collection_name, case_id,
+                            request_handler.request.headers.get('token')):
         request_handler.write(ret)
     else:
         ret['status'] = 'Failed'
