@@ -37,6 +37,7 @@ if __name__ == "__main__":
         (r"/case/(\d+)/solver_metadata", presentation.SolverMetadataHandler),
         (r"/case/(\d+)/system_iterations", presentation.SystemIterationsHandler),
         (r"/case/(\d+)/system_metadata", presentation.SystemMetadataHandler),
+        (r"/token", presentation.TokenHandler),
         (r"/(.*)", web.StaticFileHandler, {'path': public_root})
         ])
 

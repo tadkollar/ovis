@@ -126,3 +126,18 @@ def generic_delete(collection_name, case_id):
         True if successfull, False otherwise
     """
     return data.generic_delete(collection_name, case_id)
+
+def create_token(name):
+    """ create_token method
+
+    Checks to see if a user already exists. If not, sends a new token.
+
+    Args:
+        name (string): the user name
+    Returns: 
+        token if successful or -1 otherwise
+    """
+    if data.user_exists(name):
+        return -1
+
+    return data.get_new_token(name)

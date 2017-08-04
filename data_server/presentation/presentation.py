@@ -28,7 +28,7 @@ class IndexHandler(web.RequestHandler):
             self.write(ret)
             return
 
-        self.render("../../public/index.html")
+        self.render("../../public/dashboard.html")
 
 class ModelDataHandler(web.RequestHandler):
     """ ModelDataHandler class
@@ -68,7 +68,7 @@ class CaseHandler(web.RequestHandler):
             #NOTE: should only get cases available to user
             self.write(logic.get_all_cases())
         else:
-            self.render("../../public/index.html")
+            self.render("../../public/dashboard.html")
 
     def post(self):
         if self.request.headers.get('token') != _TOKEN:
@@ -219,6 +219,21 @@ class SystemMetadataHandler(web.RequestHandler):
     def delete(self, *params):
         _generic_delete(collections.SYSTEM_METADATA, self, params[0])
 
+class TokenHandler(web.RequestHandler):
+    """ Token Handler class
+
+    Contains logic to create a new token if passed a username
+    """
+    def post(self, *params):
+        body = json.loads(self.request.body)
+        token = logic.create_token(body['name'])
+        ret = _get_ret()
+        if token == -1:
+            ret['status'] = 'Failed'
+            ret['reasoning'] = 'Name already exists'
+        else:
+            ret['token'] = token
+        self.write(ret)
 #region private_methods
 
 def _get_ret():

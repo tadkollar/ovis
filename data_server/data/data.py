@@ -28,13 +28,14 @@ generic_delete : Deletes all documents with the given ID from the given
 
 """
 import os
+import string
+import pickle
 import random
 import sqlite3
 import datetime
-import pickle
-import data_server.shared.collections as collections
-from bson.json_util import dumps
 from pymongo import MongoClient
+from bson.json_util import dumps
+import data_server.shared.collections as collections
 
 _LOCATION = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 _SQLTIEDB_FILE = os.path.join(_LOCATION, 'sqlite_test')
@@ -185,7 +186,49 @@ def generic_delete(collection_name, case_id):
     """
     return _delete(_MDB[collection_name], case_id)
 
+def user_exists(name):
+    """ user_exists method
+
+    Checks to see if a user is in the DB. If so, returns true. False otherwise
+    """
+    users_coll = _MDB[collections.USERS]
+    return users_coll.find({'name': name}).count() > 0
+
+def get_new_token(name):
+    """ get_new_token method
+
+    Creates a new token and creates a new user with the token and username.
+
+    Args:
+        name (string): the user's name
+    Returns:
+        token (string): the token to be used by the user for recording
+    """
+    token = _create_token()
+    users_coll = _MDB[collections.USERS]
+    users_coll.insert({'name': name, 'token': token})
+    return token
+
 #region private
+
+def _create_token():
+    """ _create_token method
+
+    Attempts to create a unique token. Tries _MAX_ID_ATTEMPTS before giving up
+
+    Args:
+        None
+    Returns:
+        Token if a unique one is found, otherwise -1
+    """
+    attempts = 0
+    while True:
+        token = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
+        attempts += 1
+        if _MDB.users.find({'token': token}).count() == 0:
+            return token
+        elif attempts >= _MAX_ID_ATTEMPTS:
+            return -1
 
 def _get_case_id():
     """ _get_case_id method
@@ -237,6 +280,8 @@ def _create_collections():
         _MDB.create_collection('system_iterations')
     if not 'system_metadata' in _MDB.collection_names():
         _MDB.create_collection('system_metadata')
+    if not 'users' in _MDB.collection_names():
+        _MDB.create_collection('users')
 
 def _get(collection, case_id, get_many=True):
     """ _get method

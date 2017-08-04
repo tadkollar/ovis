@@ -22,24 +22,7 @@ function HTTP() {
             headers: {'token': 'squavy'},
             success: function(response) { success(response) }
         });
-
-        // var req = $.get(this.baseURL + path, function(response) {
-        //     if(success) {
-        //         success(response);
-        //     }
-        // })
-        // .fail(function(err) {
-        //     if(error) {
-        //         error(err);
-        //     }
-        // });
     };
 };
-
-// url: "http://localhost/PlatformPortal/Buyers/Account/SignIn",
-//          data: { signature: authHeader },
-//          type: "GET",
-//          beforeSend: function(xhr){xhr.setRequestHeader('X-Test-Header', 'test-value');},
-//          success: function() { alert('Success!' + authHeader); }
 
 var http = new HTTP();
