@@ -45,6 +45,7 @@ _CURSOR = _DB_CON.cursor()
 _MCLIENT = MongoClient('localhost', 27017)
 _MDB = _MCLIENT.openmdao_blue
 _MAX_ID_ATTEMPTS = 1000 #maximum number of attempts to try to create an ID
+_GLOBALLY_ACCEPTED_TOKEN = 'squavy'
 
 def get_model_data():
     """ get_model_data method
@@ -312,9 +313,15 @@ def _get(collection, case_id, token, get_many=True):
         JSON array of documents returned from the query
     """
     if get_many:
-        return dumps(collection.find({'$and': [{'case_id': int(case_id)}, {'users': token}]}, {'_id': False}))
+        if token != _GLOBALLY_ACCEPTED_TOKEN:
+            return dumps(collection.find({'case_id': int(case_id)}, {'_id': False}))
+        else:
+            return dumps(collection.find({'$and': [{'case_id': int(case_id)}, {'users': token}]}, {'_id': False}))
     else:
-        return dumps(collection.find_one({'$and': [{'case_id': int(case_id)}, {'users': token}]}, {'_id': False}))
+        if token != _GLOBALLY_ACCEPTED_TOKEN:
+            return dumps(collection.find_one({'case_id': int(case_id)}, {'_id': False}))
+        else:        
+            return dumps(collection.find_one({'$and': [{'case_id': int(case_id)}, {'users': token}]}, {'_id': False}))
 
 def _create(collection, body, case_id, token):
     """ _create method

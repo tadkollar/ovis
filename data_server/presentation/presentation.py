@@ -97,7 +97,7 @@ class DriverMetadataHandler(web.RequestHandler):
     collection.
     """
     def get(self, *params):
-        _generic_get(collections.DRIVER_METADATA, self, params[0])
+        _generic_get(collections.DRIVER_METADATA, self, _TOKEN)
 
     def post(self, *params):
         _generic_post(collections.DRIVER_METADATA, self, params[0])

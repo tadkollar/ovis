@@ -15,11 +15,10 @@ function HTTP() {
      * @param error - the failure callback. Should have one input, the reason for error
      */
     this.get = function(path, success, error) {
-        
         $.ajax({
             url: this.baseURL + path,
             type: 'GET',
-            headers: {'token': 'squavy'},
+            // headers: {'token': 'squavy'},
             success: function(response) { success(response) }
         });
     };
