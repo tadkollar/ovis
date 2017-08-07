@@ -313,15 +313,18 @@ def _get(collection, case_id, token, get_many=True):
         JSON array of documents returned from the query
     """
     if get_many:
-        if token != _GLOBALLY_ACCEPTED_TOKEN:
+        if token == _GLOBALLY_ACCEPTED_TOKEN:
             return dumps(collection.find({'case_id': int(case_id)}, {'_id': False}))
         else:
-            return dumps(collection.find({'$and': [{'case_id': int(case_id)}, {'users': token}]}, {'_id': False}))
+            return dumps(collection.find({'$and': [{'case_id': int(case_id)},
+                                         {'users': token}]}, {'_id': False}))
     else:
-        if token != _GLOBALLY_ACCEPTED_TOKEN:
-            return dumps(collection.find_one({'case_id': int(case_id)}, {'_id': False}))
-        else:        
-            return dumps(collection.find_one({'$and': [{'case_id': int(case_id)}, {'users': token}]}, {'_id': False}))
+        if token == _GLOBALLY_ACCEPTED_TOKEN:
+            return dumps(collection.find_one({'case_id': int(case_id)},
+                                             {'_id': False}))
+        else:
+            return dumps(collection.find_one({'$and': [{'case_id': int(case_id)},
+                                             {'users': token}]}, {'_id': False}))
 
 def _create(collection, body, case_id, token):
     """ _create method

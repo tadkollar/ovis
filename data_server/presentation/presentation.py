@@ -97,7 +97,7 @@ class DriverMetadataHandler(web.RequestHandler):
     collection.
     """
     def get(self, *params):
-        _generic_get(collections.DRIVER_METADATA, self, _TOKEN)
+        _generic_get(collections.DRIVER_METADATA, self, params[0], _TOKEN)
 
     def post(self, *params):
         _generic_post(collections.DRIVER_METADATA, self, params[0])
@@ -228,7 +228,7 @@ def _get_ret():
     ret['status'] = 'Success'
     return ret
 
-def _generic_get(collection_name, request_handler, case_id):
+def _generic_get(collection_name, request_handler, case_id, token=None):
     """ _generic_get private method
 
     Performs a typical 'get' request which accesses the collection given
@@ -239,12 +239,16 @@ def _generic_get(collection_name, request_handler, case_id):
         collection_name (string): name of collection to access
         request_handler (Object): object used for responding with data
         case_id (string || int): the associated case_id for querying
+        token (string): token to be used. If set to None (default)
+            will automaticlaly grab from header
     Returns:
         None
     """
 
+    if token is None:
+        token = request_handler.request.headers.get('token')
     request_handler.write(logic.generic_get(collection_name, case_id,
-                          request_handler.request.headers.get('token')))
+                                            token))
 
 def _generic_post(collection_name, request_handler, case_id):
     """ _generic_post private method
