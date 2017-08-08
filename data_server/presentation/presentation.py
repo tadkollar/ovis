@@ -20,15 +20,7 @@ class IndexHandler(web.RequestHandler):
         view existing cases.
     """
     def get(self):
-        if self.request.headers.get('token') != _TOKEN:
-            ret = {}
-            ret['status'] = 'Failed'
-            ret['reasoning'] = 'Invalid token'
-            print('Received request with bad token')
-            self.write(ret)
-            return
-
-        self.render("../../public/dashboard.html")
+        self.render("../../public/login.html")
 
 class ModelDataHandler(web.RequestHandler):
     """ ModelDataHandler class
@@ -202,7 +194,7 @@ class TokenHandler(web.RequestHandler):
     """
     def post(self, *params):
         body = json.loads(self.request.body)
-        token = logic.create_token(body['name'])
+        token = logic.create_token(body['name'], body['email'])
         ret = _get_ret()
         if token == -1:
             ret['status'] = 'Failed'

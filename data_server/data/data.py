@@ -200,27 +200,31 @@ def generic_delete(collection_name, case_id, token):
     """
     return _delete(_MDB[collection_name], case_id, token)
 
-def user_exists(name):
+def user_exists(email):
     """ user_exists method
 
     Checks to see if a user is in the DB. If so, returns true. False otherwise
+
+    Args:
+        email (string): the email to check agianst
     """
     users_coll = _MDB[collections.USERS]
-    return users_coll.find({'name': name}).count() > 0
+    return users_coll.find({'email': email}).count() > 0
 
-def get_new_token(name):
+def get_new_token(name, email):
     """ get_new_token method
 
     Creates a new token and creates a new user with the token and username.
 
     Args:
         name (string): the user's name
+        email (string): the user's email
     Returns:
         token (string): the token to be used by the user for recording
     """
     token = _create_token()
     users_coll = _MDB[collections.USERS]
-    users_coll.insert({'name': name, 'token': token})
+    users_coll.insert({'name': name, 'token': token, 'email': email})
     return token
 
 #region private

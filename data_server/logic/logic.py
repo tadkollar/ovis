@@ -133,17 +133,18 @@ def generic_delete(collection_name, case_id, token):
     """
     return data.generic_delete(collection_name, case_id, token)
 
-def create_token(name):
+def create_token(name, email):
     """ create_token method
 
     Checks to see if a user already exists. If not, sends a new token.
 
     Args:
         name (string): the user name
+        email (string): the user's email
     Returns: 
         token if successful or -1 otherwise
     """
-    if data.user_exists(name):
+    if data.user_exists(email):
         return -1
 
-    return data.get_new_token(name)
+    return data.get_new_token(name, email)
