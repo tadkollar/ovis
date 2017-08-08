@@ -18,7 +18,7 @@
 </head>
 
 <body>
-    <div class="panel-heading">
+     <div class="panel-heading">
         <div class="panel-title text-center">
             <h1 class="title">OpenMDAO Visualization</h1>
             <hr />
@@ -52,7 +52,7 @@
                     </div>
 
                     <div class="form-group ">
-                        <button type="button" class="btn btn-primary btn-lg btn-block login-button" onClick="register()">Register</button>
+                        <button type="button" class="btn btn-primary btn-lg btn-block login-button" onClick="register()" data-toggle="modal" data-target="#registerModal">Register</button>
                     </div>
                 </form>
             </div>
@@ -76,10 +76,38 @@
                 </form>
             </div>
         </div>
+    </div> 
+
+    <!-- Modal -->
+    <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="registerModalTitle" style="text-align: horizontal">Register Status</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="registerSuccessBody" style="display: none">
+                        <strong> Token is:</strong> <i><span id="tokenText"></span></i>
+                        <br/>
+                        <br/>
+                        <p>Copy the token and keep it somewhere safe! Use the token in your <i>WebRecorder</i> 
+                        to start logging to the server</p>
+                    </div>
+                    <div id="registerFailBody" style="display: none"><strong>Failed with reasoning: </strong><i><span id="failedText"></span></i></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="registerSuccessClose" style="display: none">Close</button>
+                    <button type="button" class="btn btn-primary" id="registerSuccessOkay" style="display: none">Okay</button>
+                </div>
+            </div>
+        </div>
     </div>
+
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
+        crossorigin="anonymous"></script>
     <script type="text/javascript" src="../libs/http.js"></script>
     <script type="text/javascript" src="../src/login/login.js"></script>
 </body>
