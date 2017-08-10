@@ -38,6 +38,8 @@ if __name__ == "__main__":
         (r"/case/(\d+)/system_iterations", presentation.SystemIterationsHandler),
         (r"/case/(\d+)/system_metadata", presentation.SystemMetadataHandler),
         (r"/token", presentation.TokenHandler),
+        (r"/login", presentation.LoginHandler),
+        (r"/login/([a-zA-Z0-9]+)", presentation.LoginHandler),
         (r"/(.*)", web.StaticFileHandler, {'path': public_root})
         ])
 

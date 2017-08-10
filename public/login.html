@@ -18,10 +18,9 @@
 </head>
 
 <body>
-     <div class="panel-heading">
-        <div class="panel-title text-center">
-            <h1 class="title">OpenMDAO Visualization</h1>
-            <hr />
+    <div class="container">
+        <div class="jumbotron">
+            <h1>OpenMDAO Visualization</h1>
         </div>
     </div>
 
@@ -71,7 +70,7 @@
                     </div>
 
                     <div class="form-group ">
-                        <button type="button" class="btn btn-primary btn-lg btn-block login-button" onClick="">Login</button>
+                        <button type="button" class="btn btn-primary btn-lg btn-block login-button" onClick="loginPress()">Login</button>
                     </div>
                 </form>
             </div>
@@ -84,7 +83,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="registerModalTitle" style="text-align: horizontal">Register Status</h4>
+                    <h4 class="modal-title" id="successModalTitle" style="text-align: center">Successfully Registered!</h4>
+                    <h4 class="modal-title" id="failModalTitle" style="text-align: center; display: none">Failed to Register</h4>
                 </div>
                 <div class="modal-body">
                     <div id="registerSuccessBody" style="display: none">
@@ -92,13 +92,13 @@
                         <br/>
                         <br/>
                         <p>Copy the token and keep it somewhere safe! Use the token in your <i>WebRecorder</i> 
-                        to start logging to the server</p>
+                        to start logging to the server.</p>
                     </div>
                     <div id="registerFailBody" style="display: none"><strong>Failed with reasoning: </strong><i><span id="failedText"></span></i></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal" id="registerSuccessClose" style="display: none">Close</button>
-                    <button type="button" class="btn btn-primary" id="registerSuccessOkay" style="display: none">Okay</button>
+                    <button type="button" class="btn btn-primary" id="registerSuccessOkay" style="display: none" onclick="loginRegister()">Okay</button>
                 </div>
             </div>
         </div>

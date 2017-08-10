@@ -1,4 +1,6 @@
 
+var tempToken = -1;
+
 var register = function () {
     var name = document.getElementById('name').value;
     var email = document.getElementById('email').value;
@@ -11,6 +13,9 @@ var register = function () {
             $('#registerSuccessClose').hide();
             $('#registerSuccessOkay').show();
             $('#tokenText').text(response.token);
+            $('#successModalTitle').show();
+            $('#failModalTitle').hide();
+            tempToken = response.token;
         }
         else {
             $('#registerSuccessBody').hide();
@@ -18,12 +23,40 @@ var register = function () {
             $('#registerSuccessClose').show();
             $('#registerSuccessOkay').hide();
             $('#failedText').text(response.reasoning);
+            $('#successModalTitle').hide();
+            $('#failModalTitle').show();
+            tempToken = -1;
         }
     });
 };
 
-var login = function () {
+var loginPress = function () {
     var token = document.getElementById('token').value;
+    if(token) {
+        login(token);
+    }
+    else {
+        console.log("Enter a token!");
+    }
+}
 
-    //Send to server, maybe redirect?
+var loginRegister = function() {
+    login(tempToken);
+}
+
+var login = function(token=-1) {
+    if(token != -1) {
+        http.post('login', {'token': token}, function(result) {
+            if(result.status == "Success") {
+                window.location.href += ('login/' + token);
+            }
+            else {
+                console.log("Failed to login")
+            }
+        });
+        console.log("Sending: " + token);
+    }
+    else {
+        console.log("Token was -1");
+    }
 }

@@ -146,7 +146,7 @@ def create_case(body, token):
         return case_id
 
     body['case_id'] = case_id
-    body['date'] = datetime.datetime.utcnow()
+    body['date'] = str(datetime.datetime.utcnow())
     body['users'] = [token]
     cases_coll = _MDB[collections.CASES]
     cases_coll.insert_one(body)
@@ -226,6 +226,19 @@ def get_new_token(name, email):
     users_coll = _MDB[collections.USERS]
     users_coll.insert({'name': name, 'token': token, 'email': email})
     return token
+
+def token_exists(token):
+    """ token_exists method
+
+    Checks to see if a token exists in the database
+
+    Args:
+        token (string): the token to be checked
+    Returns:
+        True if exists, False otherwise
+    """
+    users_coll = _MDB[collections.USERS]
+    return users_coll.find({'token': token}).count() > 0
 
 #region private
 
@@ -346,7 +359,7 @@ def _create(collection, body, case_id, token):
         True if successfull, False otherwise
     """
     body['case_id'] = int(case_id)
-    body['date'] = datetime.datetime.utcnow()
+    body['date'] = str(datetime.datetime.utcnow())
     body['users'] = [token]
     collection.insert_one(body)
     return True

@@ -7,6 +7,10 @@ between the presentation and data layers. This is the middle layer in the
 This layer is primarily used to do any data conversion between the expectation
 at the presentation layer and the expectation at the data layer.
 """
+import json
+import time
+from dateutil import tz
+from datetime import datetime
 import data_server.data.data as data
 
 def get_model_data():
@@ -34,7 +38,22 @@ def get_all_cases(token):
     Returns:
         JSON array of all case documents
     """
-    return data.get_all_cases(token)
+    cases = json.loads(data.get_all_cases(token))
+    for case in cases:
+        ind = case['date'].find('.')
+        if ind > -1:
+            case['date'] = case['date'][:ind]
+        from_zone = tz.tzutc()
+        to_zone = tz.tzlocal()
+        case['date'] = datetime.strptime(case['date'], '%Y-%m-%d %H:%M:%S')
+        case['date'] = case['date'].replace(tzinfo=from_zone).astimezone(to_zone)
+        case['datestring'] = case['date'].strftime('%b %d, %Y at %I:%M %p')
+
+    #sort by date
+    cases.sort(key=lambda x: x['date'])
+    cases = list(reversed(cases))
+
+    return cases
 
 def get_case_with_id(c_id, token):
     """ get_case_with_id method
@@ -141,10 +160,22 @@ def create_token(name, email):
     Args:
         name (string): the user name
         email (string): the user's email
-    Returns: 
+    Returns:
         token if successful or -1 otherwise
     """
     if data.user_exists(email):
         return -1
 
     return data.get_new_token(name, email)
+
+def token_exists(token):
+    """ token_exists method
+
+    Checks to see if a token exists in the database
+
+    Args:
+        token (string): the token to be checked
+    Returns:
+        True if exists, False otherwise
+    """
+    return data.token_exists(token)

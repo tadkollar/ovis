@@ -203,6 +203,25 @@ class TokenHandler(web.RequestHandler):
             ret['token'] = token
         self.write(ret)
 
+class LoginHandler(web.RequestHandler):
+    """ Login Handler class
+
+    Contains logic to determine if login is successfull
+    """
+    def post(self, *params):
+        body = json.loads(self.request.body)
+        ret = _get_ret()
+        if logic.token_exists(body['token']):
+            self.write(ret)
+        else:
+            ret['status'] = 'Failed'
+            ret['reasoning'] = 'Bad key'
+            self.write(ret)
+
+    def get(self, *params):
+        cases = logic.get_all_cases(params[0])
+        
+        self.render("../../public/list_cases.html", cases=cases)
 #region private_methods
 
 def _get_ret():
