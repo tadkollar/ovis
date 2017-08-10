@@ -3,7 +3,7 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../libs/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/visualization/libs/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
 
     <title>OpenMDAO Visualization</title>
@@ -27,7 +27,7 @@
                 </thead>
                 <tbody>
                     {% for case in cases %}
-                    <tr onclick="window.document.location='../case/{{case[" case_id "]}}'" style="cursor: pointer">
+                    <tr onclick="window.document.location='../case/{{case["case_id"]}}'" style="cursor: pointer">
                         <td>{{case['case_name']}}</td>
                         <td align="center">{{case['datestring']}}</td>
                         <td align="center"><button class="btn btn-sm btn-danger"><i class="fa fa-remove"></i></button></td>

@@ -48,7 +48,9 @@ var login = function(token=-1) {
     if(token != -1) {
         http.post('login', {'token': token}, function(result) {
             if(result.status == "Success") {
-                window.location.href += ('login/' + token);
+		var newHref = window.location.href + '/login/' + token;
+		console.log(newHref);
+                window.location.href = newHref;
             }
             else {
                 console.log("Failed to login")
