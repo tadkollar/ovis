@@ -46,7 +46,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
     var pTreeGroup = svg.append("g");
 
     function updateRootTypes() {
-        if (!showParams) return;
+        if (!search.showParams) return;
 
         var stack = []
         for (var i = 0; i < root.children.length; ++i) {
@@ -112,7 +112,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
         .attr("width", WIDTH_N2_PX)
         .attr("height", ptn2.HEIGHT_PX)
         .on("click", function () {
-            if (!showParams) return;
+            if (!search.showParams) return;
             var coords = d3.mouse(this);
             var c = Math.floor(coords[0] * d3RightTextNodesArrayZoomed.length / WIDTH_N2_PX);
             var r = Math.floor(coords[1] * d3RightTextNodesArrayZoomed.length / ptn2.HEIGHT_PX);
@@ -149,7 +149,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             PrintConnects();
         })
         .on("mousemove", function () {
-            if (!showParams) return;
+            if (!search.showParams) return;
             var coords = d3.mouse(this);
             var c = Math.floor(coords[0] * d3RightTextNodesArrayZoomed.length / WIDTH_N2_PX);
             var r = Math.floor(coords[1] * d3RightTextNodesArrayZoomed.length / ptn2.HEIGHT_PX);
@@ -546,7 +546,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                 }
             }
             if (d === zoomedElement) return;
-            if (!showParams && (d.type === "param" || d.type === "unconnected_param")) return;
+            if (!search.showParams && (d.type === "param" || d.type === "unconnected_param")) return;
 
             var n = d.name;
             if (d.splitByColon && d.children && d.children.length > 0) n += ":";
@@ -558,14 +558,14 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             namesToAdd.forEach(function (name) {
                 if (!autoCompleteSetNames.hasOwnProperty(name)) {
                     autoCompleteSetNames[name] = true;
-                    autoCompleteListNames.push(name);
+                    search.autoCompleteListNames.push(name);
                 }
             });
 
             var localPathName = (zoomedElement === root) ? d.absPathName : d.absPathName.slice(zoomedElement.absPathName.length + 1);
             if (!autoCompleteSetPathNames.hasOwnProperty(localPathName)) {
                 autoCompleteSetPathNames[localPathName] = true;
-                autoCompleteListPathNames.push(localPathName);
+                search.autoCompleteListPathNames.push(localPathName);
             }
         }
 
@@ -575,7 +575,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
         }
 
         function UpdateTextWidths(d) {
-            if ((!showParams && (d.type === "param" || d.type === "unconnected_param")) || d.varIsHidden) return;
+            if ((!search.showParams && (d.type === "param" || d.type === "unconnected_param")) || d.varIsHidden) return;
             d.nameWidthPx = GetTextWidth(GetText(d)) + 2 * RIGHT_TEXT_MARGIN_PX;
             if (d.children) {
                 for (var i = 0; i < d.children.length; ++i) {
@@ -589,7 +589,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             var leafWidthsPx = new Array(maxDepth + 1).fill(0.0);
 
             function DoComputeColumnWidths(d) {
-                if ((!showParams && (d.type === "param" || d.type === "unconnected_param")) || d.varIsHidden) return;
+                if ((!search.showParams && (d.type === "param" || d.type === "unconnected_param")) || d.varIsHidden) return;
 
                 var heightPx = ptn2.HEIGHT_PX * d.numLeaves / zoomedElement.numLeaves;
                 d.textOpacity0 = d.hasOwnProperty('textOpacity') ? d.textOpacity : 0;
@@ -629,7 +629,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
 
 
         function ComputeLeaves(d) {
-            if ((!showParams && (d.type === "param" || d.type === "unconnected_params")) || d.varIsHidden) {
+            if ((!search.showParams && (d.type === "param" || d.type === "unconnected_params")) || d.varIsHidden) {
                 d.numLeaves = 0;
                 return;
             }
@@ -646,9 +646,9 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
         function ComputeNormalizedPositions(d, leafCounter, isChildOfZoomed, earliestMinimizedParent) {
             isChildOfZoomed = (isChildOfZoomed) ? true : (d === zoomedElement);
             if (earliestMinimizedParent == null && isChildOfZoomed) {
-                if ((showParams || (d.type !== "param" && d.type !== "unconnected_param")) && !d.varIsHidden) d3NodesArray.push(d);
+                if ((search.showParams || (d.type !== "param" && d.type !== "unconnected_param")) && !d.varIsHidden) d3NodesArray.push(d);
                 if (!d.children || d.isMinimized) { //at a "leaf" node
-                    if ((showParams || (d.type !== "param" && d.type !== "unconnected_param")) && !d.varIsHidden) d3RightTextNodesArrayZoomed.push(d);
+                    if ((search.showParams || (d.type !== "param" && d.type !== "unconnected_param")) && !d.varIsHidden) d3RightTextNodesArrayZoomed.push(d);
                     earliestMinimizedParent = d;
                 }
             }
@@ -663,7 +663,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             d.y = leafCounter / root.numLeaves;
             d.width = (d.children && !d.isMinimized) ? (columnWidthsPx[node.depth] / ptn2.widthPTreePx) : 1 - node.x;//1-d.x;
             d.height = node.numLeaves / root.numLeaves;
-            if ((!showParams && (d.type === "param" || d.type === "unconnected_param")) || d.varIsHidden) { //param or hidden leaf leaving
+            if ((!search.showParams && (d.type === "param" || d.type === "unconnected_param")) || d.varIsHidden) { //param or hidden leaf leaving
                 d.x = columnLocationsPx[d.parentComponent.depth + 1] / ptn2.widthPTreePx;
                 d.y = d.parentComponent.y;
                 d.width = 1e-6;
@@ -703,8 +703,8 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
         }
 
         if (updateRecomputesAutoComplete) {
-            autoCompleteListNames = [];
-            autoCompleteListPathNames = [];
+            search.autoCompleteListNames = [];
+            search.autoCompleteListPathNames = [];
             PopulateAutoCompleteList(zoomedElement);
         }
         updateRecomputesAutoComplete = true; //default
@@ -1097,7 +1097,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             for (var si = 0; si < d3RightTextNodesArrayZoomed.length; ++si) {
                 var srcObj = d3RightTextNodesArrayZoomed[si];
                 matrix[si + "_" + si] = { "r": si, "c": si, "obj": srcObj, "id": srcObj.id + "_" + srcObj.id };
-                var targets = (showParams) ? srcObj.targetsParamView : srcObj.targetsHideParams;
+                var targets = (search.showParams) ? srcObj.targetsParamView : srcObj.targetsHideParams;
                 for (var j = 0; j < targets.length; ++j) {
                     var tgtObj = targets[j];
                     var ti = d3RightTextNodesArrayZoomed.indexOf(tgtObj);
@@ -1105,7 +1105,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                         matrix[si + "_" + ti] = { "r": si, "c": ti, "obj": srcObj, "id": srcObj.id + "_" + tgtObj.id }; //matrix[si][ti].z = 1;
                     }
                 }
-                if (showParams && (srcObj.type === "param" || srcObj.type === "unconnected_param")) {
+                if (search.showParams && (srcObj.type === "param" || srcObj.type === "unconnected_param")) {
                     for (var j = si + 1; j < d3RightTextNodesArrayZoomed.length; ++j) {
                         var tgtObj = d3RightTextNodesArrayZoomed[j];
                         if (srcObj.parentComponent !== tgtObj.parentComponent) break;
@@ -1143,7 +1143,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             if (d.c == d.r) { //on diagonal
                 if (srcObj.type === "subsystem") { //group
                     symbols_group.push(d);
-                } else if (srcObj.type === "unknown" || (showParams && (srcObj.type === "param" || srcObj.type === "unconnected_param"))) {
+                } else if (srcObj.type === "unknown" || (search.showParams && (srcObj.type === "param" || srcObj.type === "unconnected_param"))) {
                     if (srcObj.dtype === "ndarray") { //vector
                         symbols_vector.push(d);
                     } else { //scalar
@@ -1156,7 +1156,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                 if (tgtObj.type === "subsystem") { //groupGroup
                     symbols_groupGroup.push(d);
                 }
-                else if (tgtObj.type === "unknown" || (showParams && (tgtObj.type === "param" || tgtObj.type === "unconnected_param"))) {
+                else if (tgtObj.type === "unknown" || (search.showParams && (tgtObj.type === "param" || tgtObj.type === "unconnected_param"))) {
                     if (tgtObj.dtype === "ndarray") {//groupVector
                         symbols_groupVector.push(d);
                     }
@@ -1165,10 +1165,10 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                     }
                 }
             }
-            else if (srcObj.type === "unknown" || (showParams && (srcObj.type === "param" || srcObj.type === "unconnected_param"))) {
+            else if (srcObj.type === "unknown" || (search.showParams && (srcObj.type === "param" || srcObj.type === "unconnected_param"))) {
                 if (srcObj.dtype === "ndarray") {
-                    if (tgtObj.type === "unknown" || (showParams && (tgtObj.type === "param" || tgtObj.type === "unconnected_param"))) {
-                        if (tgtObj.dtype === "ndarray" || (showParams && (tgtObj.type === "param" || tgtObj.type === "unconnected_param"))) {//vectorVector
+                    if (tgtObj.type === "unknown" || (search.showParams && (tgtObj.type === "param" || tgtObj.type === "unconnected_param"))) {
+                        if (tgtObj.dtype === "ndarray" || (search.showParams && (tgtObj.type === "param" || tgtObj.type === "unconnected_param"))) {//vectorVector
                             symbols_vectorVector.push(d);
                         }
                         else {//vectorScalar
@@ -1181,7 +1181,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                     }
                 }
                 else { //if (srcObj.dtype !== "ndarray"){
-                    if (tgtObj.type === "unknown" || (showParams && (tgtObj.type === "param" || tgtObj.type === "unconnected_param"))) {
+                    if (tgtObj.type === "unknown" || (search.showParams && (tgtObj.type === "param" || tgtObj.type === "unconnected_param"))) {
                         if (tgtObj.dtype === "ndarray") {//scalarVector
                             symbols_scalarVector.push(d);
                         }
@@ -1310,7 +1310,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                 n2Dx * d.c + n2Dx * .5, //left x2
                 n2Dy * d.r + n2Dy * .5, //left y2
                 n2Dx * d.c + n2Dx * .5, //up x3
-                (showParams) ? n2Dy * d.c + n2Dy - 1e-2 : n2Dy * (boxEnd.stopI) + n2Dy - 1e-2, //up y3
+                (search.showParams) ? n2Dy * d.c + n2Dy - 1e-2 : n2Dy * (boxEnd.stopI) + n2Dy - 1e-2, //up y3
                 ptn2.RED_ARROW_COLOR, lineWidth, true);
 
             var targetsWithCycleArrows = [];
@@ -1353,7 +1353,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                             }
 
                             if (firstBeginIndex != firstEndIndex) {
-                                if (showParams) {
+                                if (search.showParams) {
                                     DrawArrowsParamView(firstBeginIndex, firstEndIndex);
                                 }
                                 else {
@@ -1372,7 +1372,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                 n2Dx * d.c + n2Dx * .5, //right x2
                 n2Dy * d.r + n2Dy * .5, //right y2
                 n2Dx * d.c + n2Dx * .5, //down x3
-                (showParams) ? n2Dy * d.c + 1e-2 : n2Dy * boxEnd.startI + 1e-2, //down y3
+                (search.showParams) ? n2Dy * d.c + 1e-2 : n2Dy * boxEnd.startI + 1e-2, //down y3
                 ptn2.RED_ARROW_COLOR, lineWidth, true);
         }
         var leftTextWidthR = d3RightTextNodesArrayZoomed[d.r].nameWidthPx,
@@ -1397,7 +1397,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             var box = d3RightTextNodesArrayZoomedBoxInfo[i];
             if (matrix[hoveredIndexRC + "_" + i] !== undefined) { //if (matrix[hoveredIndexRC][i].z > 0) { //i is column here
                 if (i < hoveredIndexRC) { //column less than hovered
-                    if (showParams) {
+                    if (search.showParams) {
                         DrawPathTwoLines(
                             n2Dx * hoveredIndexRC, //x1
                             n2Dy * (hoveredIndexRC + .5), //y1
@@ -1420,7 +1420,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                     DrawRect(-leftTextWidthDependency - PTREE_N2_GAP_PX, n2Dy * i, leftTextWidthDependency, n2Dy, ptn2.GREEN_ARROW_COLOR); //highlight var name
 
                 } else if (i > hoveredIndexRC) { //column greater than hovered
-                    if (showParams) {
+                    if (search.showParams) {
                         DrawPathTwoLines(
                             n2Dx * hoveredIndexRC + n2Dx, //x1
                             n2Dy * (hoveredIndexRC + .5), //y1
@@ -1599,8 +1599,8 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
 
     function ShowParamsCheckboxChange() {
         if (zoomedElement.type === "param" || zoomedElement.type === "unconnected_param") return;
-        showParams = !showParams;
-        parentDiv.querySelector("#showParamsButtonId").className = showParams ? "myButton myButtonToggledOn" : "myButton";
+        search.showParams = !search.showParams;
+        parentDiv.querySelector("#search.showParamsButtonId").className = search.showParams ? "myButton myButtonToggledOn" : "myButton";
 
         FindRootOfChangeFunction = FindRootOfChangeForShowParams;
         lastClickWasLeft = false;
@@ -1624,7 +1624,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
     }
 
     function CreateDomLayout() {
-        document.getElementById("searchButtonId").onclick = SearchButtonClicked;
+        document.getElementById("searchButtonId").onclick = search.SearchButtonClicked;
     }
 
     function CreateToolbar() {
@@ -1657,7 +1657,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
         }
 
         div.querySelector("#saveSvgButtonId").onclick = function () { SaveSvg(parentDiv) };
-        div.querySelector("#helpButtonId").onclick = DisplayModal;
+        div.querySelector("#helpButtonId").onclick = modal.DisplayModal;
     }
 
     return {
@@ -1678,12 +1678,17 @@ var treeData, connectionList;
 var url = window.location.href;
 var url_split = url.split('/');
 var case_id = url_split[url_split.length - 1];
+var modal;
+var search;
 ptn2.initializeTree = function () {
     http.get("case/" + case_id + '/driver_metadata', function (response) {
         var data = JSON.parse(response)[0];
-        treeData = JSON.parse(data['model_viewer_data'])
+        treeData = JSON.parse(data['model_viewer_data']);
         zoomedElement = treeData['tree'];
-        lastLeftClickedElement = document.getElementById("ptN2ContentDivId")
+        lastLeftClickedElement = document.getElementById("ptN2ContentDivId");
+        parentDiv = lastLeftClickedElement;
+        modal = new newModal();
+        search = newSearchObj();
         var app = PtN2Diagram(lastLeftClickedElement, treeData['tree'], treeData['connections_list']);
     });
 }
