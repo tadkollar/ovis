@@ -1,7 +1,6 @@
 var createPlot = function (container) {
-    var element = document.getElementById('plot');
-    console.log("width0: " + container.width);
-    console.log("height0: " + container.height);
+    var element = container.getElement()[0].firstChild;
+    // var element = document.getElementById('plot');
     element.style.width = container.width.toString() + 'px';
     element.style.height = container.height.toString() + 'px'
 
@@ -15,9 +14,6 @@ var createPlot = function (container) {
     }
 
     var resize = function () {
-        console.log("width: " + container.width);
-        console.log("height: " + container.height);
-
         element.style.width = container.width.toString() + 'px';
         element.style.height = container.height.toString() + 'px';
         Plotly.relayout(element, {

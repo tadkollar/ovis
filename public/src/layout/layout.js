@@ -9,11 +9,11 @@ var config = {
             type: 'column',
             content: [{
                 type: 'component',
-                componentName: 'Plot',
+                componentName: 'Plot1',
                 componentState: { label: 'B' }
             }, {
                 type: 'component',
-                componentName: 'testComponent',
+                componentName: 'Plot2',
                 componentState: { label: 'C' }
             }]
         }]
@@ -28,15 +28,18 @@ myLayout.registerComponent('Partition Tree and N<sup>2</sup>', function (contain
     });
 });
 
-myLayout.registerComponent('Plot', function (container, componentState) {
+myLayout.registerComponent('Plot1', function (container, componentState) {
     http.get("components/plot.html", function (response) {
         container.getElement().html(response);
         createPlot(container);
     });
 });
 
-myLayout.registerComponent('testComponent', function (container, componentState) {
-    container.getElement().html('<h2>' + componentState.label + '</h2>');
+myLayout.registerComponent('Plot2', function (container, componentState) {
+    http.get("components/plot.html", function (response) {
+        container.getElement().html(response);
+        createPlot(container);
+    });
 });
 
 myLayout.init();
