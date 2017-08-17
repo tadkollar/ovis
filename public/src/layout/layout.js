@@ -9,7 +9,7 @@ var config = {
             type: 'column',
             content: [{
                 type: 'component',
-                componentName: 'testComponent',
+                componentName: 'Plot',
                 componentState: { label: 'B' }
             }, {
                 type: 'component',
@@ -20,15 +20,22 @@ var config = {
     }]
 };
 
-var myLayout =  new GoldenLayout( config );
-myLayout.registerComponent('Partition Tree and N<sup>2</sup>', function(container, componentState) {
-    http.get("components/partition_tree_n2.html", function(response) {
+var myLayout = new GoldenLayout(config);
+myLayout.registerComponent('Partition Tree and N<sup>2</sup>', function (container, componentState) {
+    http.get("components/partition_tree_n2.html", function (response) {
         container.getElement().html(response);
         ptn2.initializeTree();
     });
 });
 
-myLayout.registerComponent('testComponent', function(container, componentState) {
+myLayout.registerComponent('Plot', function (container, componentState) {
+    http.get("components/plot.html", function (response) {
+        container.getElement().html(response);
+        createPlot(container);
+    });
+});
+
+myLayout.registerComponent('testComponent', function (container, componentState) {
     container.getElement().html('<h2>' + componentState.label + '</h2>');
 });
 
