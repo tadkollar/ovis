@@ -1,4 +1,3 @@
-
 var createPlot = function (container) {
     var element = document.getElementById('plot');
     console.log("width0: " + container.width);
@@ -15,11 +14,17 @@ var createPlot = function (container) {
         );
     }
 
-    container.on('resize', function () {
+    var resize = function () {
         console.log("width: " + container.width);
         console.log("height: " + container.height);
 
         element.style.width = container.width.toString() + 'px';
         element.style.height = container.height.toString() + 'px';
-    });
-}
+        Plotly.relayout(element, {
+            width: container.width,
+            height: container.height
+        });
+    };
+
+    container.on('resize', resize);
+};
