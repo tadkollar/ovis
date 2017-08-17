@@ -1689,6 +1689,7 @@ ptn2.initializeTree = function () {
         parentDiv = lastLeftClickedElement;
         modal = new newModal();
         search = newSearchObj();
+        getContextMenu();
         var app = PtN2Diagram(lastLeftClickedElement, treeData['tree'], treeData['connections_list']);
     });
 }

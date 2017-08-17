@@ -1,8 +1,17 @@
-var menu = document.querySelector('#context-menu');
-var menuItems = menu.querySelectorAll('.context-menu__item');
-var menuState = 0;
-var menuWidth, menuHeight;
-var menuPosition;
-var menuPositionX, menuPositionY;
+var contextMenuObj = {}
 
-var windowWidth, windowHeight;
+var getContextMenu = function () {
+    contextMenuObj.menu = document.querySelector('#context-menu');
+    contextMenuObj.menuItems = contextMenuObj.menu.querySelectorAll('.context-menu__item');
+    contextMenuObj.menuState = 0;
+    contextMenuObj.menuWidth;
+    contextMenuObj.menuHeight;
+    contextMenuObj.menuPosition;
+    contextMenuObj.menuPositionX
+    contextMenuObj.menuPositionY;
+
+    contextMenuObj.windowWidth;
+    contextMenuObj.windowHeight;
+
+    return contextMenuObj
+}
