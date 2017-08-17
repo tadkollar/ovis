@@ -1600,7 +1600,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
     function ShowParamsCheckboxChange() {
         if (zoomedElement.type === "param" || zoomedElement.type === "unconnected_param") return;
         search.showParams = !search.showParams;
-        parentDiv.querySelector("#search.showParamsButtonId").className = search.showParams ? "myButton myButtonToggledOn" : "myButton";
+        parentDiv.querySelector("#showParamsButtonId").className = search.showParams ? "myButton myButtonToggledOn" : "myButton";
 
         FindRootOfChangeFunction = FindRootOfChangeForShowParams;
         lastClickWasLeft = false;

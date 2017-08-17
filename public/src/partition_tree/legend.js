@@ -76,7 +76,7 @@ function SetupLegend(d3, d3ContentDiv) {
     {
         var text = ["Group", "Component", "Unknown Explicit", "Unknown Implicit", "Collapsed", "Connection"];
         var colors = [ptn2.GROUP_COLOR, ptn2.COMPONENT_COLOR, ptn2.UNKNOWN_EXPLICIT_COLOR, ptn2.UNKNOWN_IMPLICIT_COLOR, ptn2.COLLAPSED_COLOR, ptn2.CONNECTION_COLOR];
-        if (showParams) {
+        if (searchObj.showParams) {
             text.splice(2, 0, "Param");
             colors.splice(2, 0, ptn2.PARAM_COLOR);
             text.splice(3, 0, "Unconnected Param")
