@@ -26,6 +26,11 @@ generic_create : Adds the given document to the given collection
 generic_delete : Deletes all documents with the given ID from the given
     collection
 
+user_exists : Checks if a user exists
+
+get_new_token : generates a new token
+
+token_exists : returns True if the token is used in the User collection
 """
 import os
 import string
@@ -70,7 +75,7 @@ def get_all_cases(token):
     the given token has access.
 
     Args:
-        token (string): 
+        token (string): the token to query against
     Returns:
         JSON array of case documents
     """
@@ -94,7 +99,7 @@ def get_case_with_id(case_id, token):
     if case and token in case['users']:
         return _get(_MDB[collections.CASES], case_id, False)
     else:
-        return { }
+        return {}
 
 def delete_case_with_id(case_id, token):
     """ delete_case_with_id method
@@ -141,6 +146,9 @@ def create_case(body, token):
     Returns:
         Integer case_id. -1 if no case_id could be created.
     """
+    if not user_exists(token=token):
+        return -1
+
     case_id = _get_case_id()
     if case_id == -1:
         return case_id
@@ -200,16 +208,22 @@ def generic_delete(collection_name, case_id, token):
     """
     return _delete(_MDB[collection_name], case_id, token)
 
-def user_exists(email):
+def user_exists(email=None, token=None):
     """ user_exists method
 
-    Checks to see if a user is in the DB. If so, returns true. False otherwise
+    Checks to see if a user is in the DB. If so, returns true. False otherwise.
+    Can use email or token to check user
 
     Args:
-        email (string): the email to check agianst
+        email (string): the email to check agianst (optional)
+        token (string): the token to check against (optional)
     """
     users_coll = _MDB[collections.USERS]
-    return users_coll.find({'email': email}).count() > 0
+
+    if token is None:
+        return users_coll.find({'email': email}).count() > 0
+    else:
+        return users_coll.find({'token': token}).count() > 0
 
 def get_new_token(name, email):
     """ get_new_token method
@@ -358,6 +372,9 @@ def _create(collection, body, case_id, token):
     Returns:
         True if successfull, False otherwise
     """
+    if not user_exists(token=token):
+        return False
+
     body['case_id'] = int(case_id)
     body['date'] = str(datetime.datetime.utcnow())
     body['users'] = [token]
