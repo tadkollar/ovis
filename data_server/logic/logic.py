@@ -179,3 +179,33 @@ def token_exists(token):
         True if exists, False otherwise
     """
     return data.token_exists(token)
+
+def get_system_iteration_data(case_id, variable):
+    """ get_system_iteration_data method
+
+    Grabs and returns all data for a given variable over each iteration
+    in the system_iteration collection
+
+    Args:
+        case_id (string): the case whose data will be checked
+        variable (string): the variable whose data is to be used for querying
+    Returns:
+        Array of data
+    """
+    dat = data.get_system_iteration_data(case_id)
+    ret = []
+    for i in dat:
+        for v in i['inputs']:
+            if v['name'] == variable:
+                v['iteration'] = i['iteration_coordinate']
+                v['counter'] = i['counter']
+                ret.append(v)
+
+        for v in i['outputs']:
+            if v['name'] == variable:
+                v['iteration'] = i['iteration_coordinate']
+                v['counter'] = i['counter']
+                ret.append(v)
+
+    return json.dumps(ret)
+

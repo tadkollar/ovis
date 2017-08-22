@@ -222,6 +222,18 @@ class LoginHandler(web.RequestHandler):
         cases = logic.get_all_cases(params[0])
         
         self.render("../../public/list_cases.html", cases=cases)
+
+class SystemIterationVariableHandler(web.RequestHandler):
+    """ System Iteration Variable Handler class
+
+    Contains logic to grab the system iteration data for
+    a specific variable
+    """
+    def get(self, *params):
+        data = logic.get_system_iteration_data(params[0], params[1])
+
+        self.write(data)
+
 #region private_methods
 
 def _get_ret():

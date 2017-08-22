@@ -1692,5 +1692,5 @@ ptn2.initializeTree = function () {
         getContextMenu();
         var app = PtN2Diagram(lastLeftClickedElement, treeData['tree'], treeData['connections_list']);
     });
-}
+};
 

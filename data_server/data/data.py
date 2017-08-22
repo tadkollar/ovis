@@ -254,6 +254,19 @@ def token_exists(token):
     users_coll = _MDB[collections.USERS]
     return users_coll.find({'token': token}).count() > 0
 
+def get_system_iteration_data(case_id):
+    """ get_system_iteration_data method
+
+    Grabs all data for all system iterations for a given case
+
+    Args:
+        case_id (string): the case to use for querying
+    Returns:
+        Array of data
+    """
+    collection = _MDB[collections.SYSTEM_ITERATIONS]
+    return collection.find({'case_id': int(case_id)})
+
 #region private
 
 def _create_token():
