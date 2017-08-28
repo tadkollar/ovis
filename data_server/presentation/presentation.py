@@ -234,6 +234,16 @@ class SystemIterationVariableHandler(web.RequestHandler):
 
         self.write(data)
 
+class VariablesHandler(web.RequestHandler):
+    """ Variables handler class
+
+    Contains logic to get variables for a given case
+    """
+    def get(self, *params):
+        variables = logic.get_variables(params[0])
+
+        self.write(variables)
+
 #region private_methods
 
 def _get_ret():

@@ -197,15 +197,60 @@ def get_system_iteration_data(case_id, variable):
     for i in dat:
         for v in i['inputs']:
             if v['name'] == variable:
-                v['iteration'] = i['iteration_coordinate']
+                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
                 v['counter'] = i['counter']
                 ret.append(v)
 
         for v in i['outputs']:
             if v['name'] == variable:
-                v['iteration'] = i['iteration_coordinate']
+                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
                 v['counter'] = i['counter']
                 ret.append(v)
 
     return json.dumps(ret)
 
+def get_variables(case_id):
+    """ get_variables method
+
+    Grabs all variables in system_iterations for a given case_id
+
+    Args:
+        case_id (string): the case to be queried
+    Returns:
+        Array of string variable names
+    """
+    dat = data.get_system_iteration_data(case_id)
+    ret = []
+    for i in dat:
+        for v in i['inputs']:
+            if v['name'] not in ret:
+                ret.append(v['name'])
+        for v in i['outputs']:
+            if v['name'] not in ret:
+                ret.append(v['name'])
+
+    return json.dumps(ret)
+
+def _extract_iteration_coordinate(coord):
+    """ private extract_iteration_coordinate method
+
+    Splits up the iteration coordinate string and returns it as a JSON array
+
+    Args:
+        coord (string): the coordinate to be split up
+    Returns:
+        Array of JSON of the object
+    """
+    delimiter = '|'
+    ret = []
+
+    split_coord = coord.split(delimiter)
+    i = 0
+    while i < len(split_coord):
+        node = {}
+        node['name'] = split_coord[i]
+        node['iteration'] = split_coord[i+1]
+        ret.append(node)
+        i += 2
+
+    return ret
