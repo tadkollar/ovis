@@ -9,11 +9,11 @@ var config = {
             type: 'column',
             content: [{
                 type: 'component',
-                componentName: 'Plot1',
+                componentName: 'Variable1 vs. Iterations',
                 componentState: { label: 'B' }
             }, {
                 type: 'component',
-                componentName: 'Plot2',
+                componentName: 'Variable2 vs. Iterations',
                 componentState: { label: 'C' }
             }]
         }]
@@ -28,14 +28,14 @@ myLayout.registerComponent('Partition Tree and N<sup>2</sup>', function (contain
     });
 });
 
-myLayout.registerComponent('Plot1', function (container, componentState) {
+myLayout.registerComponent('Variable1 vs. Iterations', function (container, componentState) {
     http.get("components/plot.html", function (response) {
         container.getElement().html(response);
         createPlot(container);
     });
 });
 
-myLayout.registerComponent('Plot2', function (container, componentState) {
+myLayout.registerComponent('Variable2 vs. Iterations', function (container, componentState) {
     http.get("components/plot.html", function (response) {
         container.getElement().html(response);
         createPlot(container);

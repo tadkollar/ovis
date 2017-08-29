@@ -1,16 +1,16 @@
 var createPlot = function (container) {
     var search;
-    var curData = [];
-    var element = container.getElement()[0].lastChild;
+    var curData       = [];
+    var searchString  = '';
+    var element       = container.getElement()[0].lastChild;
     var searchElement = container.getElement()[0].firstChild;
-    var selectPicker = container.getElement()[0].children[1];
-    var searchString = '';
+    var selectPicker  = container.getElement()[0].children[1];
     searchElement.style.width = (container.width - 20).toString() + 'px';
-    searchElement.style.height = '15px';
+    searchElement.style.height    = '15px';
     searchElement.style.marginTop = '20px';
-    element.style.width = container.width.toString() + 'px';
-    element.style.height = (container.height - 50).toString() + 'px'
-
+    element.style.width  = container.width.toString()         + 'px';
+    element.style.height = (container.height - 60).toString() + 'px';
+    
     //Set up the basic plot
     if (element != null) {
         Plotly.plot(element, [{
@@ -20,7 +20,7 @@ var createPlot = function (container) {
             { margin: { t: 0 } }
         );
     }
-
+    
     /**
      * Function which is called when the window is resized.
      * Resets the dimensions for plotly
@@ -28,13 +28,13 @@ var createPlot = function (container) {
     var resize = function () {
         //Set element's dimensions
         element.style.width = container.width.toString() + 'px';
-        element.style.height = (container.height.toString()-50) + 'px';
-        searchElement.style.width = (container.width - 20).toString() + 'px';
+        element.style.height      = (container.height - 60).toString() + 'px';
+        searchElement.style.width = (container.width - 20 ).toString()  + 'px';
         
         //Set up plotly's dimensions
         Plotly.relayout(element, {
             width: container.width,
-            height: container.height - 50
+            height: container.height - 60
         });
     };
 
@@ -46,7 +46,7 @@ var createPlot = function (container) {
      */
     var setData = function(dat) {
         curData = [];
-
+        
         //Place everything in the data array
         for(var i = 0; i < dat.length; ++i) {
             var indexOfIterType = getIndexOfIterType(dat[i]['iteration']);
@@ -57,7 +57,7 @@ var createPlot = function (container) {
                 curData[indexOfIterType].push(dat[i]);
             }
         }
-
+        
         //Determine which data set to plot by default
         var largestCount = -1;
         var index = -1;
@@ -68,9 +68,28 @@ var createPlot = function (container) {
             }
         }
 
+        setNewPlotData(index);
+    };
+    
+    /**
+     * Called when the selectPicker is clicked. Updates plot with new data
+     */
+    var selectClicked = function() {
+        var index = Number(selectPicker.value);
+        setNewPlotData(index);
+    }
+    selectPicker.onchange = selectClicked;
+    
+    /**
+     * Sorts and formats data at the given index of curData, then 
+     * plots it
+     * 
+     * @param {int} index 
+     */
+    var setNewPlotData = function(index) {
         //Sort the data to be plotted
         curData[index].sort(compareIterations);
-
+        
         //Set up data for plotting
         var finalData = getData(index);
 
@@ -89,17 +108,19 @@ var createPlot = function (container) {
         Plotly.newPlot(element, finalData, layout);
 
         //Update the select picker
-        selectPicker.options = [];
+        while(selectPicker.options.length > 0) {
+            selectPicker.remove(0);
+        }
         for(var i = index; i < curData.length; ++i) {
             var t = curData[i][0];
-            selectPicker.options.add(new Option(getIterationName(t), i))
+            selectPicker.options.add(new Option(getIterationName(t), i));
         }
 
         for(var i = 0; i < index; ++i) {
-            var t = curData[i];
-            selectPicker.options.add(new Option(getIterationName(t), i))
+            var t = curData[i][0];
+            selectPicker.options.add(new Option(getIterationName(t), i));
         }
-    };
+    }
 
     /**
      * Pulls out the data at the given index from curData and returns
@@ -140,7 +161,8 @@ var createPlot = function (container) {
     var getIterationName = function(iteration) {
         var s = "";
         if(iteration === null) return s;
-        for(var i = 0; i < iteration['iteration'].length; ++i) {
+        s += iteration['iteration'][0].name;
+        for(var i = 1; i < iteration['iteration'].length; ++i) {
             s += '::' + iteration['iteration'][i].name;
         }
         return s;
