@@ -1,19 +1,21 @@
 var createPlot = function (container) {
+    var search;
     var curData = [];
     var element = container.getElement()[0].lastChild;
     var searchElement = container.getElement()[0].firstChild;
+    var selectPicker = container.getElement()[0].children[1];
+    var searchString = '';
     searchElement.style.width = (container.width - 20).toString() + 'px';
     searchElement.style.height = '15px';
     searchElement.style.marginTop = '20px';
     element.style.width = container.width.toString() + 'px';
-    element.style.height = (container.height - 20).toString() + 'px'
+    element.style.height = (container.height - 50).toString() + 'px'
 
-    var search;
     //Set up the basic plot
     if (element != null) {
         Plotly.plot(element, [{
             x: [1, 2, 3, 4, 5],
-            y: [1, 2, 4, 8, 16]
+            y: [0, 0, 0, 0, 0]
         }],
             { margin: { t: 0 } }
         );
@@ -26,13 +28,13 @@ var createPlot = function (container) {
     var resize = function () {
         //Set element's dimensions
         element.style.width = container.width.toString() + 'px';
-        element.style.height = (container.height.toString()-20) + 'px';
+        element.style.height = (container.height.toString()-50) + 'px';
         searchElement.style.width = (container.width - 20).toString() + 'px';
         
         //Set up plotly's dimensions
         Plotly.relayout(element, {
             width: container.width,
-            height: container.height - 20
+            height: container.height - 50
         });
     };
 
@@ -70,25 +72,79 @@ var createPlot = function (container) {
         curData[index].sort(compareIterations);
 
         //Set up data for plotting
+        var finalData = getData(index);
+
+        //Set up the layout
+        var layout = {
+            title: searchString,
+            xaxis: {
+                title: 'Iteration'
+            },
+            yaxis: {
+                title: 'Value'
+            }
+        }
+
+        //plot it
+        Plotly.newPlot(element, finalData, layout);
+
+        //Update the select picker
+        selectPicker.options = [];
+        for(var i = index; i < curData.length; ++i) {
+            var t = curData[i][0];
+            selectPicker.options.add(new Option(getIterationName(t), i))
+        }
+
+        for(var i = 0; i < index; ++i) {
+            var t = curData[i];
+            selectPicker.options.add(new Option(getIterationName(t), i))
+        }
+    };
+
+    /**
+     * Pulls out the data at the given index from curData and returns
+     * it in a format that's friendly for Plotly
+     * 
+     * @param {int} index 
+     * @return {Object}
+     */
+    var getData = function(index) {
         var finalData = [];
         for(var i = 0; i < curData[index].length; ++i) {
             for(var j = 0; j < curData[index][i]['values'].length; ++j) {
                 if(i == 0) {
                     finalData.push({
-                        x: [0],
-                        y: [curData[index][i]['values'][j]]
-                    })
+                        x: [curData[index][i]['counter']],
+                        y: [curData[index][i]['values'][j]],
+                        name: 'Index 0'
+                    });
                 }
                 else {
-                    finalData[j].x.push(i);
-                    finalData[j].y.push(curData[index][i]['values'][j])
+                    finalData[j].x.push(curData[index][i]['counter']);
+                    finalData[j].y.push(curData[index][i]['values'][j]),
+                    finalData[j].name = 'Index ' + j
                 }
             }
         }
 
-        //plot it
-        Plotly.newPlot(element, finalData);
-    };
+        return finalData;
+    }
+
+    /**
+     * Returns the iteration name, which is the sum of the names in the
+     * iteration array.
+     * 
+     * @param {Iteration} iteration 
+     * @return {String}
+     */
+    var getIterationName = function(iteration) {
+        var s = "";
+        if(iteration === null) return s;
+        for(var i = 0; i < iteration['iteration'].length; ++i) {
+            s += '::' + iteration['iteration'][i].name;
+        }
+        return s;
+    }
 
     /**
      * Compares two iterations by their counter. Returns
@@ -96,6 +152,7 @@ var createPlot = function (container) {
      * 
      * @param {Iteration} a 
      * @param {Iteration} b 
+     * @return {int}
      */
     var compareIterations = function(a, b) {
         if(a['counter'] > b['counter']) {
@@ -118,6 +175,7 @@ var createPlot = function (container) {
      *  4. Otherwise, return -1
      * 
      * @param {Object} iter 
+     * @return {int}
      */
     var getIndexOfIterType = function(iter) {
         for(var i = 0; i < curData.length; ++i) {
@@ -151,7 +209,7 @@ var createPlot = function (container) {
     {
         http.get('case/' + case_id + '/system_iterations/' + event.text.value, function(result) {
             result = JSON.parse(result);
-            console.log(result);
+            searchString = event.text.value;
             setData(result);
         });
     }});
