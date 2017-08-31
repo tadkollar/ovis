@@ -1,16 +1,16 @@
 var createPlot = function (container) {
     var search;
-    var curData       = [];
-    var searchString  = '';
-    var element       = container.getElement()[0].lastChild;
+    var curData = [];
+    var searchString = '';
+    var element = container.getElement()[0].lastChild;
     var searchElement = container.getElement()[0].firstChild;
-    var selectPicker  = container.getElement()[0].children[1];
+    var selectPicker = container.getElement()[0].children[1];
     searchElement.style.width = (container.width - 20).toString() + 'px';
-    searchElement.style.height    = '15px';
+    searchElement.style.height = '15px';
     searchElement.style.marginTop = '20px';
-    element.style.width  = container.width.toString()         + 'px';
+    element.style.width = container.width.toString() + 'px';
     element.style.height = (container.height - 60).toString() + 'px';
-    
+
     //Set up the basic plot
     if (element != null) {
         Plotly.plot(element, [{
@@ -20,7 +20,7 @@ var createPlot = function (container) {
             { margin: { t: 0 } }
         );
     }
-    
+
     /**
      * Function which is called when the window is resized.
      * Resets the dimensions for plotly
@@ -28,9 +28,9 @@ var createPlot = function (container) {
     var resize = function () {
         //Set element's dimensions
         element.style.width = container.width.toString() + 'px';
-        element.style.height      = (container.height - 60).toString() + 'px';
-        searchElement.style.width = (container.width - 20 ).toString()  + 'px';
-        
+        element.style.height = (container.height - 60).toString() + 'px';
+        searchElement.style.width = (container.width - 20).toString() + 'px';
+
         //Set up plotly's dimensions
         Plotly.relayout(element, {
             width: container.width,
@@ -44,25 +44,25 @@ var createPlot = function (container) {
      * 
      * @param {[Object]} dat 
      */
-    var setData = function(dat) {
+    var setData = function (dat) {
         curData = [];
-        
+
         //Place everything in the data array
-        for(var i = 0; i < dat.length; ++i) {
+        for (var i = 0; i < dat.length; ++i) {
             var indexOfIterType = getIndexOfIterType(dat[i]['iteration']);
-            if(indexOfIterType == -1) {
+            if (indexOfIterType == -1) {
                 curData.push([dat[i]]);
             }
             else {
                 curData[indexOfIterType].push(dat[i]);
             }
         }
-        
+
         //Determine which data set to plot by default
         var largestCount = -1;
         var index = -1;
-        for(var i = 0; i < curData.length; ++i) {
-            if(curData[i].length > largestCount) {
+        for (var i = 0; i < curData.length; ++i) {
+            if (curData[i].length > largestCount) {
                 largestCount = curData.length;
                 index = i;
             }
@@ -70,34 +70,44 @@ var createPlot = function (container) {
 
         setNewPlotData(index);
     };
-    
+
     /**
      * Called when the selectPicker is clicked. Updates plot with new data
      */
-    var selectClicked = function() {
+    var selectClicked = function () {
         var index = Number(selectPicker.value);
         setNewPlotData(index);
     }
     selectPicker.onchange = selectClicked;
-    
+
     /**
      * Sorts and formats data at the given index of curData, then 
      * plots it
      * 
      * @param {int} index 
      */
-    var setNewPlotData = function(index) {
+    var setNewPlotData = function (index) {
         //Sort the data to be plotted
         curData[index].sort(compareIterations);
-        
+
         //Set up data for plotting
         var finalData = getData(index);
+
+        //Set the precision of the data
+        for (var j = 0; j < finalData.length; ++j) {
+            for (var i = 0; i < finalData[j].y.length; ++i) {
+                var val = finalData[j].y[i];
+                val = Math.round(val * 100000000) / 100000000;
+                finalData[j].y[i] = val;
+            }
+        }
 
         //Set up the layout
         var layout = {
             title: searchString,
             xaxis: {
-                title: 'Iteration'
+                title: 'Global Counter',
+                dtick: 1
             },
             yaxis: {
                 title: 'Value'
@@ -108,15 +118,15 @@ var createPlot = function (container) {
         Plotly.newPlot(element, finalData, layout);
 
         //Update the select picker
-        while(selectPicker.options.length > 0) {
+        while (selectPicker.options.length > 0) {
             selectPicker.remove(0);
         }
-        for(var i = index; i < curData.length; ++i) {
+        for (var i = index; i < curData.length; ++i) {
             var t = curData[i][0];
             selectPicker.options.add(new Option(getIterationName(t), i));
         }
 
-        for(var i = 0; i < index; ++i) {
+        for (var i = 0; i < index; ++i) {
             var t = curData[i][0];
             selectPicker.options.add(new Option(getIterationName(t), i));
         }
@@ -129,11 +139,11 @@ var createPlot = function (container) {
      * @param {int} index 
      * @return {Object}
      */
-    var getData = function(index) {
+    var getData = function (index) {
         var finalData = [];
-        for(var i = 0; i < curData[index].length; ++i) {
-            for(var j = 0; j < curData[index][i]['values'].length; ++j) {
-                if(i == 0) {
+        for (var i = 0; i < curData[index].length; ++i) {
+            for (var j = 0; j < curData[index][i]['values'].length; ++j) {
+                if (i == 0) {
                     finalData.push({
                         x: [curData[index][i]['counter']],
                         y: [curData[index][i]['values'][j]],
@@ -143,7 +153,7 @@ var createPlot = function (container) {
                 else {
                     finalData[j].x.push(curData[index][i]['counter']);
                     finalData[j].y.push(curData[index][i]['values'][j]),
-                    finalData[j].name = 'Index ' + j
+                        finalData[j].name = 'Index ' + j
                 }
             }
         }
@@ -158,11 +168,11 @@ var createPlot = function (container) {
      * @param {Iteration} iteration 
      * @return {String}
      */
-    var getIterationName = function(iteration) {
+    var getIterationName = function (iteration) {
         var s = "";
-        if(iteration === null) return s;
+        if (iteration === null) return s;
         s += iteration['iteration'][0].name;
-        for(var i = 1; i < iteration['iteration'].length; ++i) {
+        for (var i = 1; i < iteration['iteration'].length; ++i) {
             s += '::' + iteration['iteration'][i].name;
         }
         return s;
@@ -176,8 +186,8 @@ var createPlot = function (container) {
      * @param {Iteration} b 
      * @return {int}
      */
-    var compareIterations = function(a, b) {
-        if(a['counter'] > b['counter']) {
+    var compareIterations = function (a, b) {
+        if (a['counter'] > b['counter']) {
             return 1;
         }
         else if (b['counter'] > a['counter']) {
@@ -199,19 +209,19 @@ var createPlot = function (container) {
      * @param {Object} iter 
      * @return {int}
      */
-    var getIndexOfIterType = function(iter) {
-        for(var i = 0; i < curData.length; ++i) {
+    var getIndexOfIterType = function (iter) {
+        for (var i = 0; i < curData.length; ++i) {
             var tempIter = curData[i][0]['iteration'];
             var found = true;
-            if(tempIter.length == iter.length) {
-                for(var j = 0; j < tempIter.length; ++j) {
-                    if(tempIter[j]['name'] != iter[j]['name']) {
+            if (tempIter.length == iter.length) {
+                for (var j = 0; j < tempIter.length; ++j) {
+                    if (tempIter[j]['name'] != iter[j]['name']) {
                         found = false;
                         break;
                     }
                 }
 
-                if(found) {
+                if (found) {
                     return i;
                 }
             }
@@ -220,21 +230,37 @@ var createPlot = function (container) {
         return -1;
     };
 
+    /**
+     * Attempts to get the data with the given name and
+     * plot it.
+     * 
+     * @param {string} name 
+     */
+    var handleSearch = function(name) {
+        http.get('case/' + case_id + '/system_iterations/' + name, function (result) {
+            result = JSON.parse(result);
+            searchString = name;
+            setData(result);
+        });
+    };
+
     //Get the variables
-    http.get('case/' + case_id + '/variables', function(result) {
+    http.get('case/' + case_id + '/variables', function (result) {
         result = JSON.parse(result);
-        search = new Awesomplete(searchElement, {list: result})
+        search = new Awesomplete(searchElement, { list: result });
+
+        var randIndex = Math.floor(Math.random() * result.length);
+        if(randIndex < result.length) {
+            handleSearch(result[randIndex]);
+        }
     });
 
     //Bind to search so that we grab data and update plot after searching
-    Awesomplete.$.bind(searchElement, { "awesomplete-select":function(event)
-    {
-        http.get('case/' + case_id + '/system_iterations/' + event.text.value, function(result) {
-            result = JSON.parse(result);
-            searchString = event.text.value;
-            setData(result);
-        });
-    }});
+    Awesomplete.$.bind(searchElement, {
+        "awesomplete-select": function (event) {
+            handleSearch(event.text.value);
+        }
+    });
 
     //Set callback on resize
     container.on('resize', resize);
