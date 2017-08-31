@@ -107,7 +107,7 @@ var createPlot = function (container) {
             title: searchString,
             xaxis: {
                 title: 'Global Counter',
-                dtick: 1
+                // dtick: 1
             },
             yaxis: {
                 title: 'Value'
