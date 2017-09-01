@@ -136,29 +136,63 @@ var createPlot = function (container) {
      * Pulls out the data at the given index from curData and returns
      * it in a format that's friendly for Plotly
      * 
-     * @param {int} index 
+     * @param {int} index
      * @return {Object}
      */
+    // var getData = function (index) {
+    //     var finalData = [];
+    //     for (var i = 0; i < curData[index].length; ++i) {
+    //         for (var j = 0; j < curData[index][i]['values'].length; ++j) {
+    //             if (i == 0) {
+    //                 finalData.push({
+    //                     x: [curData[index][i]['counter']],
+    //                     y: [curData[index][i]['values'][j]],
+    //                     name: 'Index 0'
+    //                 });
+    //             }
+    //             else {
+    //                 finalData[j].x.push(curData[index][i]['counter']);
+    //                 finalData[j].y.push(curData[index][i]['values'][j]);
+    //                 finalData[j].name = 'Index ' + j;
+    //             }
+    //         }
+    //     }
+
+    //     return finalData;
+    // }
+
     var getData = function (index) {
-        var finalData = [];
-        for (var i = 0; i < curData[index].length; ++i) {
-            for (var j = 0; j < curData[index][i]['values'].length; ++j) {
-                if (i == 0) {
+        finalData = [];
+        return getDataRecursive(curData[index], '', finalData)
+    }
+
+    var getDataRecursive = function (coll, name, finalData) {
+        //Base case
+        if(coll.length === 0 || coll[0].hasOwnProperty('iteration')) {
+            for(var i = 0; i < coll.length; ++i) {
+                if(i == 0) {
                     finalData.push({
-                        x: [curData[index][i]['counter']],
-                        y: [curData[index][i]['values'][j]],
-                        name: 'Index 0'
+                        x: [coll[i]['counter']],
+                        y: [coll[i]['values']],
+                        name: name + '[' + i + ']'
                     });
                 }
                 else {
-                    finalData[j].x.push(curData[index][i]['counter']);
-                    finalData[j].y.push(curData[index][i]['values'][j]),
-                        finalData[j].name = 'Index ' + j
+                    finalData.x.push(coll[i]['counter']);
+                    finalData.y.push(coll[i]['values']);
+                    name: name + '[' + i + ']'
                 }
             }
-        }
 
-        return finalData;
+            return finalData;
+        }
+        else {
+            for(var i = 0; i < coll.length; ++i) {
+                finalData = getDataRecursive(coll[i], name + '[' + i + ']', finalData);
+            }
+
+            return finalData;
+        }
     }
 
     /**
@@ -236,7 +270,7 @@ var createPlot = function (container) {
      * 
      * @param {string} name 
      */
-    var handleSearch = function(name) {
+    var handleSearch = function (name) {
         http.get('case/' + case_id + '/system_iterations/' + name, function (result) {
             result = JSON.parse(result);
             searchString = name;
@@ -250,7 +284,7 @@ var createPlot = function (container) {
         search = new Awesomplete(searchElement, { list: result });
 
         var randIndex = Math.floor(Math.random() * result.length);
-        if(randIndex < result.length) {
+        if (randIndex < result.length) {
             handleSearch(result[randIndex]);
         }
     });
