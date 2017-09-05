@@ -139,45 +139,45 @@ var createPlot = function (container) {
      * @param {int} index
      * @return {Object}
      */
-     var getData = function (index) {
-         var finalData = [];
-         for (var i = 0; i < curData[index].length; ++i) {
-             for (var j = 0; j < curData[index][i]['values'].length; ++j) {
-                 if(curData[index][i]['values'][0].hasOwnProperty('length')) {
-		     for(var k = 0; k < curData[index][i]['values'][0].length; ++k) {
-			 if(i == 0) {
-			     finalData.push({
-				 x: [curData[index][i]['counter']],
-				 y: [curData[index][i]['values'][j][k]],
-				 name: '[0][0]'
-			     });
-			 }
-			 else {
-			     var k_len = curData[index][i]['values'][0].length;
-			     finalData[k_len*j + k].x.push(curData[index][i]['counter']);
-			     finalData[k_len*j + k].y.push(curData[index][i]['values'][j][k]);
-			     finalData[k_len*j + k].name = '[' + j + '][' + k + ']';
-			 }
-		     }
-		 }
-		 else{
-		     if (i == 0) {
-			 finalData.push({
-                             x: [curData[index][i]['counter']],
-                             y: [curData[index][i]['values'][j]],
-                             name: 'Index 0'
-			 });
-                     }
-                     else {
-			 finalData[j].x.push(curData[index][i]['counter']);
-			 finalData[j].y.push(curData[index][i]['values'][j]);
-			 finalData[j].name = 'Index ' + j;
-                     }
-		 }
-             }
-         }
+    var getData = function (index) {
+        var finalData = [];
+        for (var i = 0; i < curData[index].length; ++i) {
+            for (var j = 0; j < curData[index][i]['values'].length; ++j) {
+                if (curData[index][i]['values'][0].hasOwnProperty('length')) {
+                    for (var k = 0; k < curData[index][i]['values'][0].length; ++k) {
+                        if (i == 0) {
+                            finalData.push({
+                                x: [curData[index][i]['counter']],
+                                y: [curData[index][i]['values'][j][k]],
+                                name: '[0][0]'
+                            });
+                        }
+                        else {
+                            var k_len = curData[index][i]['values'][0].length;
+                            finalData[k_len * j + k].x.push(curData[index][i]['counter']);
+                            finalData[k_len * j + k].y.push(curData[index][i]['values'][j][k]);
+                            finalData[k_len * j + k].name = '[' + j + '][' + k + ']';
+                        }
+                    }
+                }
+                else {
+                    if (i == 0) {
+                        finalData.push({
+                            x: [curData[index][i]['counter']],
+                            y: [curData[index][i]['values'][j]],
+                            name: 'Index 0'
+                        });
+                    }
+                    else {
+                        finalData[j].x.push(curData[index][i]['counter']);
+                        finalData[j].y.push(curData[index][i]['values'][j]);
+                        finalData[j].name = 'Index ' + j;
+                    }
+                }
+            }
+        }
 
-         return finalData;
+        return finalData;
     }
 
     /*var getData = function (index) {
@@ -187,9 +187,9 @@ var createPlot = function (container) {
 
     var getDataRecursive = function (coll, name, finalData) {
         //Base case
-        if(coll.length === 0 || coll[0].hasOwnProperty('iteration')) {
-            for(var i = 0; i < coll.length; ++i) {
-                if(i == 0) {
+        if (coll.length === 0 || coll[0].hasOwnProperty('iteration')) {
+            for (var i = 0; i < coll.length; ++i) {
+                if (i == 0) {
                     finalData.push({
                         x: [coll[i]['counter']],
                         y: [coll[i]['values']],
@@ -206,7 +206,7 @@ var createPlot = function (container) {
             return finalData;
         }
         else {
-            for(var i = 0; i < coll.length; ++i) {
+            for (var i = 0; i < coll.length; ++i) {
                 finalData = getDataRecursive(coll[i], name + '[' + i + ']', finalData);
             }
 
