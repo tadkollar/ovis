@@ -139,32 +139,51 @@ var createPlot = function (container) {
      * @param {int} index
      * @return {Object}
      */
-    // var getData = function (index) {
-    //     var finalData = [];
-    //     for (var i = 0; i < curData[index].length; ++i) {
-    //         for (var j = 0; j < curData[index][i]['values'].length; ++j) {
-    //             if (i == 0) {
-    //                 finalData.push({
-    //                     x: [curData[index][i]['counter']],
-    //                     y: [curData[index][i]['values'][j]],
-    //                     name: 'Index 0'
-    //                 });
-    //             }
-    //             else {
-    //                 finalData[j].x.push(curData[index][i]['counter']);
-    //                 finalData[j].y.push(curData[index][i]['values'][j]);
-    //                 finalData[j].name = 'Index ' + j;
-    //             }
-    //         }
-    //     }
+     var getData = function (index) {
+         var finalData = [];
+         for (var i = 0; i < curData[index].length; ++i) {
+             for (var j = 0; j < curData[index][i]['values'].length; ++j) {
+                 if(curData[index][i]['values'][0].hasOwnProperty('length')) {
+		     for(var k = 0; k < curData[index][i]['values'][0].length; ++k) {
+			 if(i == 0) {
+			     finalData.push({
+				 x: [curData[index][i]['counter']],
+				 y: [curData[index][i]['values'][j][k]],
+				 name: '[0][0]'
+			     });
+			 }
+			 else {
+			     var k_len = curData[index][i]['values'][0].length;
+			     finalData[k_len*j + k].x.push(curData[index][i]['counter']);
+			     finalData[k_len*j + k].y.push(curData[index][i]['values'][j][k]);
+			     finalData[k_len*j + k].name = '[' + j + '][' + k + ']';
+			 }
+		     }
+		 }
+		 else{
+		     if (i == 0) {
+			 finalData.push({
+                             x: [curData[index][i]['counter']],
+                             y: [curData[index][i]['values'][j]],
+                             name: 'Index 0'
+			 });
+                     }
+                     else {
+			 finalData[j].x.push(curData[index][i]['counter']);
+			 finalData[j].y.push(curData[index][i]['values'][j]);
+			 finalData[j].name = 'Index ' + j;
+                     }
+		 }
+             }
+         }
 
-    //     return finalData;
-    // }
+         return finalData;
+    }
 
-    var getData = function (index) {
+    /*var getData = function (index) {
         finalData = [];
         return getDataRecursive(curData[index], '', finalData)
-    }
+    }*/
 
     var getDataRecursive = function (coll, name, finalData) {
         //Base case
