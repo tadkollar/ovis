@@ -33,6 +33,7 @@ get_new_token : generates a new token
 token_exists : returns True if the token is used in the User collection
 """
 import os
+import json
 import string
 import pickle
 import random
@@ -95,9 +96,9 @@ def get_case_with_id(case_id, token):
     Returns:
         JSON document corresponding to that case_id
     """
-    case = _get(_MDB[collections.CASES], case_id, False)
+    case = json.loads(_get(_MDB[collections.CASES], case_id, token, False))
     if case and token in case['users']:
-        return _get(_MDB[collections.CASES], case_id, False)
+        return _get(_MDB[collections.CASES], case_id, token, False)
     else:
         return {}
 
@@ -238,8 +239,24 @@ def get_new_token(name, email):
     """
     token = _create_token()
     users_coll = _MDB[collections.USERS]
-    users_coll.insert({'name': name, 'token': token, 'email': email})
+    users_coll.insert_one({'name': name, 'token': token, 'email': email})
     return token
+
+def delete_token(token):
+    """ delete_token method
+
+    Deletes a token and everything associated with that token
+
+    Args:
+        token (string): the token to be deleted
+    """
+    if(token_exists(token)):
+        all_cases = json.loads(get_all_cases(token))
+        for c in all_cases:
+            delete_case_with_id(c['case_id'], token)
+
+        users_coll = _MDB[collections.USERS]
+        users_coll.delete_many({'token': token})
 
 def token_exists(token):
     """ token_exists method
