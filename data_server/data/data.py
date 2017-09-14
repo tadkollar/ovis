@@ -176,7 +176,7 @@ def generic_get(collection_name, case_id, token):
     """
     return _get(_MDB[collection_name], case_id, token)
 
-def generic_create(collection_name, body, case_id, token):
+def generic_create(collection_name, body, case_id, token, update):
     """ generic_create method
 
     Performs a generic 'post' request, which takes the body,
@@ -191,7 +191,7 @@ def generic_create(collection_name, body, case_id, token):
     Returns:
         True if successfull, False otherwise
     """
-    return _create(_MDB[collection_name], body, case_id, token)
+    return _create(_MDB[collection_name], body, case_id, token, update)
 
 def generic_delete(collection_name, case_id, token):
     """ generic_delete method
@@ -387,7 +387,7 @@ def _get(collection, case_id, token, get_many=True):
             return dumps(collection.find_one({'$and': [{'case_id': int(case_id)},
                                              {'users': token}]}, {'_id': False}))
 
-def _create(collection, body, case_id, token):
+def _create(collection, body, case_id, token, update):
     """ _create method
 
     Performs a generic 'post' request, which takes the body,
@@ -399,11 +399,27 @@ def _create(collection, body, case_id, token):
         body (json): the document to be added to the collection
         case_id (string || int): ID to be used for querying
         token (string): the token to be used for authentication
+        update (bool): whether or not we're just updating an existing recording
     Returns:
         True if successfull, False otherwise
     """
     if not user_exists(token=token):
         return False
+
+    if update:
+        if _get(_MDB[collections.CASES], case_id, token) is None:
+            return False
+        if 'iteration_coordinate' in body:
+            collection.delete_many({'$and': [{'case_id': int(case_id)},
+                                   {'iteration_coordinate': body['iteration_coordinate']}]})
+        elif 'counter' in body:
+            collection.delete_many({'$and': [{'case_id': int(case_id)},
+                                   {'counter': body['counter']}]})
+        elif 'solver_class' in body:
+            collection.delete_many({'$and': [{'case_id': int(case_id)},
+                                   {'solver_class': body['solver_class']}]})
+        else:
+            collection.delete_many({'case_id': int(case_id)})
 
     body['case_id'] = int(case_id)
     body['date'] = str(datetime.datetime.utcnow())

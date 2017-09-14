@@ -119,7 +119,7 @@ def generic_get(collection_name, case_id, token):
     """
     return data.generic_get(collection_name, case_id, token)
 
-def generic_create(collection_name, body, case_id, token):
+def generic_create(collection_name, body, case_id, token, update):
     """ generic_create method
 
     Performs the typical 'post' request. Takes the body and case_id, passes
@@ -131,10 +131,15 @@ def generic_create(collection_name, body, case_id, token):
         body (json): document to be added to the collection
         case_id (string || int): the case_id for querying
         token (string): the token to be used for authentication
+        update (string): whether or not we're simply updating an existing recording
     Returns:
         True if successfull, False otherwise
     """
-    return data.generic_create(collection_name, body, case_id, token)
+    
+    converted_update = False
+    if update == 'True':
+        converted_update = True
+    return data.generic_create(collection_name, body, case_id, token, converted_update)
 
 def generic_delete(collection_name, case_id, token):
     """ generic_delete method

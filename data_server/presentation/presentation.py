@@ -301,7 +301,8 @@ def _generic_post(collection_name, request_handler, case_id):
     ret = _get_ret()
     body = json.loads(request_handler.request.body)
     if logic.generic_create(collection_name, body, case_id,
-                            request_handler.request.headers.get('token')):
+                            request_handler.request.headers.get('token'),
+                            request_handler.request.headers.get('update')):
         request_handler.write(ret)
     else:
         ret['status'] = 'Failed'
