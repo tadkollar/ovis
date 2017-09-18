@@ -94,14 +94,20 @@ var createPlot = function (container) {
         var finalData = getData(index);
 
         //Set the precision of the data
-        for (var j = 0; j < finalData.length; ++j) {
-            for (var i = 0; i < finalData[j].y.length; ++i) {
-                var val = finalData[j].y[i];
+        for (var j = 0; j < finalData['inputs_outputs'].length; ++j) {
+            for (var i = 0; i < finalData['inputs_outputs'][j].y.length; ++i) {
+                var val = finalData['inputs_outputs'][j].y[i];
                 val = Math.round(val * 100000000) / 100000000;
-                finalData[j].y[i] = val;
+                finalData['inputs_outputs'][j].y[i] = val;
             }
         }
-
+        for (var j = 0; j < finalData['residuals'].length; ++j) {
+            for (var i = 0; i < finalData['residuals'][j].y.length; ++i) {
+                var val = finalData['residuals'][j].y[i];
+                val = Math.round(val * 100000000) / 100000000;
+                finalData['residuals'][j].y[i] = val;
+            }
+        }
         //Set up the layout
         var layout = {
             title: searchString,
@@ -114,8 +120,13 @@ var createPlot = function (container) {
             }
         }
 
+        //Add residuals to inputs_outputs
+        for(var i = 0; i < finalData['residuals'].length; ++i) {
+            finalData['inputs_outputs'].push(finalData['residuals'][i])
+        }
+
         //plot it
-        Plotly.newPlot(element, finalData, layout);
+        Plotly.newPlot(element, finalData['inputs_outputs'], layout);
 
         //Update the select picker
         while (selectPicker.options.length > 0) {
@@ -140,78 +151,85 @@ var createPlot = function (container) {
      * @return {Object}
      */
     var getData = function (index) {
-        var finalData = [];
+        var finalData = {
+            'residuals': [],
+            'inputs_outputs': []
+        };
+        var got_first_in_outs = false;
+        var got_first_resids = false;
         for (var i = 0; i < curData[index].length; ++i) {
             for (var j = 0; j < curData[index][i]['values'].length; ++j) {
                 if (curData[index][i]['values'][0].hasOwnProperty('length')) {
                     for (var k = 0; k < curData[index][i]['values'][0].length; ++k) {
-                        if (i == 0) {
-                            finalData.push({
-                                x: [curData[index][i]['counter']],
-                                y: [curData[index][i]['values'][j][k]],
-                                name: '[0][0]'
-                            });
+                        if ((curData[index][i]['type'] !== 'residual' && !got_first_in_outs) || (curData[index][i]['type'] === 'residual' && !got_first_resids)) {
+                            if (curData[index][i]['type'] !== 'residual') {
+                                got_first_in_outs = true;
+                                finalData['inputs_outputs'].push({
+                                    x: [curData[index][i]['counter']],
+                                    y: [curData[index][i]['values'][j][k]],
+                                    name: '[0][0]'
+                                });
+                            }
+                            else {
+                                got_first_resids = true;
+                                finalData['residuals'].push({
+                                    x: [curData[index][i]['counter']],
+                                    y: [curData[index][i]['values'][j][k]],
+                                    name: 'Residuals [0][0]'
+                                });
+                            }
                         }
                         else {
-                            var k_len = curData[index][i]['values'][0].length;
-                            finalData[k_len * j + k].x.push(curData[index][i]['counter']);
-                            finalData[k_len * j + k].y.push(curData[index][i]['values'][j][k]);
-                            finalData[k_len * j + k].name = '[' + j + '][' + k + ']';
+                            if (curData[index][i]['type'] !== 'residual') {
+                                var k_len = curData[index][i]['values'][0].length;
+                                finalData['inputs_outputs'][k_len * j + k].x.push(curData[index][i]['counter']);
+                                finalData['inputs_outputs'][k_len * j + k].y.push(curData[index][i]['values'][j][k]);
+                                finalData['inputs_outputs'][k_len * j + k].name = '[' + j + '][' + k + ']';
+                            }
+                            else {
+                                finalData['residuals'][k_len * j + k].x.push(curData[index][i]['counter']);
+                                finalData['residuals'][k_len * j + k].y.push(curData[index][i]['values'][j][k]);
+                                finalData['residuals'][k_len * j + k].name = 'Residuals [' + j + '][' + k + ']';
+                            }
                         }
                     }
                 }
                 else {
-                    if (i == 0) {
-                        finalData.push({
-                            x: [curData[index][i]['counter']],
-                            y: [curData[index][i]['values'][j]],
-                            name: 'Index 0'
-                        });
+                    if ((curData[index][i]['type'] !== 'residual' && !got_first_in_outs) || (curData[index][i]['type'] === 'residual' && !got_first_resids)) {
+                        if (curData[index][i]['type'] !== 'residual') {
+                            got_first_in_outs = true;
+                            finalData['inputs_outputs'].push({
+                                x: [curData[index][i]['counter']],
+                                y: [curData[index][i]['values'][j]],
+                                name: 'Index 0'
+                            });
+                        }
+                        else {
+                            got_first_resids = true;
+                            finalData['residuals'].push({
+                                x: [curData[index][i]['counter']],
+                                y: [curData[index][i]['values'][j]],
+                                name: 'Residuals'
+                            });
+                        }
                     }
                     else {
-                        finalData[j].x.push(curData[index][i]['counter']);
-                        finalData[j].y.push(curData[index][i]['values'][j]);
-                        finalData[j].name = 'Index ' + j;
+                        if (curData[index][i]['type'] !== 'residual') {
+                            finalData['inputs_outputs'][j].x.push(curData[index][i]['counter']);
+                            finalData['inputs_outputs'][j].y.push(curData[index][i]['values'][j]);
+                            finalData['inputs_outputs'][j].name = 'Index ' + j;
+                        }
+                        else {
+                            finalData['residuals'][j].x.push(curData[index][i]['counter']);
+                            finalData['residuals'][j].y.push(curData[index][i]['values'][j]);
+                            finalData['residuals'][j].name = 'Residuals Index ' + j;
+                        }
                     }
                 }
             }
         }
 
         return finalData;
-    }
-
-    /*var getData = function (index) {
-        finalData = [];
-        return getDataRecursive(curData[index], '', finalData)
-    }*/
-
-    var getDataRecursive = function (coll, name, finalData) {
-        //Base case
-        if (coll.length === 0 || coll[0].hasOwnProperty('iteration')) {
-            for (var i = 0; i < coll.length; ++i) {
-                if (i == 0) {
-                    finalData.push({
-                        x: [coll[i]['counter']],
-                        y: [coll[i]['values']],
-                        name: name + '[' + i + ']'
-                    });
-                }
-                else {
-                    finalData.x.push(coll[i]['counter']);
-                    finalData.y.push(coll[i]['values']);
-                    name: name + '[' + i + ']'
-                }
-            }
-
-            return finalData;
-        }
-        else {
-            for (var i = 0; i < coll.length; ++i) {
-                finalData = getDataRecursive(coll[i], name + '[' + i + ']', finalData);
-            }
-
-            return finalData;
-        }
     }
 
     /**

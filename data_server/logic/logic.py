@@ -204,19 +204,22 @@ def get_system_iteration_data(case_id, variable):
             if v['name'] == variable:
                 v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
                 v['counter'] = i['counter']
+                v['type'] = 'input'
                 ret.append(v)
 
         for v in i['outputs']:
             if v['name'] == variable:
                 v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
                 v['counter'] = i['counter']
+                v['type'] = 'output'
                 ret.append(v)
 
-        # for v in i['residuals']:
-        #     if v['name'] == variable:
-        #         v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
-        #         v['counter'] = i['counter']
-        #         ret.append(v)
+        for v in i['residuals']:
+            if v['name'] == variable:
+                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
+                v['counter'] = i['counter']
+                v['type'] = 'residual'
+                ret.append(v)
 
     return json.dumps(ret)
 
