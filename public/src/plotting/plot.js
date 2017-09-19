@@ -181,7 +181,8 @@ var createPlot = function (container) {
                     }
                 }
                 else {
-                    if (typeFunc(curData[index][i]) && !gotFirstProp) {
+                    if ((typeFunc(curData[index][i]) && !gotFirstProp) ||
+                        (typeFunc(curData[index][i]) && finalData.length < (j-1))) {
                         gotFirstProp = true;
                         finalData.push({
                             x: [curData[index][i]['counter']],
