@@ -284,6 +284,19 @@ def get_system_iteration_data(case_id):
     collection = _MDB[collections.SYSTEM_ITERATIONS]
     return collection.find({'case_id': int(case_id)})
 
+def get_driver_iteration_data(case_id):
+    """ get_driver_iteration_data method
+
+    Grabs all data for all driver iterations for a given case
+
+    Args:
+        case_id (string): the case to use for querying
+    Returns:
+        Array of data
+    """
+    collection = _MDB[collections.DRIVER_ITERATIONS]
+    return collection.find({'case_id': int(case_id)})
+
 #region private
 
 def _create_token():

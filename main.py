@@ -30,6 +30,7 @@ if __name__ == "__main__":
         (r"/case/([a-zA-Z]+)/(.*)", web.StaticFileHandler, {'path': public_root}),
         (r"/case/(\d+)", presentation.CaseHandler),
         (r"/case/(\d+)/driver_iterations", presentation.DriverIterationsHandler),
+        (r"/case/(\d+)/driver_iterations/([a-zA-Z0-9_.:]+)", presentation.DriverIterationVariableHandler),
         (r"/case/(\d+)/driver_metadata", presentation.DriverMetadataHandler),
         (r"/case/(\d+)/global_iterations", presentation.GlobalIterationsHandler),
         (r"/case/(\d+)/metadata", presentation.MetadataHandler),
@@ -42,6 +43,7 @@ if __name__ == "__main__":
         (r"/login", presentation.LoginHandler),
         (r"/login/([a-zA-Z0-9]+)", presentation.LoginHandler),
         (r"/case/(\d+)/variables", presentation.VariablesHandler),
+        (r"/case/(\d+)/desvars", presentation.DesvarsHandler),
         (r"/(.*)", web.StaticFileHandler, {'path': public_root})
         ])
 

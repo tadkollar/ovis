@@ -244,6 +244,27 @@ class VariablesHandler(web.RequestHandler):
 
         self.write(variables)
 
+class DriverIterationVariableHandler(web.RequestHandler):
+    """ Driver Iteration Variable Handler class
+
+    Contains logic to grab the driver iteration data for
+    a specific variable
+    """
+    def get(self, *params):
+        data = logic.get_driver_iteration_data(params[0], params[1])
+
+        self.write(data)
+
+class DesvarsHandler(web.RequestHandler):
+    """ Desvars handler class
+
+    Contains logic to get Desvars for a given case
+    """
+    def get(self, *params):
+        variables = logic.get_desvars(params[0])
+
+        self.write(variables)
+
 #region private_methods
 
 def _get_ret():

@@ -245,6 +245,49 @@ def get_variables(case_id):
 
     return json.dumps(ret)
 
+def get_driver_iteration_data(case_id, variable):
+    """ get_driver_iteration_data method
+
+    Grabs and returns all data for a given variable over each iteration
+    in the driver_iteration collection
+
+    Args:
+        case_id (string): the case whose data will be checked
+        variable (string): the variable whose data is to be used for querying
+    Returns:
+        Array of data
+    """
+    dat = data.get_driver_iteration_data(case_id)
+    ret = []
+    for i in dat:
+        for v in i['desvars']:
+            if v['name'] == variable:
+                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
+                v['counter'] = i['counter']
+                v['type'] = 'desvar'
+                ret.append(v)
+
+    return json.dumps(ret)
+
+def get_desvars(case_id):
+    """ get_desvars method
+
+    Grabs all desvars in driver_iterations for a given case_id
+
+    Args:
+        case_id (string): the case to be queried
+    Returns:
+        Array of string variable names
+    """
+    dat = data.get_driver_iteration_data(case_id)
+    ret = []
+    for i in dat:
+        for v in i['desvars']:
+            if v['name'] not in ret:
+                ret.append(v['name'])
+
+    return json.dumps(ret)
+
 def _extract_iteration_coordinate(coord):
     """ private extract_iteration_coordinate method
 

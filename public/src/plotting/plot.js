@@ -91,23 +91,27 @@ var createPlot = function (container) {
         curData[index].sort(compareIterations);
 
         //Set up data for plotting
-        var finalData = getData(index);
-
+        // var finalData = formatData(index, function (obj) { return obj['type'] == 'input' || obj['type'] == 'output' });
+        var finalData = formatData(index, function (obj) { return obj['type'] == 'desvar' });
+        
         //Set the precision of the data
-        for (var j = 0; j < finalData['inputs_outputs'].length; ++j) {
-            for (var i = 0; i < finalData['inputs_outputs'][j].y.length; ++i) {
-                var val = finalData['inputs_outputs'][j].y[i];
+        for (var j = 0; j < finalData.length; ++j) {
+            for (var i = 0; i < finalData[j].y.length; ++i) {
+                var val = finalData[j].y[i];
                 val = Math.round(val * 100000000) / 100000000;
-                finalData['inputs_outputs'][j].y[i] = val;
+                finalData[j].y[i] = val;
             }
         }
-        for (var j = 0; j < finalData['residuals'].length; ++j) {
-            for (var i = 0; i < finalData['residuals'][j].y.length; ++i) {
-                var val = finalData['residuals'][j].y[i];
-                val = Math.round(val * 100000000) / 100000000;
-                finalData['residuals'][j].y[i] = val;
-            }
-        }
+
+        // var resid_data = formatData(index, function (obj) { return obj['type'] === 'residual' }, 'resids')
+        // for (var j = 0; j < resid_data.length; ++j) {
+        //     for (var i = 0; i < resid_data[j].y.length; ++i) {
+        //         var val = resid_data[j].y[i];
+        //         val = Math.round(val * 100000000) / 100000000;
+        //         resid_data[j].y[i] = val;
+        //     }
+        // }
+
         //Set up the layout
         var layout = {
             title: searchString,
@@ -121,12 +125,12 @@ var createPlot = function (container) {
         }
 
         //Add residuals to inputs_outputs
-        for(var i = 0; i < finalData['residuals'].length; ++i) {
-            finalData['inputs_outputs'].push(finalData['residuals'][i])
-        }
+        // for (var i = 0; i < resid_data.length; ++i) {
+        //     finalData.push(resid_data[i])
+        // }
 
         //plot it
-        Plotly.newPlot(element, finalData['inputs_outputs'], layout);
+        Plotly.newPlot(element, finalData, layout);
 
         //Update the select picker
         while (selectPicker.options.length > 0) {
@@ -150,79 +154,45 @@ var createPlot = function (container) {
      * @param {int} index
      * @return {Object}
      */
-    var getData = function (index) {
-        var finalData = {
-            'residuals': [],
-            'inputs_outputs': []
-        };
-        var got_first_in_outs = false;
-        var got_first_resids = false;
+    var formatData = function (index, typeFunc, prependName='') {
+        var finalData = [];
+        var gotFirstProp = false;
         for (var i = 0; i < curData[index].length; ++i) {
             for (var j = 0; j < curData[index][i]['values'].length; ++j) {
                 if (curData[index][i]['values'][0].hasOwnProperty('length')) {
                     for (var k = 0; k < curData[index][i]['values'][0].length; ++k) {
-                        if ((curData[index][i]['type'] !== 'residual' && !got_first_in_outs) || (curData[index][i]['type'] === 'residual' && !got_first_resids)) {
-                            if (curData[index][i]['type'] !== 'residual') {
-                                got_first_in_outs = true;
-                                finalData['inputs_outputs'].push({
-                                    x: [curData[index][i]['counter']],
-                                    y: [curData[index][i]['values'][j][k]],
-                                    name: '[0][0]'
-                                });
-                            }
-                            else {
-                                got_first_resids = true;
-                                finalData['residuals'].push({
-                                    x: [curData[index][i]['counter']],
-                                    y: [curData[index][i]['values'][j][k]],
-                                    name: 'Residuals [0][0]'
-                                });
-                            }
+                        if (typeFunc(curData[index][i]) && !gotFirstProp) {
+                            gotFirstProp = true;
+                            finalData.push({
+                                x: [curData[index][i]['counter']],
+                                y: [curData[index][i]['values'][j][k]],
+                                name: '[0][0]'
+                            });
                         }
                         else {
-                            if (curData[index][i]['type'] !== 'residual') {
+                            if (typeFunc(curData[index][i])) {
                                 var k_len = curData[index][i]['values'][0].length;
-                                finalData['inputs_outputs'][k_len * j + k].x.push(curData[index][i]['counter']);
-                                finalData['inputs_outputs'][k_len * j + k].y.push(curData[index][i]['values'][j][k]);
-                                finalData['inputs_outputs'][k_len * j + k].name = '[' + j + '][' + k + ']';
-                            }
-                            else {
-                                finalData['residuals'][k_len * j + k].x.push(curData[index][i]['counter']);
-                                finalData['residuals'][k_len * j + k].y.push(curData[index][i]['values'][j][k]);
-                                finalData['residuals'][k_len * j + k].name = 'Residuals [' + j + '][' + k + ']';
+                                finalData[k_len * j + k].x.push(curData[index][i]['counter']);
+                                finalData[k_len * j + k].y.push(curData[index][i]['values'][j][k]);
+                                finalData[k_len * j + k].name = '[' + j + '][' + k + ']';
                             }
                         }
                     }
                 }
                 else {
-                    if ((curData[index][i]['type'] !== 'residual' && !got_first_in_outs) || (curData[index][i]['type'] === 'residual' && !got_first_resids)) {
-                        if (curData[index][i]['type'] !== 'residual') {
-                            got_first_in_outs = true;
-                            finalData['inputs_outputs'].push({
-                                x: [curData[index][i]['counter']],
-                                y: [curData[index][i]['values'][j]],
-                                name: 'Index 0'
-                            });
-                        }
-                        else {
-                            got_first_resids = true;
-                            finalData['residuals'].push({
-                                x: [curData[index][i]['counter']],
-                                y: [curData[index][i]['values'][j]],
-                                name: 'Residuals'
-                            });
-                        }
+                    if (typeFunc(curData[index][i]) && !gotFirstProp) {
+                        gotFirstProp = true;
+                        finalData.push({
+                            x: [curData[index][i]['counter']],
+                            y: [curData[index][i]['values'][j]],
+                            name: 'Index 0'
+                        });
                     }
                     else {
-                        if (curData[index][i]['type'] !== 'residual') {
-                            finalData['inputs_outputs'][j].x.push(curData[index][i]['counter']);
-                            finalData['inputs_outputs'][j].y.push(curData[index][i]['values'][j]);
-                            finalData['inputs_outputs'][j].name = 'Index ' + j;
-                        }
-                        else {
-                            finalData['residuals'][j].x.push(curData[index][i]['counter']);
-                            finalData['residuals'][j].y.push(curData[index][i]['values'][j]);
-                            finalData['residuals'][j].name = 'Residuals Index ' + j;
+                        if (typeFunc(curData[index][i])) {
+                            finalData[j].x.push(curData[index][i]['counter']);
+                            finalData[j].y.push(curData[index][i]['values'][j]);
+                            finalData[j].name = prependName + 'Index ' + j;
                         }
                     }
                 }
@@ -308,7 +278,7 @@ var createPlot = function (container) {
      * @param {string} name 
      */
     var handleSearch = function (name) {
-        http.get('case/' + case_id + '/system_iterations/' + name, function (result) {
+        http.get('case/' + case_id + '/driver_iterations/' + name, function (result) {
             result = JSON.parse(result);
             searchString = name;
             setData(result);
@@ -316,7 +286,7 @@ var createPlot = function (container) {
     };
 
     //Get the variables
-    http.get('case/' + case_id + '/variables', function (result) {
+    http.get('case/' + case_id + '/desvars', function (result) {
         result = JSON.parse(result);
         search = new Awesomplete(searchElement, { list: result });
 
