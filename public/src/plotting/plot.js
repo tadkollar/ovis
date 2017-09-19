@@ -92,8 +92,12 @@ var createPlot = function (container) {
 
         //Set up data for plotting
         // var finalData = formatData(index, function (obj) { return obj['type'] == 'input' || obj['type'] == 'output' });
-        var finalData = formatData(index, function (obj) { return obj['type'] == 'desvar' });
-        
+        var finalData = formatData(index, function (obj) { return obj['type'] == 'desvar' }, 'Desvar ');
+        var objectives = formatData(index, function (obj) { return obj['type'] == 'objective' }, 'Objective');
+        var constraint = formatData(index, function (obj) { return obj['type'] == 'constraint' }, 'Constraint');
+        append(finalData, object);
+        append(finalData, constraint);
+
         //Set the precision of the data
         for (var j = 0; j < finalData.length; ++j) {
             for (var i = 0; i < finalData[j].y.length; ++i) {
@@ -103,15 +107,6 @@ var createPlot = function (container) {
                 finalData[j].x[i] = parseInt(finalData[j].x[i]) - 1;
             }
         }
-
-        // var resid_data = formatData(index, function (obj) { return obj['type'] === 'residual' }, 'resids')
-        // for (var j = 0; j < resid_data.length; ++j) {
-        //     for (var i = 0; i < resid_data[j].y.length; ++i) {
-        //         var val = resid_data[j].y[i];
-        //         val = Math.round(val * 100000000) / 100000000;
-        //         resid_data[j].y[i] = val;
-        //     }
-        // }
 
         //Set up the layout
         var layout = {
@@ -145,6 +140,18 @@ var createPlot = function (container) {
         for (var i = 0; i < index; ++i) {
             var t = curData[i][0];
             selectPicker.options.add(new Option(getIterationName(t), i));
+        }
+    }
+
+    /**
+     * Appends array2 onto array1
+     * 
+     * @param {[*]} arr1 
+     * @param {[*]} arr2 
+     */
+    var append = function(arr1, arr2) {
+        for(var i = 0; i < arr2.length; ++i) {
+            arr1.push(arr2[i])
         }
     }
 

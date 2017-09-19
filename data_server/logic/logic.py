@@ -266,6 +266,18 @@ def get_driver_iteration_data(case_id, variable):
                 v['counter'] = i['counter']
                 v['type'] = 'desvar'
                 ret.append(v)
+        for v in i['objectives']:
+            if v['name'] == variable:
+                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
+                v['counter'] = i['counter']
+                v['type'] = 'objective'
+                ret.append(v)
+        for v in i['constraints']:
+            if v['name'] == variable:
+                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
+                v['counter'] = i['counter']
+                v['type'] = 'constraint'
+                ret.append(v)
 
     return json.dumps(ret)
 
@@ -283,6 +295,12 @@ def get_desvars(case_id):
     ret = []
     for i in dat:
         for v in i['desvars']:
+            if v['name'] not in ret:
+                ret.append(v['name'])
+        for v in i['objectives']:
+            if v['name'] not in ret:
+                ret.append(v['name'])
+        for v in i['constraints']:
             if v['name'] not in ret:
                 ret.append(v['name'])
 
