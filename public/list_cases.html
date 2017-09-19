@@ -21,14 +21,16 @@
             <h2>Available Cases</h2>
             <table class="table table-striped table-hover">
                 <thead>
-                    <th style="width: 60%">Name</th>
-                    <th style="width: 30%; text-align: center">Date</th>
+                    <th style="width: 40%">Name</th>
+                    <th style="width: 20%; text-align: center">Case ID</th>
+                    <th style="width: 20%; text-align: center">Date</th>
                     <th style="text-align: center">Delete</th>
                 </thead>
                 <tbody>
                     {% for case in cases %}
                     <tr onclick="window.document.location='../case/{{case["case_id"]}}'" style="cursor: pointer">
                         <td>{{case['case_name']}}</td>
+                        <td align="center">{{case['case_id']}}</td>
                         <td align="center">{{case['datestring']}}</td>
                         <td align="center"><button class="btn btn-sm btn-danger"><i class="fa fa-remove"></i></button></td>
                     </tr>
