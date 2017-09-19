@@ -100,6 +100,7 @@ var createPlot = function (container) {
                 var val = finalData[j].y[i];
                 val = Math.round(val * 100000000) / 100000000;
                 finalData[j].y[i] = val;
+                finalData[j].x[i] = parseInt(finalData[j].x[i]) - 1;
             }
         }
 
