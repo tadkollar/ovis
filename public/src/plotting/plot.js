@@ -3,13 +3,13 @@ var createPlot = function (container) {
     var curData = [];
     var searchString = '';
     var element = container.getElement()[0].lastChild;
-    var searchElement = container.getElement()[0].firstChild;
-    var selectPicker = container.getElement()[0].children[1];
-    searchElement.style.width = (container.width - 20).toString() + 'px';
-    searchElement.style.height = '15px';
+    var searchElement = container.getElement()[0].children[1];
+    var selectPicker = container.getElement()[0].children[2];
+    searchElement.style.width = (container.width - 60).toString() + 'px';
+    searchElement.style.height = '20px';
     searchElement.style.marginTop = '20px';
     element.style.width = container.width.toString() + 'px';
-    element.style.height = (container.height - 60).toString() + 'px';
+    element.style.height = (container.height - 65).toString() + 'px';
 
     //Set up the basic plot
     if (element != null) {
@@ -28,13 +28,13 @@ var createPlot = function (container) {
     var resize = function () {
         //Set element's dimensions
         element.style.width = container.width.toString() + 'px';
-        element.style.height = (container.height - 60).toString() + 'px';
-        searchElement.style.width = (container.width - 20).toString() + 'px';
+        element.style.height = (container.height - 65).toString() + 'px';
+        searchElement.style.width = (container.width - 60).toString() + 'px';
 
         //Set up plotly's dimensions
         Plotly.relayout(element, {
             width: container.width,
-            height: container.height - 60
+            height: container.height - 65
         });
     };
 
