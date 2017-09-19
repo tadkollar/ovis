@@ -95,7 +95,7 @@ var createPlot = function (container) {
         var finalData = formatData(index, function (obj) { return obj['type'] == 'desvar' }, 'Desvar ');
         var objectives = formatData(index, function (obj) { return obj['type'] == 'objective' }, 'Objective');
         var constraint = formatData(index, function (obj) { return obj['type'] == 'constraint' }, 'Constraint');
-        append(finalData, object);
+        append(finalData, objectives);
         append(finalData, constraint);
 
         //Set the precision of the data
@@ -189,7 +189,7 @@ var createPlot = function (container) {
                 }
                 else {
                     if ((typeFunc(curData[index][i]) && !gotFirstProp) ||
-                        (typeFunc(curData[index][i]) && finalData.length < (j-1))) {
+                        (typeFunc(curData[index][i]) && j >= finalData.length)) {
                         gotFirstProp = true;
                         finalData.push({
                             x: [curData[index][i]['counter']],
