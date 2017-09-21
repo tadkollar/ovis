@@ -2,6 +2,7 @@ import unittest
 import sys
 import os.path
 import json
+from bson.json_util import dumps
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 from data_server.data import data
 from data_server.shared import collections
@@ -59,8 +60,76 @@ class TestData(unittest.TestCase):
 
     def test_generic_create(self):
         new_case = data.create_case({}, token)
-        
-        
+        data.generic_create(collections.DRIVER_ITERATIONS, {'test': True}, new_case, token, False)
+        driv_iter = json.loads(data.generic_get(collections.DRIVER_ITERATIONS, new_case, token))[0]
+        self.assertTrue(driv_iter['test'])
+
+    def test_generic_create_fail(self):
+        new_case = data.create_case({}, token)
+        result = data.generic_create(collections.DRIVER_ITERATIONS, {'test': True}, new_case, 'badtoken', False)
+        self.assertFalse(result)
+
+    def test_generic_delete(self):
+        new_case = data.create_case({}, token)
+        data.generic_create(collections.DRIVER_ITERATIONS, {'test': True}, new_case, token, False)
+        data.generic_delete(collections.DRIVER_ITERATIONS, new_case, token)
+        self.assertEqual(data.generic_get(collections.DRIVER_ITERATIONS, new_case, token), '[]')
+
+    def test_create_replace_iter_coord(self):
+        new_case = data.create_case({}, token)
+        data.generic_create(collections.DRIVER_ITERATIONS, {'iteration_coordinate': '123', 'test': True}, new_case, token, False)
+        data.generic_create(collections.DRIVER_ITERATIONS, {'iteration_coordinate': '123', 'test': False}, new_case, token, True)
+        driv_iter = json.loads(data.generic_get(collections.DRIVER_ITERATIONS, new_case, token))[0]
+        self.assertFalse(driv_iter['test'])
+
+    def test_create_replace_counter(self):
+        new_case = data.create_case({}, token)
+        data.generic_create(collections.DRIVER_ITERATIONS, {'counter': '123', 'test': True}, new_case, token, False)
+        data.generic_create(collections.DRIVER_ITERATIONS, {'counter': '123', 'test': False}, new_case, token, True)
+        driv_iter = json.loads(data.generic_get(collections.DRIVER_ITERATIONS, new_case, token))[0]
+        self.assertFalse(driv_iter['test'])
+
+    def test_create_replace_solver_class(self):
+        new_case = data.create_case({}, token)
+        data.generic_create(collections.DRIVER_ITERATIONS, {'solver_class': '123', 'test': True}, new_case, token, False)
+        data.generic_create(collections.DRIVER_ITERATIONS, {'solver_class': '123', 'test': False}, new_case, token, True)
+        driv_iter = json.loads(data.generic_get(collections.DRIVER_ITERATIONS, new_case, token))[0]
+        self.assertFalse(driv_iter['test'])
+
+    def test_create_replace_none(self):
+        new_case = data.create_case({}, token)
+        data.generic_create(collections.DRIVER_ITERATIONS, {'test': True}, new_case, token, False)
+        data.generic_create(collections.DRIVER_ITERATIONS, {'test': False}, new_case, token, True)
+        driv_iter = json.loads(data.generic_get(collections.DRIVER_ITERATIONS, new_case, token))[0]
+        self.assertFalse(driv_iter['test'])
+
+    def test_get_system_iteration_data(self):
+        new_case = data.create_case({}, token)
+        data.generic_create(collections.SYSTEM_ITERATIONS, {'iteration_coordinate': '123', 'data':1}, new_case, token, False)
+        data.generic_create(collections.SYSTEM_ITERATIONS, {'iteration_coordinate': '124', 'data':2}, new_case, token, False)
+        sys_iters = dumps(data.get_system_iteration_data(new_case))
+        self.assertEqual(len(json.loads(sys_iters)), 2)
+
+    def test_get_driver_iteration_data(self):
+        new_case = data.create_case({}, token)
+        data.generic_create(collections.DRIVER_ITERATIONS, {'iteration_coordinate': '123', 'data':1}, new_case, token, False)
+        data.generic_create(collections.DRIVER_ITERATIONS, {'iteration_coordinate': '124', 'data':2}, new_case, token, False)
+        driv_iters = dumps(data.get_driver_iteration_data(new_case))
+        self.assertEqual(len(json.loads(driv_iters)), 2)
+
+    def test_delete_token(self):
+        new_token = data.get_new_token('test-delete-token', 'test@fake2.com')
+        new_case = data.create_case({}, new_token)
+        data.generic_create(collections.DRIVER_ITERATIONS, {'test': True}, new_case, new_token, False)
+        self.assertTrue(data.token_exists(new_token))
+        case = json.loads(data.get_case_with_id(new_case, new_token))
+        self.assertEqual(case['case_id'], new_case)
+        driv_iter = json.loads(data.generic_get(collections.DRIVER_ITERATIONS, new_case, new_token))[0]
+        self.assertTrue(driv_iter['test'])
+        data.delete_token(new_token)
+        self.assertFalse(data.token_exists(new_token))
+        self.assertEqual(data.get_case_with_id(new_case, new_token), {})
+        self.assertEqual(data.generic_get(collections.DRIVER_ITERATIONS, new_case, new_token), '[]')
 
 if __name__ == "__main__":
     unittest.main()

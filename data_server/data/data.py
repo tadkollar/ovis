@@ -188,6 +188,7 @@ def generic_create(collection_name, body, case_id, token, update):
         body (json): the document to be added to the collection
         case_id (string || int): ID to be used for querying
         token (string): the token to be used for authentication
+        update (bool): if we're updating the data or simply adding new data
     Returns:
         True if successfull, False otherwise
     """
@@ -250,7 +251,7 @@ def delete_token(token):
     Args:
         token (string): the token to be deleted
     """
-    if(token_exists(token)):
+    if token_exists(token):
         all_cases = json.loads(get_all_cases(token))
         for c in all_cases:
             delete_case_with_id(c['case_id'], token)
