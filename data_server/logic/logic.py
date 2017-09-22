@@ -13,20 +13,6 @@ from dateutil import tz
 from datetime import datetime
 import data_server.data.data as data
 
-def get_model_data():
-    """ get_model_data method
-
-    Grabs and returns the model/connection information for the example case.
-    NOTE: this is completely temporary and will be replaced entirely with
-        the logic for getting driver metadata.
-
-    Args:
-        None
-    Returns:
-        JSON representing the model/connections of the example
-    """
-    return data.get_model_data()
-
 def get_all_cases(token):
     """ get_all_cases method
 

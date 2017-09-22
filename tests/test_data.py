@@ -117,6 +117,22 @@ class TestData(unittest.TestCase):
         driv_iters = dumps(data.get_driver_iteration_data(new_case))
         self.assertEqual(len(json.loads(driv_iters)), 2)
 
+    def test_get_many(self):
+        new_case = data.create_case({}, token)
+        data.generic_create(collections.SOLVER_ITERATIONS, {'test':1}, new_case, token, False)
+        data.generic_create(collections.SOLVER_ITERATIONS, {'test':2}, new_case, token, False)
+        data.generic_create(collections.SOLVER_ITERATIONS, {'test':3}, new_case, token, False)
+        sol_iters = json.loads(data.generic_get(collections.SOLVER_ITERATIONS, new_case, token, get_many=True))
+        self.assertEqual(len(sol_iters), 3)
+
+    def test_get_one(self):
+        new_case = data.create_case({}, token)
+        data.generic_create(collections.SOLVER_ITERATIONS, {'test':1}, new_case, token, False)
+        data.generic_create(collections.SOLVER_ITERATIONS, {'test':2}, new_case, token, False)
+        data.generic_create(collections.SOLVER_ITERATIONS, {'test':3}, new_case, token, False)
+        sol_iters = json.loads(data.generic_get(collections.SOLVER_ITERATIONS, new_case, token, get_many=False))
+        self.assertEqual(sol_iters['test'], 1)
+
     def test_delete_token(self):
         new_token = data.get_new_token('test-delete-token', 'test@fake2.com')
         new_case = data.create_case({}, new_token)
@@ -130,6 +146,42 @@ class TestData(unittest.TestCase):
         self.assertFalse(data.token_exists(new_token))
         self.assertEqual(data.get_case_with_id(new_case, new_token), {})
         self.assertEqual(data.generic_get(collections.DRIVER_ITERATIONS, new_case, new_token), '[]')
+
+    def test_delete_without_access(self):
+        new_token = data.get_new_token('temp-token', 'test@fake3.com')
+        new_case = data.create_case({}, token)
+        data.generic_create(collections.SOLVER_ITERATIONS, {'test':1}, new_case, token, False)
+        self.assertFalse(data.delete_case_with_id(new_case, new_token))
+        data.delete_token(new_token)
+        data.delete_case_with_id(new_case, token)
+
+    def test_create_case_bad_token(self):
+        new_case = data.create_case({}, 'bad token')
+        self.assertEqual(new_case, -1)
+
+    def test_get_many_globally_accepted_token(self):
+        new_case = data.create_case({}, token)
+        data.generic_create(collections.SYSTEM_ITERATIONS, {'test': True}, new_case, token, False)
+        sys_iters = json.loads(data.generic_get(collections.SYSTEM_ITERATIONS, new_case, data._GLOBALLY_ACCEPTED_TOKEN))
+        self.assertEqual(len(sys_iters), 1)
+
+    def test_get_one_globally_accepted_token(self):
+        new_case = data.create_case({}, token)
+        data.generic_create(collections.SYSTEM_ITERATIONS, {'test': True}, new_case, token, False)
+        sys_iters = json.loads(data.generic_get(collections.SYSTEM_ITERATIONS, new_case, data._GLOBALLY_ACCEPTED_TOKEN, False))
+        self.assertTrue(sys_iters['test'])
+
+    def test_update_without_access(self):
+        new_case = data.create_case({}, token)
+        data.generic_create(collections.SYSTEM_ITERATIONS, {'iteration_coordinate': 123, 'test': True}, new_case, token, False)
+        self.assertFalse(data.generic_create(collections.SYSTEM_ITERATIONS, {'iteration_coordinate': 123, 'test': False}, new_case, 'bad token', True))
+
+    def test_update_without_access2(self):
+        new_token = data.get_new_token('temp-token', 'test@fake4.com')
+        new_case = data.create_case({}, token)
+        data.generic_create(collections.SYSTEM_ITERATIONS, {'iteration_coordinate': 123, 'test': True}, new_case, token, False)
+        self.assertFalse(data.generic_create(collections.SYSTEM_ITERATIONS, {'iteration_coordinate': 123, 'test': False}, new_case, new_token, True))
+        data.delete_token(new_token)
 
 if __name__ == "__main__":
     unittest.main()

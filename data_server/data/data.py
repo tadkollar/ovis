@@ -53,22 +53,6 @@ _MDB = _MCLIENT.openmdao_blue
 _MAX_ID_ATTEMPTS = 1000 #maximum number of attempts to try to create an ID
 _GLOBALLY_ACCEPTED_TOKEN = 'squavy'
 
-def get_model_data():
-    """ get_model_data method
-
-    Grabs the example model/connection data from the SQLITE DB.
-    NOTE: this should be replaced in its entirety with the driver metadata
-        collection, as we don't use SQLITE as the main DB here.
-
-    Args:
-        None
-    Returns:
-        JSON model/connection data for the example
-    """
-    _CURSOR.execute("SELECT model_viewer_data FROM driver_metadata;")
-    model_pickle = _CURSOR.fetchone()
-    return pickle.loads(model_pickle[0])
-
 def get_all_cases(token):
     """ get_all_cases method
 
@@ -161,7 +145,7 @@ def create_case(body, token):
     cases_coll.insert_one(body)
     return case_id
 
-def generic_get(collection_name, case_id, token):
+def generic_get(collection_name, case_id, token, get_many=True):
     """ generic_get method
 
     Performs a generic 'get' request, which attempts to query and return
@@ -171,10 +155,11 @@ def generic_get(collection_name, case_id, token):
         collection_name (string): the collection to query
         case_id (string || int): ID to be used for querying
         token (string): the token to be used for authentication
+        get_many (bool): whether you should query to get one or all instances
     Returns:
         JSON array of documents returned from the query
     """
-    return _get(_MDB[collection_name], case_id, token)
+    return _get(_MDB[collection_name], case_id, token, get_many)
 
 def generic_create(collection_name, body, case_id, token, update):
     """ generic_create method
@@ -421,7 +406,7 @@ def _create(collection, body, case_id, token, update):
         return False
 
     if update:
-        if _get(_MDB[collections.CASES], case_id, token) is None:
+        if _get(_MDB[collections.CASES], case_id, token) == '[]':
             return False
         if 'iteration_coordinate' in body:
             collection.delete_many({'$and': [{'case_id': int(case_id)},

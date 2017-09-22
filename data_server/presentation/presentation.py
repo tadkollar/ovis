@@ -22,24 +22,6 @@ class IndexHandler(web.RequestHandler):
     def get(self):
         self.render("../../public/login.html")
 
-class ModelDataHandler(web.RequestHandler):
-    """ ModelDataHandler class
-
-    Contains logic for getting the stored model/connections data.
-    NOTE: this is completely temporary and should be replaced
-        by getting the driver metadata.
-    """
-    def get(self):
-        if self.request.headers.get('token') != _TOKEN:
-            ret = {}
-            ret['status'] = 'Failed'
-            ret['reasoning'] = 'Invalid token'
-            print('Received request with bad token')
-            self.write(ret)
-            return
-
-        self.write(logic.get_model_data())
-
 class CaseHandler(web.RequestHandler):
     """ CaseHandler class
 
