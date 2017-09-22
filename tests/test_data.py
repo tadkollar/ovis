@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.
 from data_server.data import data
 from data_server.shared import collections
 
-token = data.get_new_token('Unit Test', 'UnitTest@fake.com')
+token = data.get_new_token('Unit Test', 'UnitTestData@fake.com')
 
 def cleanup():
     data.delete_token(token)
@@ -44,7 +44,7 @@ class TestData(unittest.TestCase):
         self.assertEqual(data.get_case_with_id(new_case, token), {})
 
     def test_user_exists(self):
-        self.assertTrue(data.user_exists(email='UnitTest@fake.com'))
+        self.assertTrue(data.user_exists(email='UnitTestData@fake.com'))
 
     def test_user_exists2(self):
         self.assertTrue(data.user_exists(token=token))
@@ -184,5 +184,7 @@ class TestData(unittest.TestCase):
         data.delete_token(new_token)
 
 if __name__ == "__main__":
-    unittest.main()
-    cleanup()
+    try:
+        unittest.main()
+    finally:
+        cleanup()

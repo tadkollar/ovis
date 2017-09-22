@@ -43,11 +43,6 @@ from pymongo import MongoClient
 from bson.json_util import dumps
 import data_server.shared.collections as collections
 
-_LOCATION = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-_SQLTIEDB_FILE = os.path.join(_LOCATION, 'sqlite_test')
-_DB_CON = sqlite3.connect(_SQLTIEDB_FILE, detect_types=sqlite3.PARSE_DECLTYPES)
-_CURSOR = _DB_CON.cursor()
-
 _MCLIENT = MongoClient('localhost', 27017)
 _MDB = _MCLIENT.openmdao_blue
 _MAX_ID_ATTEMPTS = 1000 #maximum number of attempts to try to create an ID

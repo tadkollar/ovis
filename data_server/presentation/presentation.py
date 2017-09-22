@@ -202,7 +202,6 @@ class LoginHandler(web.RequestHandler):
 
     def get(self, *params):
         cases = logic.get_all_cases(params[0])
-        
         self.render("../../public/list_cases.html", cases=cases)
 
 class SystemIterationVariableHandler(web.RequestHandler):

@@ -90,7 +90,7 @@ def create_case(body, token):
         ret['status'] = 'Failed to create ID'
     return ret
 
-def generic_get(collection_name, case_id, token):
+def generic_get(collection_name, case_id, token, get_many = True):
     """ generic_get method
 
     Performs the typical 'get' request, passing the case_id to the data layer
@@ -100,10 +100,11 @@ def generic_get(collection_name, case_id, token):
         collection_name (string): the collection to be queried
         case_id (string || int): the case_id for querying
         token (string): the token to be used for authentication
+        get_many (bool): true if you want to get all, false if you only want one
     Returns:
         Array of documents with the given case_id from the given collection
     """
-    return data.generic_get(collection_name, case_id, token)
+    return data.generic_get(collection_name, case_id, token, get_many)
 
 def generic_create(collection_name, body, case_id, token, update):
     """ generic_create method
@@ -121,7 +122,6 @@ def generic_create(collection_name, body, case_id, token, update):
     Returns:
         True if successfull, False otherwise
     """
-    
     converted_update = False
     if update == 'True':
         converted_update = True
@@ -170,6 +170,18 @@ def token_exists(token):
         True if exists, False otherwise
     """
     return data.token_exists(token)
+
+def delete_token(token):
+    """ delete_token method
+
+    deletes a given token
+
+    Args:
+        token (string): the token to be deleted
+    Returns:
+        None
+    """
+    data.delete_token(token)
 
 def get_system_iteration_data(case_id, variable):
     """ get_system_iteration_data method
