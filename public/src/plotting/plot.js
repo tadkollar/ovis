@@ -1,15 +1,34 @@
 var createPlot = function (container) {
+    var deltaPlotheight = 80;
+    var deltaSearchWidth = 100;
+
     var search;
     var curData = [];
     var searchString = '';
     var element = container.getElement()[0].lastChild;
     var searchElement = container.getElement()[0].children[1];
-    var selectPicker = container.getElement()[0].children[2];
-    searchElement.style.width = (container.width - 60).toString() + 'px';
-    searchElement.style.height = '20px';
+    var options = container.getElement()[0].children[3];
+    var selectPicker = container.getElement()[0].children[4];
+    var recentData = [];
+    searchElement.style.width = (container.width - deltaSearchWidth).toString() + 'px';
+    searchElement.style.height = '30px';
     searchElement.style.marginTop = '20px';
     element.style.width = container.width.toString() + 'px';
-    element.style.height = (container.height - 65).toString() + 'px';
+    element.style.height = (container.height - deltaPlotheight).toString() + 'px';
+
+    var logscaleXVal = false;
+    var logscaleYVal = false;
+    var stackedPlotVal = false;
+    var variables = [];
+    var selectedVariables = [];
+
+    //Setup control panel
+    if(options != null) {
+        options.onclick = function() {
+            openNav(logscaleXVal, logscaleYVal, stackedPlotVal, variables, selectedVariables,
+                    logscaleX, logscaleY, stackedPlot, variableFun); 
+        }
+    }
 
     //Set up the basic plot
     if (element != null) {
@@ -28,13 +47,13 @@ var createPlot = function (container) {
     var resize = function () {
         //Set element's dimensions
         element.style.width = container.width.toString() + 'px';
-        element.style.height = (container.height - 65).toString() + 'px';
-        searchElement.style.width = (container.width - 60).toString() + 'px';
+        element.style.height = (container.height - deltaPlotheight).toString() + 'px';
+        searchElement.style.width = (container.width - deltaSearchWidth).toString() + 'px';
 
         //Set up plotly's dimensions
         Plotly.relayout(element, {
             width: container.width,
-            height: container.height - 65
+            height: container.height - deltaPlotheight
         });
     };
 
@@ -108,25 +127,7 @@ var createPlot = function (container) {
             }
         }
 
-        //Set up the layout
-        var layout = {
-            title: searchString,
-            xaxis: {
-                title: 'Global Counter',
-                // dtick: 1
-            },
-            yaxis: {
-                title: 'Value'
-            }
-        }
-
-        //Add residuals to inputs_outputs
-        // for (var i = 0; i < resid_data.length; ++i) {
-        //     finalData.push(resid_data[i])
-        // }
-
-        //plot it
-        Plotly.newPlot(element, finalData, layout);
+        updatePlotly(finalData);
 
         //Update the select picker
         while (selectPicker.options.length > 0) {
@@ -141,6 +142,38 @@ var createPlot = function (container) {
             var t = curData[i][0];
             selectPicker.options.add(new Option(getIterationName(t), i));
         }
+    }
+
+    /**
+     * Updates plotly to plot the new data
+     * 
+     * @param{[Object]} finalData - the data to be plotted
+     */
+    var updatePlotly = function(finalData) {
+        //Set up the layout
+        var xaxis = {
+            title: 'Global Counter'
+        }
+        var yaxis = {
+            title: 'Value'
+        }
+
+        if(logscaleXVal) {
+            xaxis['type'] = 'log'
+        }
+        if(logscaleYVal) {
+            yaxis['type'] = 'log'
+        }
+
+        var layout = {
+            title: searchString,
+            xaxis: xaxis,
+            yaxis: yaxis
+        }
+
+        //plot it
+        recentData = finalData;
+        Plotly.newPlot(element, finalData, layout);
     }
 
     /**
@@ -287,17 +320,42 @@ var createPlot = function (container) {
      * @param {string} name 
      */
     var handleSearch = function (name) {
+        selectedVariables = [];
         http.get('case/' + case_id + '/driver_iterations/' + name, function (result) {
             result = JSON.parse(result);
             searchString = name;
+            selectedVariables.push(name);
             setData(result);
         });
     };
+
+    var logscaleX = function(val) {
+        console.log("Changing x logscale to: " + val);
+        logscaleXVal = val;
+        updatePlotly(recentData);
+    }
+
+    var logscaleY = function(val) {
+        console.log("Changing y logscale to: " + val);
+        logscaleYVal = val;
+        updatePlotly(recentData);
+    }
+
+    var stackedPlot = function(val) {
+        console.log("Changing stackedPlot to: " + val);
+        stackedPlotVal = val;
+        updatePlotly(recentData);
+    }
+
+    var variableFun = function() {
+        console.log("variableFun called");
+    }
 
     //Get the variables
     http.get('case/' + case_id + '/desvars', function (result) {
         result = JSON.parse(result);
         search = new Awesomplete(searchElement, { list: result });
+        variables = result;
 
         var randIndex = Math.floor(Math.random() * result.length);
         if (randIndex < result.length) {

@@ -1,0 +1,55 @@
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    background-color: rgb(31, 31, 31);
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.varname {
+    padding: 8px 8px 8px 32px;
+    font-size: 25px;
+    color: #d6d6d6;
+    width: 350px;
+}
+
+.sidenav h1 {
+    text-align: center;
+    text-decoration: none;
+    color: #f0eeee;
+    display: block;
+}
+
+.inline {
+    display: inline;
+}
+
+.checkbox {
+    height: 18px;
+    width: 18px;
+}
+
+#variables.variableslist {
+    height: 150px;
+    width: 200px;
+    margin-left: 32px;
+}
+
+#variables.variableslist.option {
+    margin-left: 5px;
+    font-size: 15px;
+    color: #818181;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
