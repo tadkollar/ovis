@@ -24,9 +24,6 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, variables, ch
     }
     $('.selectpicker').selectpicker('refresh');
     $('.selectpicker').selectpicker('val', checkedVariables)
-    // for(var i = 0; i < checkedVariables.length; ++i) {
-    //     $('.selectpicker').selectpicker('val', checkedVariables[i])
-    // }
     
     document.getElementById("mySidenav").style.width = "350px";
     document.body.style.backgroundColor = "rgba(0,0,0,0.4)";

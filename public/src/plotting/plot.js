@@ -8,7 +8,7 @@ var createPlot = function (container) {
     var element = container.getElement()[0].lastChild;
     var searchElement = container.getElement()[0].children[1];
     var options = container.getElement()[0].children[3];
-    var selectPicker = container.getElement()[0].children[4];
+    // var selectPicker = container.getElement()[0].children[4];
     var dataInUse = {};
     searchElement.style.width = (container.width - deltaSearchWidth).toString() + 'px';
     searchElement.style.height = '30px';
@@ -87,7 +87,7 @@ var createPlot = function (container) {
             }
         }
 
-        var finalData = setNewPlotData(index);
+        var finalData = setNewPlotData(index, variable);
         dataInUse[variable] = finalData;
         updatePlotly(dataInUse);
     };
@@ -100,7 +100,7 @@ var createPlot = function (container) {
         var finalData = setNewPlotData(index);
         updatePlotly(finalData);
     }
-    selectPicker.onchange = selectClicked;
+    // selectPicker.onchange = selectClicked;
 
     /**
      * Sorts and formats data at the given index of curData, then 
@@ -108,15 +108,15 @@ var createPlot = function (container) {
      * 
      * @param {int} index 
      */
-    var setNewPlotData = function (index) {
+    var setNewPlotData = function (index, variableName) {
         //Sort the data to be plotted
         curData[index].sort(compareIterations);
 
         //Set up data for plotting
         // var finalData = formatData(index, function (obj) { return obj['type'] == 'input' || obj['type'] == 'output' });
-        var finalData = formatData(index, function (obj) { return obj['type'] == 'desvar' }, 'Desvar ');
-        var objectives = formatData(index, function (obj) { return obj['type'] == 'objective' }, 'Objective');
-        var constraint = formatData(index, function (obj) { return obj['type'] == 'constraint' }, 'Constraint');
+        var finalData = formatData(index, function (obj) { return obj['type'] == 'desvar' }, variableName + ' ');
+        var objectives = formatData(index, function (obj) { return obj['type'] == 'objective' }, variableName + ' ');
+        var constraint = formatData(index, function (obj) { return obj['type'] == 'constraint' }, variableName + ' ');
         append(finalData, objectives);
         append(finalData, constraint);
 
@@ -130,21 +130,19 @@ var createPlot = function (container) {
             }
         }
 
-        // updatePlotly(finalData);
-
         //Update the select picker
-        while (selectPicker.options.length > 0) {
-            selectPicker.remove(0);
-        }
-        for (var i = index; i < curData.length; ++i) {
-            var t = curData[i][0];
-            selectPicker.options.add(new Option(getIterationName(t), i));
-        }
+        // while (selectPicker.options.length > 0) {
+        //     selectPicker.remove(0);
+        // }
+        // for (var i = index; i < curData.length; ++i) {
+        //     var t = curData[i][0];
+        //     selectPicker.options.add(new Option(getIterationName(t), i));
+        // }
 
-        for (var i = 0; i < index; ++i) {
-            var t = curData[i][0];
-            selectPicker.options.add(new Option(getIterationName(t), i));
-        }
+        // for (var i = 0; i < index; ++i) {
+        //     var t = curData[i][0];
+        //     selectPicker.options.add(new Option(getIterationName(t), i));
+        // }
 
         return finalData;
     }
@@ -158,15 +156,19 @@ var createPlot = function (container) {
 
         var finalData = [];
 
+        var titleString = '';
         for(var k in data) {
+            titleString += k + ' '
             for(var n = 0; n < data[k].length; ++n) {
                 finalData.push(data[k][n]);
             }
         }
 
+        titleString += " vs. Iterations"
+
         //Set up the layout
         var xaxis = {
-            title: 'Global Counter'
+            title: 'Iteration'
         }
         var yaxis = {
             title: 'Value'
@@ -180,7 +182,7 @@ var createPlot = function (container) {
         }
 
         var layout = {
-            title: searchString,
+            title: titleString,
             xaxis: xaxis,
             yaxis: yaxis
         }
@@ -220,7 +222,7 @@ var createPlot = function (container) {
                             finalData.push({
                                 x: [curData[index][i]['counter']],
                                 y: [curData[index][i]['values'][j][k]],
-                                name: '[0][0]'
+                                name: prependName + '[0][0]'
                             });
                         }
                         else {
@@ -228,7 +230,7 @@ var createPlot = function (container) {
                                 var k_len = curData[index][i]['values'][0].length;
                                 finalData[k_len * j + k].x.push(curData[index][i]['counter']);
                                 finalData[k_len * j + k].y.push(curData[index][i]['values'][j][k]);
-                                finalData[k_len * j + k].name = '[' + j + '][' + k + ']';
+                                finalData[k_len * j + k].name = prependName + '[' + j + '][' + k + ']';
                             }
                         }
                     }
@@ -240,14 +242,14 @@ var createPlot = function (container) {
                         finalData.push({
                             x: [curData[index][i]['counter']],
                             y: [curData[index][i]['values'][j]],
-                            name: 'Index 0'
+                            name: prependName + '[0]'
                         });
                     }
                     else {
                         if (typeFunc(curData[index][i])) {
                             finalData[j].x.push(curData[index][i]['counter']);
                             finalData[j].y.push(curData[index][i]['values'][j]);
-                            finalData[j].name = prependName + 'Index ' + j;
+                            finalData[j].name = prependName + '[' + j + ']';
                         }
                     }
                 }
