@@ -9,7 +9,7 @@ var createPlot = function (container) {
     var searchElement = container.getElement()[0].children[1];
     var options = container.getElement()[0].children[3];
     var selectPicker = container.getElement()[0].children[4];
-    var recentData = [];
+    var dataInUse = {};
     searchElement.style.width = (container.width - deltaSearchWidth).toString() + 'px';
     searchElement.style.height = '30px';
     searchElement.style.marginTop = '20px';
@@ -63,7 +63,7 @@ var createPlot = function (container) {
      * 
      * @param {[Object]} dat 
      */
-    var setData = function (dat) {
+    var setData = function (dat, variable) {
         curData = [];
 
         //Place everything in the data array
@@ -87,7 +87,9 @@ var createPlot = function (container) {
             }
         }
 
-        setNewPlotData(index);
+        var finalData = setNewPlotData(index);
+        dataInUse[variable] = finalData;
+        updatePlotly(dataInUse);
     };
 
     /**
@@ -95,7 +97,8 @@ var createPlot = function (container) {
      */
     var selectClicked = function () {
         var index = Number(selectPicker.value);
-        setNewPlotData(index);
+        var finalData = setNewPlotData(index);
+        updatePlotly(finalData);
     }
     selectPicker.onchange = selectClicked;
 
@@ -127,7 +130,7 @@ var createPlot = function (container) {
             }
         }
 
-        updatePlotly(finalData);
+        // updatePlotly(finalData);
 
         //Update the select picker
         while (selectPicker.options.length > 0) {
@@ -142,6 +145,8 @@ var createPlot = function (container) {
             var t = curData[i][0];
             selectPicker.options.add(new Option(getIterationName(t), i));
         }
+
+        return finalData;
     }
 
     /**
@@ -149,7 +154,16 @@ var createPlot = function (container) {
      * 
      * @param{[Object]} finalData - the data to be plotted
      */
-    var updatePlotly = function(finalData) {
+    var updatePlotly = function(data) {
+
+        var finalData = [];
+
+        for(var k in data) {
+            for(var n = 0; n < data[k].length; ++n) {
+                finalData.push(data[k][n]);
+            }
+        }
+
         //Set up the layout
         var xaxis = {
             title: 'Global Counter'
@@ -172,7 +186,6 @@ var createPlot = function (container) {
         }
 
         //plot it
-        recentData = finalData;
         Plotly.newPlot(element, finalData, layout);
     }
 
@@ -320,35 +333,43 @@ var createPlot = function (container) {
      * @param {string} name 
      */
     var handleSearch = function (name) {
-        selectedVariables = [];
         http.get('case/' + case_id + '/driver_iterations/' + name, function (result) {
             result = JSON.parse(result);
             searchString = name;
             selectedVariables.push(name);
-            setData(result);
+            setData(result, name);
         });
     };
 
     var logscaleX = function(val) {
-        console.log("Changing x logscale to: " + val);
         logscaleXVal = val;
-        updatePlotly(recentData);
+        updatePlotly(dataInUse);
     }
 
     var logscaleY = function(val) {
-        console.log("Changing y logscale to: " + val);
         logscaleYVal = val;
-        updatePlotly(recentData);
+        updatePlotly(dataInUse);
     }
 
     var stackedPlot = function(val) {
         console.log("Changing stackedPlot to: " + val);
         stackedPlotVal = val;
-        updatePlotly(recentData);
+        updatePlotly(dataInUse);
     }
 
-    var variableFun = function() {
+    var variableFun = function(variable, val) {
         console.log("variableFun called");
+        if(val) {
+            handleSearch(variable);
+        }
+        else {
+            delete dataInUse[variable];
+            var index = selectedVariables.indexOf(variable);
+            if(index > -1) {
+                selectedVariables.splice(index, 1);
+            }
+            updatePlotly(dataInUse);
+        }
     }
 
     //Get the variables

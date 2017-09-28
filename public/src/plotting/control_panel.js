@@ -23,9 +23,10 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, variables, ch
         panelOptions.variableSelector.options.add(option)
     }
     $('.selectpicker').selectpicker('refresh');
-    for(var i = 0; i < checkedVariables.length; ++i) {
-        $('.selectpicker').selectpicker('val', checkedVariables[i])
-    }
+    $('.selectpicker').selectpicker('val', checkedVariables)
+    // for(var i = 0; i < checkedVariables.length; ++i) {
+    //     $('.selectpicker').selectpicker('val', checkedVariables[i])
+    // }
     
     document.getElementById("mySidenav").style.width = "350px";
     document.body.style.backgroundColor = "rgba(0,0,0,0.4)";
@@ -37,14 +38,12 @@ function closeNav() {
 }
 
 function logscaleX() {
-    console.log("running logscaleX");
     if(panelOptions.logscaleXFunction) {
         panelOptions.logscaleXFunction(panelOptions.logscaleXCheckbox.checked);
     }
 }
 
 function logscaleY() {
-    console.log("running logscaleY");
     if(panelOptions.logscaleYFunction) {
         panelOptions.logscaleYFunction(panelOptions.logscaleYCheckbox.checked);
     }
@@ -60,7 +59,7 @@ function stackedPlot() {
 function variablesSelected(variable, val) {
     console.log("running variablesSelected");
     if(panelOptions.variablesFunction) {
-        panelOptions.variablesFunction();
+        panelOptions.variablesFunction(variable, val);
     }
 }
 
