@@ -291,16 +291,29 @@ def get_desvars(case_id):
     """
     dat = data.get_driver_iteration_data(case_id)
     ret = []
+    cache = []
     for i in dat:
         for v in i['desvars']:
-            if v['name'] not in ret:
-                ret.append(v['name'])
+            if v['name'] not in cache:
+                ret.append({ 
+                    'name': v['name'],
+                    'type': 'desvar'
+                    })
+                cache.append(v['name'])
         for v in i['objectives']:
-            if v['name'] not in ret:
-                ret.append(v['name'])
+            if v['name'] not in cache:
+                ret.append({ 
+                    'name': v['name'],
+                    'type': 'objective'
+                })
+                cache.append(v['name'])
         for v in i['constraints']:
-            if v['name'] not in ret:
-                ret.append(v['name'])
+            if v['name'] not in cache:
+                ret.append({ 
+                    'name': v['name'],
+                    'type': 'constraint'
+                })
+                cache.append(v['name'])
 
     return json.dumps(ret)
 

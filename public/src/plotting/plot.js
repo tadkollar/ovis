@@ -1,38 +1,42 @@
 var createPlot = function (container) {
-    var deltaPlotheight = 80;
+    var deltaPlotheight = 20;
     var deltaSearchWidth = 100;
 
     var search;
     var curData = [];
     var searchString = '';
-    var element = container.getElement()[0].lastChild;
-    var searchElement = container.getElement()[0].children[1];
-    var options = container.getElement()[0].children[3];
+    var plotlyElement = container.getElement()[0].lastChild;
+    // var searchElement = container.getElement()[0].children[1];
+    var options = container.getElement()[0].children[0];
     // var selectPicker = container.getElement()[0].children[4];
     var dataInUse = {};
-    searchElement.style.width = (container.width - deltaSearchWidth).toString() + 'px';
-    searchElement.style.height = '30px';
-    searchElement.style.marginTop = '20px';
-    element.style.width = container.width.toString() + 'px';
-    element.style.height = (container.height - deltaPlotheight).toString() + 'px';
+    // searchElement.style.width = (container.width - deltaSearchWidth).toString() + 'px';
+    // searchElement.style.height = '30px';
+    // searchElement.style.marginTop = '20px';
+    plotlyElement.style.width = container.width.toString() + 'px';
+    plotlyElement.style.height = (container.height - deltaPlotheight).toString() + 'px';
 
     var logscaleXVal = false;
     var logscaleYVal = false;
     var stackedPlotVal = false;
-    var variables = [];
-    var selectedVariables = [];
+
+    var designVariables = [];
+    var constraints = [];
+    var objectives = [];
+    var selectedDesignVariables = [];
+    var selectedConstraints = [];
+    var selectedObjectives = [];
 
     //Setup control panel
-    if(options != null) {
-        options.onclick = function() {
-            openNav(logscaleXVal, logscaleYVal, stackedPlotVal, variables, selectedVariables,
-                    logscaleX, logscaleY, stackedPlot, variableFun); 
+    if (options != null) {
+        options.onclick = function () {
+            onDoubleClick();
         }
     }
 
     //Set up the basic plot
-    if (element != null) {
-        Plotly.plot(element, [{
+    if (plotlyElement != null) {
+        Plotly.plot(plotlyElement, [{
             x: [1, 2, 3, 4, 5],
             y: [0, 0, 0, 0, 0]
         }],
@@ -45,13 +49,13 @@ var createPlot = function (container) {
      * Resets the dimensions for plotly
      */
     var resize = function () {
-        //Set element's dimensions
-        element.style.width = container.width.toString() + 'px';
-        element.style.height = (container.height - deltaPlotheight).toString() + 'px';
-        searchElement.style.width = (container.width - deltaSearchWidth).toString() + 'px';
+        //Set plotlyElement's dimensions
+        plotlyElement.style.width = container.width.toString() + 'px';
+        plotlyElement.style.height = (container.height - deltaPlotheight).toString() + 'px';
+        // searchElement.style.width = (container.width - deltaSearchWidth).toString() + 'px';
 
         //Set up plotly's dimensions
-        Plotly.relayout(element, {
+        Plotly.relayout(plotlyElement, {
             width: container.width,
             height: container.height - deltaPlotheight
         });
@@ -115,10 +119,10 @@ var createPlot = function (container) {
         //Set up data for plotting
         // var finalData = formatData(index, function (obj) { return obj['type'] == 'input' || obj['type'] == 'output' });
         var finalData = formatData(index, function (obj) { return obj['type'] == 'desvar' }, variableName + ' ');
-        var objectives = formatData(index, function (obj) { return obj['type'] == 'objective' }, variableName + ' ');
-        var constraint = formatData(index, function (obj) { return obj['type'] == 'constraint' }, variableName + ' ');
-        append(finalData, objectives);
-        append(finalData, constraint);
+        var objectivesT = formatData(index, function (obj) { return obj['type'] == 'objective' }, variableName + ' ');
+        var constraintT = formatData(index, function (obj) { return obj['type'] == 'constraint' }, variableName + ' ');
+        append(finalData, objectivesT);
+        append(finalData, constraintT);
 
         //Set the precision of the data
         for (var j = 0; j < finalData.length; ++j) {
@@ -152,14 +156,14 @@ var createPlot = function (container) {
      * 
      * @param{[Object]} finalData - the data to be plotted
      */
-    var updatePlotly = function(data) {
+    var updatePlotly = function (data) {
 
         var finalData = [];
 
         var titleString = '';
-        for(var k in data) {
+        for (var k in data) {
             titleString += k + ' '
-            for(var n = 0; n < data[k].length; ++n) {
+            for (var n = 0; n < data[k].length; ++n) {
                 finalData.push(data[k][n]);
             }
         }
@@ -174,10 +178,10 @@ var createPlot = function (container) {
             title: 'Value'
         }
 
-        if(logscaleXVal) {
+        if (logscaleXVal) {
             xaxis['type'] = 'log'
         }
-        if(logscaleYVal) {
+        if (logscaleYVal) {
             yaxis['type'] = 'log'
         }
 
@@ -188,7 +192,7 @@ var createPlot = function (container) {
         }
 
         //plot it
-        Plotly.newPlot(element, finalData, layout);
+        Plotly.newPlot(plotlyElement, finalData, layout);
     }
 
     /**
@@ -197,8 +201,8 @@ var createPlot = function (container) {
      * @param {[*]} arr1 
      * @param {[*]} arr2 
      */
-    var append = function(arr1, arr2) {
-        for(var i = 0; i < arr2.length; ++i) {
+    var append = function (arr1, arr2) {
+        for (var i = 0; i < arr2.length; ++i) {
             arr1.push(arr2[i])
         }
     }
@@ -210,7 +214,7 @@ var createPlot = function (container) {
      * @param {int} index
      * @return {Object}
      */
-    var formatData = function (index, typeFunc, prependName='') {
+    var formatData = function (index, typeFunc, prependName = '') {
         var finalData = [];
         var gotFirstProp = false;
         for (var i = 0; i < curData[index].length; ++i) {
@@ -334,64 +338,107 @@ var createPlot = function (container) {
      * 
      * @param {string} name 
      */
-    var handleSearch = function (name) {
+    var handleSearch = function (name, type) {
         http.get('case/' + case_id + '/driver_iterations/' + name, function (result) {
             result = JSON.parse(result);
             searchString = name;
-            selectedVariables.push(name);
+            if (type === 'desvar') {
+                selectedDesignVariables.push(name);
+            }
+            if (type === 'constraint') {
+                selectedConstraints.push(name);
+            }
+            if (type === 'objective') {
+                selectedObjectives.push(name);
+            }
+
             setData(result, name);
         });
     };
 
-    var logscaleX = function(val) {
+    var logscaleX = function (val) {
         logscaleXVal = val;
         updatePlotly(dataInUse);
     }
 
-    var logscaleY = function(val) {
+    var logscaleY = function (val) {
         logscaleYVal = val;
         updatePlotly(dataInUse);
     }
 
-    var stackedPlot = function(val) {
+    var stackedPlot = function (val) {
         console.log("Changing stackedPlot to: " + val);
         stackedPlotVal = val;
         updatePlotly(dataInUse);
     }
 
-    var variableFun = function(variable, val) {
+    var variableFun = function (variable, val, type) {
         console.log("variableFun called");
-        if(val) {
-            handleSearch(variable);
+        if (val) {
+            handleSearch(variable, type);
         }
         else {
             delete dataInUse[variable];
-            var index = selectedVariables.indexOf(variable);
-            if(index > -1) {
-                selectedVariables.splice(index, 1);
+            var set = selectedDesignVariables;
+            if (type === 'objective') {
+                set = selectedObjectives;
+            }
+            else if (type === 'constraint') {
+                set = selectedConstraints;
+            }
+
+            var index = set.indexOf(variable);
+            if (index > -1) {
+                set.splice(index, 1);
             }
             updatePlotly(dataInUse);
         }
     }
 
-    //Get the variables
+    //Get the designVariables
     http.get('case/' + case_id + '/desvars', function (result) {
         result = JSON.parse(result);
-        search = new Awesomplete(searchElement, { list: result });
-        variables = result;
+        designVariables = [];
+        objectives = [];
+        constraints = [];
+        for (var i = 0; i < result.length; ++i) {
+            if (result[i]['type'] === 'desvar') {
+                designVariables.push(result[i]['name']);
+            }
+            else if (result[i]['type'] === 'objective') {
+                objectives.push(result[i]['name']);
+            }
+            else {
+                constraints.push(result[i]['name']);
+            }
+        }
+        // search = new Awesomplete(searchElement, { list: result });
 
-        var randIndex = Math.floor(Math.random() * result.length);
-        if (randIndex < result.length) {
-            handleSearch(result[randIndex]);
+        var randIndex = Math.floor(Math.random() * designVariables.length);
+        if (randIndex < designVariables.length) {
+            handleSearch(designVariables[randIndex], 'desvar');
         }
     });
 
     //Bind to search so that we grab data and update plot after searching
-    Awesomplete.$.bind(searchElement, {
-        "awesomplete-select": function (event) {
-            handleSearch(event.text.value);
+    // Awesomplete.$.bind(searchElement, {
+    //     "awesomplete-select": function (event) {
+    //         handleSearch(event.text.value);
+    //     }
+    // });
+
+    var onDoubleClick = function () {
+        if (!controlPanelOpen) {
+            openNav(logscaleXVal, logscaleYVal, stackedPlotVal, designVariables,
+                objectives, constraints, selectedDesignVariables, selectedObjectives, selectedConstraints,
+                logscaleX, logscaleY, stackedPlot, variableFun);
         }
-    });
+        else {
+            closeNav();
+        }
+    }
+
+    plotlyElement.addEventListener('dblclick', onDoubleClick);
 
     //Set callback on resize
     container.on('resize', resize);

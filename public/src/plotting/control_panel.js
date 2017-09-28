@@ -1,9 +1,10 @@
-
+controlPanelOpen = false;
 function emptyMethod(checked) { }
 
-function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, variables, checkedVariables,
+function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariables, objectives, constraints, 
+                 checkedDesignVariables, checkedObjectives, checkedConstraints,
                  logscaleXFunction, logscaleYFunction, stackedPlotFunction, variablesFunction) {
-    
+    controlPanelOpen = true;
     panelOptions.logscaleXFunction = logscaleXFunction;
     panelOptions.logscaleYFunction = logscaleYFunction;
     panelOptions.stackedPlotFunction = stackedPlotFunction;
@@ -11,25 +12,51 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, variables, ch
     panelOptions.logscaleXCheckbox.checked = logscaleXValue;
     panelOptions.logscaleYCheckbox.checked = logscaleYValue;
     panelOptions.stackedPlotCheckbox.checked = stackedPlotValue;
-    panelOptions.variables = variables;
-    panelOptions.variableSelector.options = [];
-    for(var i = 0; i < panelOptions.variableSelector.options.length; ++i) {
-        panelOptions.variableSelector.options[i] = null;
+    panelOptions.designVariables = designVariables;
+    panelOptions.objectives = objectives;
+    panelOptions.constraints = constraints;
+
+    panelOptions.designVariablesSelector.options = [];
+    panelOptions.objectivesSelector.options = [];
+    panelOptions.constraintsSelector.options = [];
+    for(var i = 0; i < panelOptions.designVariablesSelector.options.length; ++i) {
+        panelOptions.designVariablesSelector.options[i] = null;
     }
-    panelOptions.variableSelector.options.length = 0;
-    $('.selectpicker').selectpicker('refresh');
-    for(var i = 0; i < variables.length; ++i) {
-        var option = new Option(variables[i], variables[i]);
-        panelOptions.variableSelector.options.add(option)
+    for(var i = 0; i < panelOptions.objectivesSelector.options.length; ++i) {
+        panelOptions.objectivesSelector.options[i] = null;
     }
-    $('.selectpicker').selectpicker('refresh');
-    $('.selectpicker').selectpicker('val', checkedVariables)
+    for(var i = 0; i < panelOptions.constraintsSelector.options.length; ++i) {
+        panelOptions.constraintsSelector.options[i] = null;
+    }
+    panelOptions.designVariablesSelector.options.length = 0;
+    $('#designVariablesSelection').selectpicker('refresh');
+    $('#objectivesSelection').selectpicker('refresh');
+    $('#constraintsSelection').selectpicker('refresh');
+    for(var i = 0; i < designVariables.length; ++i) {
+        var option = new Option(designVariables[i], designVariables[i]);
+        panelOptions.designVariablesSelector.options.add(option)
+    }
+    for(var i = 0; i < objectives.length; ++i) {
+        var option = new Option(objectives[i], objectives[i]);
+        panelOptions.objectivesSelector.options.add(option)
+    }
+    for(var i = 0; i < constraints.length; ++i) {
+        var option = new Option(constraints[i], constraints[i]);
+        panelOptions.constraintsSelector.options.add(option)
+    }
+    $('#designVariablesSelection').selectpicker('refresh');
+    $('#objectivesSelection').selectpicker('refresh');
+    $('#constraintsSelection').selectpicker('refresh');
+    $('#designVariablesSelection').selectpicker('val', checkedDesignVariables)
+    $('#objectivesSelection').selectpicker('val', checkedObjectives)
+    $('#constraintsSelection').selectpicker('val', checkedConstraints)
     
     document.getElementById("mySidenav").style.width = "350px";
     document.body.style.backgroundColor = "rgba(0,0,0,0.4)";
 }
 
 function closeNav() {
+    controlPanelOpen = false;
     document.getElementById("mySidenav").style.width = "0";
     document.body.style.backgroundColor = "white";
 }
@@ -53,10 +80,10 @@ function stackedPlot() {
     }
 }
 
-function variablesSelected(variable, val) {
+function variablesSelected(variable, val, type) {
     console.log("running variablesSelected");
     if(panelOptions.variablesFunction) {
-        panelOptions.variablesFunction(variable, val);
+        panelOptions.variablesFunction(variable, val, type);
     }
 }
 
@@ -69,9 +96,19 @@ var panelOptions = {
     logscaleXCheckbox: document.getElementById('logscaleXCheckbox'),
     logscaleYCheckbox: document.getElementById('logscaleYCheckbox'),
     stackedPlotCheckbox: document.getElementById('stackedPlotCheckbox'),
-    variableSelector: document.getElementById('variableSelection')
+    designVariablesSelector: document.getElementById('designVariablesSelection'),
+    objectivesSelector: document.getElementById('objectivesSelection'),
+    constraintsSelector: document.getElementById('constraintsSelection')
 };
 
-$('.selectpicker').on('changed.bs.select', function (e, clickedIndex, newValue, oldValue) {
-    variablesSelected(panelOptions.variables[clickedIndex], newValue);
+$('#designVariablesSelection').on('changed.bs.select', function (e, clickedIndex, newValue, oldValue) {
+    variablesSelected(panelOptions.designVariables[clickedIndex], newValue, 'desvar');
+});
+
+$('#objectivesSelection').on('changed.bs.select', function (e, clickedIndex, newValue, oldValue) {
+    variablesSelected(panelOptions.objectives[clickedIndex], newValue, 'objective');
+});
+
+$('#constraintsSelection').on('changed.bs.select', function (e, clickedIndex, newValue, oldValue) {
+    variablesSelected(panelOptions.constraints[clickedIndex], newValue, 'constraint');
 });
