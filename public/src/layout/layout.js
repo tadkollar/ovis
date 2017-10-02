@@ -4,14 +4,16 @@ var plotConfig = {
     componentState: { label: 'B' }
 };
 
+var n2Config = {
+    type: 'component',
+    componentName: 'Partition Tree and N<sup>2</sup>',
+    componentState: { label: 'A' }
+};
+
 var config = {
     content: [{
         type: 'row',
-        content: [{
-            type: 'component',
-            componentName: 'Partition Tree and N<sup>2</sup>',
-            componentState: { label: 'A' }
-        }, {
+        content: [n2Config, {
             type: 'column',
             content: [plotConfig, plotConfig]
         }]
@@ -23,6 +25,11 @@ myLayout.registerComponent('Partition Tree and N<sup>2</sup>', function (contain
     http.get("components/partition_tree_n2.html", function (response) {
         container.getElement().html(response);
         ptn2.initializeTree();
+    });
+    document.getElementById('addN2Button').disabled = true;
+    
+    container.on('destroy', function (container) {
+        document.getElementById('addN2Button').disabled = false;
     });
 });
 
@@ -40,3 +47,7 @@ myLayout.init();
 var addNewPlot = function () {
     myLayout.root.contentItems[0].addChild(plotConfig);
 };
+
+var addNewN2 = function() {
+    myLayout.root.contentItems[0].addChild(n2Config);
+}
