@@ -1,5 +1,15 @@
 <!DOCTYPE html>
 <html>
+    <script>
+        var deleteCase = function(case_id, token) {
+            if(confirm("Are you sure you want to delete this case?") == true) {
+                console.log("deleting case with id: " + case_id)
+                http.delete('case/' + case_id, token, function(response) {
+                    location.reload();
+                });
+            }
+        }
+    </script>
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -28,11 +38,15 @@
                 </thead>
                 <tbody>
                     {% for case in cases %}
-                    <tr onclick="window.document.location='../case/{{case["case_id"]}}'" style="cursor: pointer">
-                        <td>{{case['case_name']}}</td>
-                        <td align="center">{{case['case_id']}}</td>
-                        <td align="center">{{case['datestring']}}</td>
-                        <td align="center"><button class="btn btn-sm btn-danger"><i class="fa fa-remove"></i></button></td>
+                    <tr  style="cursor: pointer">
+                        <td onclick="window.document.location='../case/{{case["case_id"]}}'">{{case['case_name']}}</td>
+                        <td align="center" onclick="window.document.location='../case/{{case["case_id"]}}'">{{case['case_id']}}</td>
+                        <td align="center" onclick="window.document.location='../case/{{case["case_id"]}}'">{{case['datestring']}}</td>
+                        <td align="center">
+                            <button class="btn btn-sm btn-danger" onClick="deleteCase({{case["case_id"]}}, '{{token}}')">
+                                <i class="fa fa-remove"></i>
+                            </button>
+                        </td>
                     </tr>
                     {% end %}
                 </tbody>
@@ -47,6 +61,8 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
         crossorigin="anonymous"></script>
+    <script type="text/javascript" src="../libs/http.js"></script>
+
 </body>
 
 </html>

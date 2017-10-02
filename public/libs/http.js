@@ -40,6 +40,26 @@ function HTTP() {
             success: function(response) { success(response); }
         });
     };
+
+    /**
+     * function delete - performs HTTP DELETE request at given address (after prepending
+     * base URL) and cals success or error callback
+     * 
+     * @param path - the URL excluding the base URL (which is automatically prepened)
+     * @param token - the token to use to delete
+     * @param success - the success callback
+     * @param error - the failure callback.
+     */
+    this.delete = function(path, token, success, error) {
+        $.ajax({
+            url: this.baseURL + path,
+            type: 'DELETE',
+            success: function(response) { success(response); },
+            beforeSend: function(request) {
+                request.setRequestHeader('token', token);
+            }
+        });
+    }
 };
 
 var http = new HTTP();
