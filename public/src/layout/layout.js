@@ -1,3 +1,9 @@
+var plotConfig = {
+    type: 'component',
+    componentName: 'Variable vs. Iterations',
+    componentState: { label: 'B' }
+};
+
 var config = {
     content: [{
         type: 'row',
@@ -7,15 +13,7 @@ var config = {
             componentState: { label: 'A' }
         }, {
             type: 'column',
-            content: [{
-                type: 'component',
-                componentName: 'Variable1 vs. Iterations',
-                componentState: { label: 'B' }
-            }, {
-                type: 'component',
-                componentName: 'Variable2 vs. Iterations',
-                componentState: { label: 'C' }
-            }]
+            content: [plotConfig, plotConfig]
         }]
     }]
 };
@@ -28,18 +26,17 @@ myLayout.registerComponent('Partition Tree and N<sup>2</sup>', function (contain
     });
 });
 
-myLayout.registerComponent('Variable1 vs. Iterations', function (container, componentState) {
+myLayout.registerComponent('Variable vs. Iterations', function (container, componentState) {
     http.get("components/plot.html", function (response) {
         container.getElement().html(response);
         createPlot(container);
     });
 });
 
-myLayout.registerComponent('Variable2 vs. Iterations', function (container, componentState) {
-    http.get("components/plot.html", function (response) {
-        container.getElement().html(response);
-        createPlot(container);
-    });
-});
-
+myLayout.container = "#goldenLayout";
+myLayout._isFullPage = true;
 myLayout.init();
+
+var addNewPlot = function () {
+    myLayout.root.contentItems[0].addChild(plotConfig);
+};

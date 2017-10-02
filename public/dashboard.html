@@ -6,6 +6,30 @@
 </head>
 
 <body>
+    <nav class="navbar">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <h2>
+                    <strong style="text-align: center">OpenMDAO Visualization</strong>
+                </h2>
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li style="padding-left: 5px; padding-right: 5px">
+                    <button class="btn navbar-btn btn-lg" onclick="addNewPlot()">
+                        <span class="glyphicon glyphicon-stats"></span> Plot</button>
+                </li>
+                <li style="padding-right: 5px">
+                    <button class="btn navbar-btn btn-lg">
+                        <span class="glyphicon glyphicon-th"></span> N
+                        <sup>2</sup>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="goldenLayout" style="width: 100%; height: 88vh"></div>
+
     <div id="mySidenav" class="sidenav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
         <h1>Plot Options</h1>
@@ -25,7 +49,7 @@
                 </tr>
                 <tr>
                     <td width="25%">
-                        <input type="checkbox" class="checkbox" id='stackedPlotCheckbox' onclick="stackedPlot()">
+                        <input type="checkbox" class="checkbox" id='stackedPlotCheckbox' onclick="stackedPlot()" disabled>
                     </td>
                     <td>Stacked Plot</td>
                 </tr>
