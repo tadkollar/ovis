@@ -94,7 +94,7 @@ def create_case(body, token):
         ret['status'] = 'Failed to create ID'
     return ret
 
-def generic_get(collection_name, case_id, token, get_many = True):
+def generic_get(collection_name, case_id, token, get_many=True):
     """ generic_get method
 
     Performs the typical 'get' request, passing the case_id to the data layer
@@ -341,6 +341,25 @@ def get_driver_iteration_based_on_count(case_id, variable, count):
 
     return "[]"
 
+def send_activated_email(token):
+    """ send_activated_email
+
+    Sends an email to the given user indicating that their
+    token has been activated
+
+    Args:
+        token (string): the token associated with the user
+    """
+    user = data.get_user(token)
+    if 'active' in user and user['active']:
+        subject = 'OpenMDAO Visualization Token Activated'
+        recipient = user['email']
+        message = 'Hey ' + user['name'] + ',\r\n\r\n'
+        message += 'Your OpenMDAO Visualization token has been activated.\r\n\r\n'
+        message += 'Token: ' + user['token'] + '\r\n\r\n'
+        message += 'Sincerely,\r\nThe OpenMDAO Team'
+        _send_email(recipient, subject, message)
+
 def send_activation_email(token, name, email):
     """ send_activation_email method
 
@@ -351,24 +370,10 @@ def send_activation_email(token, name, email):
         name (string): the person's name
         email (string): the person's email
     """
-    gmailUser = os.environ['VISUALIZATION_EMAIL']
-    gmailPassword = os.environ['VISUALIZATION_EMAIL_PASSWORD']
     recipient = 'ryanfarr01@gmail.com'
-    message = 'Activate new user ' + name + ' with the email: ' + email + '\r\nhttp://openmdao.org/visualization/activate/' + token
-
-    msg = MIMEMultipart()
-    msg['From'] = gmailUser
-    msg['To'] = recipient
-    msg['Subject'] = 'Activate OpenMDAO Visualization User'
-    msg.attach(MIMEText(message))
-
-    mailServer = smtplib.SMTP('smtp.gmail.com', 587)
-    mailServer.ehlo()
-    mailServer.starttls()
-    mailServer.ehlo()
-    mailServer.login(gmailUser, gmailPassword)
-    mailServer.sendmail(gmailUser, recipient, msg.as_string())
-    mailServer.close()
+    message = 'Activate new user: ' + name + ' with the email: ' + email + '\r\nhttp://openmdao.org/visualization/activate/' + token
+    subject = 'Activate OpenMDAO Visualization User'
+    _send_email(recipient, subject, message)
 
 def activate_account(token):
     """ activate_account method
@@ -379,6 +384,33 @@ def activate_account(token):
 token(string): the token that needs activating
     """
     data.activate_account(token)
+
+def _send_email(recipient, subject, message):
+    """ _send_email private method
+
+    Sends an email to the recipient with the given subject and message.
+
+    Args:
+        recipient (string): the email address to receive the message
+        subject (string): the email subject
+        message (string): the email body
+    """
+    gmail_user = os.environ['VISUALIZATION_EMAIL']
+    gmail_password = os.environ['VISUALIZATION_EMAIL_PASSWORD']
+
+    msg = MIMEMultipart()
+    msg['From'] = gmail_user
+    msg['To'] = recipient
+    msg['Subject'] = subject
+    msg.attach(MIMEText(message))
+
+    mail_server = smtplib.SMTP('smtp.gmail.com', 587)
+    mail_server.ehlo()
+    mail_server.starttls()
+    mail_server.ehlo()
+    mail_server.login(gmail_user, gmail_password)
+    mail_server.sendmail(gmail_user, recipient, msg.as_string())
+    mail_server.close()
 
 def _extract_iteration_coordinate(coord):
     """ private extract_iteration_coordinate method

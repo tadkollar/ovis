@@ -211,8 +211,9 @@ class ActivationHandler(web.RequestHandler):
     Contains logic for activating an account
     """
     def get(self, *params):
-        logic.activate_account(params[0])
         self.write("<html>Account Activated</html>")
+        logic.activate_account(params[0])
+        logic.send_activated_email(params[0])
 
 class SystemIterationVariableHandler(web.RequestHandler):
     """ System Iteration Variable Handler class

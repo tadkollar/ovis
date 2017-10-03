@@ -207,6 +207,21 @@ def user_exists(email=None, token=None):
     else:
         return users_coll.find({'token': token}).count() > 0
 
+def get_user(token):
+    """ get_user method
+
+    Returns a user represented as a dictionary or an empty dictionary if user doesn't exist
+
+    Args:
+        token (string): the token associated with the user
+    """
+    if not user_exists(token=token):
+        return {}
+
+    users_coll = _MDB[collections.USERS]
+
+    return users_coll.find_one({'token': token})
+
 def user_active(token):
     """ user_active method
 
