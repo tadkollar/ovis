@@ -7,8 +7,12 @@ between the presentation and data layers. This is the middle layer in the
 This layer is primarily used to do any data conversion between the expectation
 at the presentation layer and the expectation at the data layer.
 """
+import os
 import json
 import time
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from dateutil import tz
 from datetime import datetime
 import data_server.data.data as data
@@ -316,6 +320,55 @@ def get_desvars(case_id):
                 cache.append(v['name'])
 
     return json.dumps(ret)
+
+def get_driver_iteration_based_on_count(case_id, variable, count):
+    """ get_highest_driver_iteartion_count method
+
+    Returns data if new data is available (checked by count)
+
+    Args:
+        case_id (string): the case to be queried
+        variable (string): the variable to be checked
+        count (int): the max count up to this point
+    Returns:
+        JSON string of '[]' if no update necessary or the data
+    """
+    s_data = get_driver_iteration_data(case_id, variable)
+    data = json.loads(s_data)
+    for d in data:
+        if int(d['counter']) > int(count):
+            return s_data
+
+    return "[]"
+
+def send_activation_email(token, name, email):
+    """ send_activation_email method
+
+    Sends an email over SMTP to request that an account be activated
+
+    Args:
+        token (string): the token that needs activating
+        name (string): the person's name
+        email (string): the person's email
+    """
+    gmailUser = os.environ['VISUALIZATION_EMAIL']
+    gmailPassword = os.environ['VISUALIZATION_EMAIL_PASSWORD']
+    recipient = 'ryanfarr01@gmail.com'
+    message = 'Activate new user ' + name + ' with the email: ' + email + '\r\nhttp://openmdao.org/visualization/activate/' + token
+
+    msg = MIMEMultipart()
+    msg['From'] = gmailUser
+    msg['To'] = recipient
+    msg['Subject'] = 'Activate OpenMDAO Visualization User'
+    msg.attach(MIMEText(message))
+
+    mailServer = smtplib.SMTP('smtp.gmail.com', 587)
+    mailServer.ehlo()
+    mailServer.starttls()
+    mailServer.ehlo()
+    mailServer.login(gmailUser, gmailPassword)
+    mailServer.sendmail(gmailUser, recipient, msg.as_string())
+    mailServer.close()
 
 def _extract_iteration_coordinate(coord):
     """ private extract_iteration_coordinate method

@@ -6,13 +6,8 @@ var createPlot = function (container) {
     var curData = [];
     var searchString = '';
     var plotlyElement = container.getElement()[0].lastChild;
-    // var searchElement = container.getElement()[0].children[1];
     var options = container.getElement()[0].children[0];
-    // var selectPicker = container.getElement()[0].children[4];
     var dataInUse = {};
-    // searchElement.style.width = (container.width - deltaSearchWidth).toString() + 'px';
-    // searchElement.style.height = '30px';
-    // searchElement.style.marginTop = '20px';
     plotlyElement.style.width = container.width.toString() + 'px';
     plotlyElement.style.height = (container.height - deltaPlotheight).toString() + 'px';
 
@@ -412,20 +407,12 @@ var createPlot = function (container) {
                 constraints.push(result[i]['name']);
             }
         }
-        // search = new Awesomplete(searchElement, { list: result });
 
         var randIndex = Math.floor(Math.random() * designVariables.length);
         if (randIndex < designVariables.length) {
             handleSearch(designVariables[randIndex], 'desvar');
         }
     });
-
-    //Bind to search so that we grab data and update plot after searching
-    // Awesomplete.$.bind(searchElement, {
-    //     "awesomplete-select": function (event) {
-    //         handleSearch(event.text.value);
-    //     }
-    // });
 
     var onDoubleClick = function () {
         if (!controlPanelOpen) {

@@ -182,6 +182,7 @@ class TokenHandler(web.RequestHandler):
             ret['status'] = 'Failed'
             ret['reasoning'] = 'Name already exists'
         else:
+            logic.send_activation_email(token, body['name'], body['email'])
             ret['token'] = token
         self.write(ret)
 
@@ -232,7 +233,10 @@ class DriverIterationVariableHandler(web.RequestHandler):
     a specific variable
     """
     def get(self, *params):
-        data = logic.get_driver_iteration_data(params[0], params[1])
+        if 'cur_max_count' in self.request.headers:
+            data = logic.get_driver_iteration_based_on_count(params[0], params[1], self.request.headers.get('cur_max_count'))
+        else:
+            data = logic.get_driver_iteration_data(params[0], params[1])
 
         self.write(data)
 
