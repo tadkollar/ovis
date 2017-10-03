@@ -381,7 +381,7 @@ def activate_account(token):
     Activates the account associated with a given token
 
     Args:
-token(string): the token that needs activating
+        token(string): the token that needs activating
     """
     data.activate_account(token)
 

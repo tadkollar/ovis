@@ -8,6 +8,7 @@ from data_server.data import data
 from data_server.shared import collections
 
 token = data.get_new_token('Unit Test', 'UnitTestData@fake.com')
+data.activate_account(token)
 
 def cleanup():
     data.delete_token(token)
@@ -30,6 +31,7 @@ class TestData(unittest.TestCase):
 
     def test_cleanup(self):
         new_token = data.get_new_token('Unit Test Cleanup', 'blah@fake.com')
+        data.activate_account(new_token)
         new_case = data.create_case({}, new_token)
         self.assertEqual(data.token_exists(new_token), True)
         self.assertNotEqual(data.get_case_with_id(new_case, new_token), {})
@@ -135,6 +137,7 @@ class TestData(unittest.TestCase):
 
     def test_delete_token(self):
         new_token = data.get_new_token('test-delete-token', 'test@fake2.com')
+        data.activate_account(new_token)
         new_case = data.create_case({}, new_token)
         data.generic_create(collections.DRIVER_ITERATIONS, {'test': True}, new_case, new_token, False)
         self.assertTrue(data.token_exists(new_token))
@@ -149,6 +152,7 @@ class TestData(unittest.TestCase):
 
     def test_delete_without_access(self):
         new_token = data.get_new_token('temp-token', 'test@fake3.com')
+        data.activate_account(new_token)
         new_case = data.create_case({}, token)
         data.generic_create(collections.SOLVER_ITERATIONS, {'test':1}, new_case, token, False)
         self.assertFalse(data.delete_case_with_id(new_case, new_token))
@@ -178,10 +182,36 @@ class TestData(unittest.TestCase):
 
     def test_update_without_access2(self):
         new_token = data.get_new_token('temp-token', 'test@fake4.com')
+        data.activate_account(new_token)
         new_case = data.create_case({}, token)
         data.generic_create(collections.SYSTEM_ITERATIONS, {'iteration_coordinate': 123, 'test': True}, new_case, token, False)
         self.assertFalse(data.generic_create(collections.SYSTEM_ITERATIONS, {'iteration_coordinate': 123, 'test': False}, new_case, new_token, True))
         data.delete_token(new_token)
+
+    def test_get_user(self):
+        new_token = data.get_new_token('temp-token', 'test@fake5.com')
+        data.activate_account(new_token)
+        user = data.get_user(new_token)
+        self.assertEqual(user['name'], 'temp-token')
+        data.delete_token(new_token)
+
+    def test_get_fake_user(self):
+        user = data.get_user('fake token')
+        self.assertEqual(user, {})
+
+    def test_user_active(self):
+        new_token = data.get_new_token('temp-token', 'test@fake6.com')
+        data.activate_account(new_token)
+        self.assertTrue(data.user_active(new_token))
+        data.delete_token(new_token)
+
+    def test_user_not_active(self):
+        new_token = data.get_new_token('temp-token', 'test@fake7.com')
+        self.assertFalse(data.user_active(new_token))
+        data.delete_token(new_token)
+
+    def test_user_not_active_fake_token(self):
+        self.assertFalse(data.user_active('fake token'))
 
 if __name__ == "__main__":
     try:
