@@ -370,7 +370,7 @@ def send_activation_email(token, name, email):
         name (string): the person's name
         email (string): the person's email
     """
-    recipient = 'ryanfarr01@gmail.com'
+    recipient = os.environ['OPENMDAO_EMAIL']
     message = 'Activate new user: ' + name + ' with the email: ' + email + '\r\nhttp://openmdao.org/visualization/activate/' + token
     subject = 'Activate OpenMDAO Visualization User'
     _send_email(recipient, subject, message)
