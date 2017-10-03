@@ -205,6 +205,15 @@ class LoginHandler(web.RequestHandler):
         cases = logic.get_all_cases(params[0])
         self.render("../../public/list_cases.html", cases=cases, token=params[0])
 
+class ActivationHandler(web.RequestHandler):
+    """ Activation Handler class
+
+    Contains logic for activating an account
+    """
+    def get(self, *params):
+        logic.activate_account(params[0])
+        self.write("<html>Account Activated</html>")
+
 class SystemIterationVariableHandler(web.RequestHandler):
     """ System Iteration Variable Handler class
 

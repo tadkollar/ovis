@@ -126,7 +126,7 @@ def create_case(body, token):
     Returns:
         Integer case_id. -1 if no case_id could be created.
     """
-    if not user_exists(token=token):
+    if not user_exists(token=token) or not user_active(token):
         return -1
 
     case_id = _get_case_id()
@@ -207,6 +207,22 @@ def user_exists(email=None, token=None):
     else:
         return users_coll.find({'token': token}).count() > 0
 
+def user_active(token):
+    """ user_active method
+
+    Checks if a user is active. If so, returns true. False otherwise.
+
+    Args:
+token(string): the token to be checked
+    """
+    users_coll = _MDB[collections.USERS]
+    user = users_coll.find_one({'token': token})
+    if not user is None:
+        if 'active' in user:
+            return user['active']
+
+    return False
+
 def get_new_token(name, email):
     """ get_new_token method
 
@@ -220,7 +236,7 @@ def get_new_token(name, email):
     """
     token = _create_token()
     users_coll = _MDB[collections.USERS]
-    users_coll.insert_one({'name': name, 'token': token, 'email': email})
+    users_coll.insert_one({'name': name, 'token': token, 'email': email, 'active': False})
     return token
 
 def delete_token(token):
@@ -277,6 +293,14 @@ def get_driver_iteration_data(case_id):
     """
     collection = _MDB[collections.DRIVER_ITERATIONS]
     return collection.find({'case_id': int(case_id)})
+
+def activate_account(token):
+    """ activate_account method
+
+    Activates the account associated with a given token
+    """
+    collection = _MDB[collections.USERS]
+    collection.update_one({'token':token}, {'$set': {'active':True}})
 
 #region private
 

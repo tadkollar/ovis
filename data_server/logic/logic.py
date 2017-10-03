@@ -370,6 +370,16 @@ def send_activation_email(token, name, email):
     mailServer.sendmail(gmailUser, recipient, msg.as_string())
     mailServer.close()
 
+def activate_account(token):
+    """ activate_account method
+
+    Activates the account associated with a given token
+
+    Args:
+token(string): the token that needs activating
+    """
+    data.activate_account(token)
+
 def _extract_iteration_coordinate(coord):
     """ private extract_iteration_coordinate method
 
