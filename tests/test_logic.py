@@ -8,6 +8,7 @@ from data_server.logic import logic
 from data_server.shared import collections
 
 token = logic.create_token('Unit Test', 'UnitTestLogic4@fake.com')
+logic.activate_account(token)
 
 def cleanup():
     logic.delete_token(token)
@@ -48,6 +49,7 @@ class TestLogic(unittest.TestCase):
 
     def test_cleanup(self):
         new_token = logic.create_token('Unit Test Cleanup', 'blah@fake4.com')
+        logic.activate_account(new_token)
         try:
             new_case = logic.create_case({}, new_token)
             self.assertEqual(logic.token_exists(new_token), True)
@@ -66,6 +68,7 @@ class TestLogic(unittest.TestCase):
 
     def test_get_all_cases_empty(self):
         new_token = logic.create_token('test cases empty', 'TestCasesEmpty@fake.com')
+        logic.activate_account(new_token)
         try:
             self.assertEqual(logic.get_all_cases(new_token), [])
         finally:
@@ -73,6 +76,7 @@ class TestLogic(unittest.TestCase):
 
     def test_get_all_cases_not_empty(self):
         new_token = logic.create_token('test cases not empty', 'TestCasesNotEmpty@fake.com')
+        logic.activate_account(new_token)
         try:
             case1 = logic.create_case({}, new_token)
             case2 = logic.create_case({}, new_token)
@@ -91,6 +95,7 @@ class TestLogic(unittest.TestCase):
 
     def test_get_case_with_id_bad_token(self):
         new_token = logic.create_token('test get case with bad token', 'TestGetCaseBadToken@fake.com')
+        logic.activate_account(new_token)
         try:
             new_case = logic.create_case({}, token)
             self.assertEqual(logic.get_case_with_id(new_case['case_id'], new_token), {})
@@ -107,6 +112,7 @@ class TestLogic(unittest.TestCase):
 
     def test_delete_case_bad_token(self):
         new_token = logic.create_token('test delete with bad token', 'TestDeleteBadToken@fake.com')
+        logic.activate_account(new_token)
         try:
             new_case = logic.create_case({}, token)
             self.assertFalse(logic.delete_case_with_id(new_case['case_id'], new_token))
@@ -258,15 +264,49 @@ class TestLogic(unittest.TestCase):
         got_var2 = False
         got_var3 = False
         for i in variables:
-            if i == 'var1':
+            if i['name'] == 'var1':
                 got_var1 = True
-            elif i == 'var2':
+            elif i['name'] == 'var2':
                 got_var2 = True
-            elif i == 'var3':
+            elif i['name'] == 'var3':
                 got_var3 = True
         self.assertTrue(got_var1)
         self.assertTrue(got_var2)
         self.assertTrue(got_var3)
+
+    def test_user_already_exists(self):
+        new_token = logic.create_token('unitTest', 'UnitTest@fake2.com')
+        try:
+            self.assertEqual(logic.create_token('unitTest', 'UnitTest@fake2.com'), -1)
+        finally:
+            logic.delete_token(new_token)
+
+    def test_get_driver_iteration_based_on_count(self):
+        new_case = logic.create_case({}, token)
+        di1 = self.create_driver_iteration()
+        di2 = self.create_driver_iteration()
+        di2['counter'] = 2
+        logic.generic_create(collections.DRIVER_ITERATIONS, di1, new_case['case_id'], token, False)
+        logic.generic_create(collections.DRIVER_ITERATIONS, di2, new_case['case_id'], token, False)
+        self.assertEqual(logic.get_driver_iteration_based_on_count(new_case['case_id'], 'var1', 2), '[]')
+
+    def test_get_driver_iteration_based_on_count2(self):
+        new_case = logic.create_case({}, token)
+        di1 = self.create_driver_iteration()
+        di2 = self.create_driver_iteration()
+        di2['counter'] = 2
+        logic.generic_create(collections.DRIVER_ITERATIONS, di1, new_case['case_id'], token, False)
+        logic.generic_create(collections.DRIVER_ITERATIONS, di2, new_case['case_id'], token, False)
+        dat = json.loads(logic.get_driver_iteration_based_on_count(new_case['case_id'], 'var1', 1))
+        self.assertEqual(len(dat), 2)
+
+    def test_get_case_without_validation(self):
+        new_token = logic.create_token('test token', 'UnitTest123@fake.com')
+        try:
+            new_case = logic.create_case({}, new_token)
+            self.assertEqual(new_case['status'], 'Failed to create ID')
+        finally:
+            logic.delete_token(new_token)
 
 if __name__ == "__main__":
     try:
