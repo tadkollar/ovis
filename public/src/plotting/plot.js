@@ -8,6 +8,7 @@ var createPlot = function (container) {
     var plotlyElement = container.getElement()[0].lastChild;
     var options = container.getElement()[0].children[0];
     var dataInUse = {};
+    var originalData = {};
     plotlyElement.style.width = container.width.toString() + 'px';
     plotlyElement.style.height = (container.height - deltaPlotheight).toString() + 'px';
 
@@ -64,6 +65,7 @@ var createPlot = function (container) {
      */
     var setData = function (dat, variable) {
         curData = [];
+        originalData[variable] = dat;
 
         //Place everything in the data array
         for (var i = 0; i < dat.length; ++i) {
@@ -128,20 +130,6 @@ var createPlot = function (container) {
                 finalData[j].x[i] = parseInt(finalData[j].x[i]) - 1;
             }
         }
-
-        //Update the select picker
-        // while (selectPicker.options.length > 0) {
-        //     selectPicker.remove(0);
-        // }
-        // for (var i = index; i < curData.length; ++i) {
-        //     var t = curData[i][0];
-        //     selectPicker.options.add(new Option(getIterationName(t), i));
-        // }
-
-        // for (var i = 0; i < index; ++i) {
-        //     var t = curData[i][0];
-        //     selectPicker.options.add(new Option(getIterationName(t), i));
-        // }
 
         return finalData;
     }
@@ -351,22 +339,45 @@ var createPlot = function (container) {
         });
     };
 
+    /**
+     * Callback function when logscale x is selected
+     * 
+     * @param {Boolean} val 
+     */
     var logscaleX = function (val) {
         logscaleXVal = val;
         updatePlotly(dataInUse);
     }
 
+    /**
+     * Callback function when logscale y is selected
+     * 
+     * @param {Boolean} val 
+     */
     var logscaleY = function (val) {
         logscaleYVal = val;
         updatePlotly(dataInUse);
     }
 
+    /**
+     * Callback function to use stacked plots
+     * 
+     * @param {Boolean} val 
+     */
     var stackedPlot = function (val) {
         console.log("Changing stackedPlot to: " + val);
         stackedPlotVal = val;
         updatePlotly(dataInUse);
     }
 
+    /**
+     * Callback function when a variable is selected or de-selected in the
+     *  control panel.
+     * 
+     * @param {*} variable - the variable name
+     * @param {*} val - added or deleted
+     * @param {*} type - type of variable
+     */
     var variableFun = function (variable, val, type) {
         console.log("variableFun called");
         if (val) {
@@ -387,6 +398,38 @@ var createPlot = function (container) {
                 set.splice(index, 1);
             }
             updatePlotly(dataInUse);
+        }
+    }
+
+    /**
+     * Tries to update each variable in the plot by setting the 'cur_max_count' header
+     */
+    var tryUpdateVariables = function() {
+        //Try to update the variables
+        for(var variable in originalData) {
+            var maxCount = 0;
+
+            //Find max count in data
+            for(var i = 0; i < originalData[variable].length; ++i) {
+                var curCount = originalData[variable][i]['counter'];
+                if(curCount > maxCount) {
+                    maxCount = curCount;
+                }
+            }
+
+            //set the header for the request
+            headers = [{
+                'name': 'cur_max_count',
+                'value': maxCount
+            }];
+
+            //Send the request to see if data needs to be updated
+            http.get('case/' + case_id + '/driver_iterations/' + variable, function (result) {
+                result = JSON.parse(result);
+                if(result.length > 0) { //if data needs to be updated, update
+                    setData(result, variable);
+                }
+            }, null, headers);
         }
     }
 
@@ -424,6 +467,8 @@ var createPlot = function (container) {
             closeNav();
         }
     }
+
+    setInterval(tryUpdateVariables, 5000);
 
     plotlyElement.addEventListener('dblclick', onDoubleClick);
 

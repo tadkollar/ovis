@@ -15,11 +15,16 @@ function HTTP() {
      * @param success - the success callback. Should have one input, the response
      * @param error - the failure callback. Should have one input, the reason for error
      */
-    this.get = function(path, success, error) {
+    this.get = function(path, success, error, headers = []) {
         $.ajax({
             url: this.baseURL + path,
             type: 'GET',
-            success: function(response) { success(response); }
+            success: function(response) { success(response); },
+            beforeSend: function(xhr) {
+                for(var i = 0; i < headers.length; ++i) {
+                    xhr.setRequestHeader(headers[i]['name'], headers[i]['value'])
+                }
+            }
         });
     };
 
