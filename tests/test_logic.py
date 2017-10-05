@@ -2,13 +2,18 @@ import unittest
 import sys
 import os.path
 import json
+import smtplib
 from bson.json_util import dumps
+from minimock import Mock
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 from data_server.logic import logic
 from data_server.shared import collections
+from data_server.data import data
 
 token = logic.create_token('Unit Test', 'UnitTestLogic4@fake.com')
 logic.activate_account(token)
+smtplib.SMTP = Mock('smtplib.SMTP')
+smtplib.SMTP.mock_returns = Mock('smtp_connection')
 
 def cleanup():
     logic.delete_token(token)
@@ -305,6 +310,21 @@ class TestLogic(unittest.TestCase):
         try:
             new_case = logic.create_case({}, new_token)
             self.assertEqual(new_case['status'], 'Failed to create ID')
+        finally:
+            logic.delete_token(new_token)
+
+    def test_activate_token_email(self):
+        new_token = logic.create_token('test token', 'UnitTest1234@fake.com')
+        try:
+            logic.send_activation_email(new_token, 'test token', 'UnitTest1234@fake.com')
+        finally:
+            logic.delete_token(new_token)
+
+    def test_activated_email(self):
+        new_token = logic.create_token('test token', 'UnitTest12345@fake.com')
+        try:
+            logic.activate_account(new_token)
+            logic.send_activated_email(new_token)
         finally:
             logic.delete_token(new_token)
 
