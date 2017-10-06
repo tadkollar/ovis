@@ -192,6 +192,11 @@ var createPlot = function (container) {
                 }
             }
         }
+        else {
+            for(var i = 0; i < finalData.length; ++i) {
+                delete finalData[i].yaxis;
+            }
+        }
 
         //plot it
         Plotly.newPlot(plotlyElement, finalData, layout);
