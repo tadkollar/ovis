@@ -148,6 +148,7 @@ var createPlot = function (container) {
             titleString += k + ' '
             for (var n = 0; n < data[k].length; ++n) {
                 finalData.push(data[k][n]);
+                finalData[finalData.length-1]['type'] = 'scatter';
             }
         }
 
@@ -157,9 +158,12 @@ var createPlot = function (container) {
         var xaxis = {
             title: 'Iteration'
         }
+
         var yaxis = {
             title: 'Value'
         }
+
+        if(stackedPlotVal) { yaxis.title = ''; }
 
         if (logscaleXVal) {
             xaxis['type'] = 'log'
@@ -172,6 +176,21 @@ var createPlot = function (container) {
             title: titleString,
             xaxis: xaxis,
             yaxis: yaxis
+        };
+
+        if(stackedPlotVal) {
+            var delta = 1.0 / finalData.length;
+            layout['yaxis']['domain'] = [0, delta];
+            for(var i = 1; i < finalData.length; ++i) {
+                finalData[i]['yaxis'] = 'y' + (i+1).toString();
+                layout['yaxis' + (i+1).toString()] = {
+                    domain: [delta * i, delta * (i+1)]
+                }
+
+                if(logscaleYVal) {
+                    finalData[i]['yaxis' + i.toString()]['type'] = 'log';
+                }
+            }
         }
 
         //plot it
