@@ -26,7 +26,7 @@ class CaseHandler(web.RequestHandler):
     """ CaseHandler class
 
     Handles all get/post/delete for /case and /case/[0-9]+, which includes
-    rendering the N^2 diagram if it is given a case ID, responding with
+    rendering the dashboard if it is given a case ID, responding with
     all cases if it isn't, posting a new case (responding with an ID),
     and deleting everything associated with a given case ID.
     """

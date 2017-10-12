@@ -178,9 +178,11 @@ var createPlot = function (container) {
             yaxis: yaxis
         };
 
+        //Deal with stacked plots
         if(stackedPlotVal) {
             var delta = 1.0 / finalData.length;
             layout['yaxis']['domain'] = [0, delta];
+            var variableIndex = -1;
             for(var i = 1; i < finalData.length; ++i) {
                 finalData[i]['yaxis'] = 'y' + (i+1).toString();
                 layout['yaxis' + (i+1).toString()] = {
@@ -188,11 +190,11 @@ var createPlot = function (container) {
                 }
 
                 if(logscaleYVal) {
-                    finalData[i]['yaxis' + i.toString()]['type'] = 'log';
+                    layout['yaxis' + (i+1).toString()]['type'] = 'log';
                 }
             }
         }
-        else {
+        else { //delete the old y-axis values if you used stacked plots previously
             for(var i = 0; i < finalData.length; ++i) {
                 delete finalData[i].yaxis;
             }
@@ -217,6 +219,10 @@ var createPlot = function (container) {
     /**
      * Pulls out the data at the given index from curData and returns
      * it in a format that's friendly for Plotly
+     * 
+     * NOTE: In the current state, it is needlessly complex dealing with variable
+     *  arrays and arrays of arrays. Should find a generic way to do this that's
+     *  a bit cleaner.
      * 
      * @param {int} index
      * @return {Object}
@@ -481,6 +487,10 @@ var createPlot = function (container) {
         }
     });
 
+    /**
+     * Function that opens the plot control panel if it's closed, or closes
+     * it if it's already open
+     */
     var onDoubleClick = function () {
         if (!controlPanelOpen) {
             openNav(logscaleXVal, logscaleYVal, stackedPlotVal, designVariables,
@@ -492,8 +502,10 @@ var createPlot = function (container) {
         }
     }
 
+    //Start trying to update the variables so data is live
     setInterval(tryUpdateVariables, 5000);
 
+    //Set plotly's event listener to open/close the control panel
     plotlyElement.addEventListener('dblclick', onDoubleClick);
 
     //Set callback on resize
