@@ -148,7 +148,7 @@ var createPlot = function (container) {
             titleString += k + ' '
             for (var n = 0; n < data[k].length; ++n) {
                 finalData.push(data[k][n]);
-                finalData[finalData.length-1]['type'] = 'scatter';
+                finalData[finalData.length - 1]['type'] = 'scatter';
             }
         }
 
@@ -163,7 +163,7 @@ var createPlot = function (container) {
             title: 'Value'
         }
 
-        if(stackedPlotVal) { yaxis.title = ''; }
+        if (stackedPlotVal) { yaxis.title = ''; }
 
         if (logscaleXVal) {
             xaxis['type'] = 'log'
@@ -179,29 +179,83 @@ var createPlot = function (container) {
         };
 
         //Deal with stacked plots
-        if(stackedPlotVal) {
-            var delta = 1.0 / finalData.length;
-            layout['yaxis']['domain'] = [0, delta];
-            var variableIndex = -1;
-            for(var i = 1; i < finalData.length; ++i) {
-                finalData[i]['yaxis'] = 'y' + (i+1).toString();
-                layout['yaxis' + (i+1).toString()] = {
-                    domain: [delta * i, delta * (i+1)]
-                }
-
-                if(logscaleYVal) {
-                    layout['yaxis' + (i+1).toString()]['type'] = 'log';
-                }
-            }
+        if (stackedPlotVal) {
+            updateForStackedPlots(finalData, layout);
         }
         else { //delete the old y-axis values if you used stacked plots previously
-            for(var i = 0; i < finalData.length; ++i) {
+            for (var i = 0; i < finalData.length; ++i) {
                 delete finalData[i].yaxis;
             }
         }
 
         //plot it
         Plotly.newPlot(plotlyElement, finalData, layout);
+    }
+
+    /**
+     * Updates the data and layout to switch the plot over to 
+     * a stacked plot. Should keep variables which are arrays in the
+     * same row.
+     * 
+     * @param {*} data 
+     * @param {Object} curLayout 
+     */
+    var updateForStackedPlots = function (data, curLayout) {
+        //Set the y axis for each of data set and get the total number of unique variables
+        var prevYIndex = 1;
+        for(var i = 1; i < data.length; ++i) {
+            if(checkIfNewVariable(data[i].name)) {
+                ++prevYIndex;
+            }
+
+            //if prevYIndex == 1, then we're on the first variable, which isn't given a number
+            data[i]['yaxis'] = 'y' + (prevYIndex == 1 ? '' : prevYIndex.toString());
+        }
+
+        //Use prevYIndex as proxy for number of unique variables
+        var numVars = prevYIndex;
+        var delta = 1.0 / numVars;
+        curLayout['yaxis']['domain'] = [0, delta];
+
+        //Set layout
+        for(var i = 2; i <= numVars; ++i) {
+            curLayout['yaxis' + i.toString()] = {
+                domain: [delta * (i-1), delta * i]
+            }
+
+            if(logscaleYVal) {
+                curLayout['yaxis' + i.toString()]['type'] = 'log';
+            }
+        }
+    }
+
+    /**
+     * Checks if a given variable name (including index) is a new variable
+     * or simply another index of a variable that is already being used in 'data'
+     * 
+     * Used by updateForStackedPlots
+     * 
+     * @param {String} name 
+     * @returns {Boolean} true if it's new, false if it's already used in 'data'
+     */
+    var checkIfNewVariable = function(name) {
+        //Convert name from 'name[x][y][z]' to 'name|x|y|z|'
+        var alteredName = name.replace(/\[/g, "|");
+        alteredName = alteredName.replace(/]/g, "|");
+        alteredName = alteredName.replace(/\|\|/g, "|");
+
+        //Split so we get ['name', 'x', 'y', 'z']
+        var splitName = alteredName.split("|");
+
+        //Check the numbers. If we get one that's greater than 0, then this isn't
+        // a new variable
+        for(var i = 0; i < splitName.length; ++i) {
+            if(!isNaN(splitName[i])) {
+                if(splitName[i] > 0) { return false; }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -434,15 +488,15 @@ var createPlot = function (container) {
     /**
      * Tries to update each variable in the plot by setting the 'cur_max_count' header
      */
-    var tryUpdateVariables = function() {
+    var tryUpdateVariables = function () {
         //Try to update the variables
-        for(var variable in originalData) {
+        for (var variable in originalData) {
             var maxCount = 0;
 
             //Find max count in data
-            for(var i = 0; i < originalData[variable].length; ++i) {
+            for (var i = 0; i < originalData[variable].length; ++i) {
                 var curCount = originalData[variable][i]['counter'];
-                if(curCount > maxCount) {
+                if (curCount > maxCount) {
                     maxCount = curCount;
                 }
             }
@@ -456,7 +510,7 @@ var createPlot = function (container) {
             //Send the request to see if data needs to be updated
             http.get('case/' + case_id + '/driver_iterations/' + variable, function (result) {
                 result = JSON.parse(result);
-                if(result.length > 0) { //if data needs to be updated, update
+                if (result.length > 0) { //if data needs to be updated, update
                     setData(result, variable);
                 }
             }, null, headers);
