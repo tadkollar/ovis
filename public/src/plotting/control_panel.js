@@ -17,14 +17,16 @@ function emptyMethod(checked) { }
  * @param {[String]]} checkedDesignVariables 
  * @param {[String]]} checkedObjectives 
  * @param {[String]} checkedConstraints 
+ * @param {*} variableIndexValues
  * @param {Method} logscaleXFunction 
  * @param {Method} logscaleYFunction 
  * @param {Method} stackedPlotFunction 
  * @param {Method} variablesFunction 
+ * @param {Method} variableIndicesFunction
  */
 function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariables, objectives, constraints,
-                    checkedDesignVariables, checkedObjectives, checkedConstraints,
-                    logscaleXFunction, logscaleYFunction, stackedPlotFunction, variablesFunction) {
+                    checkedDesignVariables, checkedObjectives, checkedConstraints, variableIndexValues,
+                    logscaleXFunction, logscaleYFunction, stackedPlotFunction, variablesFunction, variableIndicesFunction) {
     //Set that the control panel is open
     controlPanelOpen = true;
 
@@ -33,6 +35,7 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariabl
     panelOptions.logscaleYFunction = logscaleYFunction;
     panelOptions.stackedPlotFunction = stackedPlotFunction;
     panelOptions.variablesFunction = variablesFunction;
+    panelOptions.variableIndicesFunction = variableIndicesFunction;
 
     //Set the check boxes
     panelOptions.logscaleXCheckbox.checked = logscaleXValue;
@@ -85,6 +88,12 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariabl
     $('#designVariablesSelection').selectpicker('val', checkedDesignVariables)
     $('#objectivesSelection').selectpicker('val', checkedObjectives)
     $('#constraintsSelection').selectpicker('val', checkedConstraints)
+
+    //Get rid of all of the variable index inputs and add the new ones
+    resetVariableIndices();
+    for(var i = 0; i < variableIndexValues.length; ++i) {
+        addVariableIndicesGroup(variableIndexValues[i].name, variableIndexValues[i].indices);
+    }
 
     //Set width and background color
     document.getElementById("mySidenav").style.width = "350px";
@@ -143,6 +152,43 @@ function variablesSelected(variable, val, type) {
     }
 }
 
+/**
+ * Callback when a variable's index input is changed
+ * 
+ * @param {String} name 
+ * @param {String} val 
+ */
+function indicesChanged(name, val) {
+    console.log(name + "'s indices were updated to " + val);
+    if(panelOptions.variableIndicesFunction) {
+        panelOptions.variableIndicesFunction(name, val);
+    }
+}
+
+/**
+ * Adds an input for the variable indices
+ * 
+ * @param {String} name 
+ * @param {String} curIndices 
+ */
+function addVariableIndicesGroup(name, curIndices) {
+    var content = "<br/>\r\n<div class='form-group'>\r\n" +
+                  name + " Indices\r\n" +
+                  "<input type='text' class='form-control' id='varx' onchange='indicesChanged(\"" + name + "\")'>\r\n" +
+                  "</div>\r\n";
+
+    var variableIndicesDiv = document.getElementById('variableIndices');
+    variableIndicesDiv.innerHTML += content;
+}
+
+/**
+ * Resets the innerHTMl for the variable indices div
+ */
+function resetVariableIndices() {
+    var variableIndicesDiv = document.getElementById('variableIndices');
+    variableIndicesDiv.innerHTML = "";    
+}
+
 //Structure that keeps track of all of the elements and methods used
 // for the current plot
 var panelOptions = {
@@ -150,6 +196,7 @@ var panelOptions = {
     logscaleYFunction: emptyMethod,
     stackedPlotFunction: emptyMethod,
     variablesFunction: emptyMethod,
+    variableIndicesFunction: emptyMethod,
 
     logscaleXCheckbox: document.getElementById('logscaleXCheckbox'),
     logscaleYCheckbox: document.getElementById('logscaleYCheckbox'),

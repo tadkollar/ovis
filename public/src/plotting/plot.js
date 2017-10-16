@@ -546,9 +546,20 @@ var createPlot = function (container) {
      * it if it's already open
      */
     var onDoubleClick = function () {
+        var variableIndices = [
+            {
+                name: 'test1',
+                indices: '0-10'
+            },
+            {
+                name: 'test2',
+                indices: '1-3, 5-10'
+            }
+        ];
+
         if (!controlPanelOpen) {
             openNav(logscaleXVal, logscaleYVal, stackedPlotVal, designVariables,
-                objectives, constraints, selectedDesignVariables, selectedObjectives, selectedConstraints,
+                objectives, constraints, selectedDesignVariables, selectedObjectives, selectedConstraints, variableIndices,
                 logscaleX, logscaleY, stackedPlot, variableFun);
         }
         else {
