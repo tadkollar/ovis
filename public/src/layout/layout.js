@@ -20,34 +20,81 @@ var config = {
     }]
 };
 
-var myLayout = new GoldenLayout(config);
-myLayout.registerComponent('Partition Tree and N<sup>2</sup>', function (container, componentState) {
-    http.get("components/partition_tree_n2.html", function (response) {
-        container.getElement().html(response);
-        ptn2.initializeTree();
-    });
-    document.getElementById('addN2Button').disabled = true;
+var createLayout = function (newConfig) {
+    var layout = new GoldenLayout(newConfig);
+    registerN2(layout);
+    registerPlot(layout);
+    layout.container = "#goldenLayout";
+    layout._isFullPage = true;
+    layout.init();
+    return layout;
+}
+
+var registerN2 = function(layout) {
+    layout.registerComponent('Partition Tree and N<sup>2</sup>', function (container, componentState) {
+        http.get("components/partition_tree_n2.html", function (response) {
+            container.getElement().html(response);
+            ptn2.initializeTree();
+        });
+        document.getElementById('addN2Button').disabled = true;
     
-    container.on('destroy', function (container) {
-        document.getElementById('addN2Button').disabled = false;
+        container.on('destroy', function (container) {
+            document.getElementById('addN2Button').disabled = false;
+        });
     });
-});
+}
 
-myLayout.registerComponent('Variable vs. Iterations', function (container, componentState) {
-    http.get("components/plot.html", function (response) {
-        container.getElement().html(response);
-        createPlot(container);
+var registerPlot = function(layout) {
+    layout.registerComponent('Variable vs. Iterations', function (container, componentState) {
+        http.get("components/plot.html", function (response) {
+            container.getElement().html(response);
+            createPlot(container);
+        });
     });
-});
-
-myLayout.container = "#goldenLayout";
-myLayout._isFullPage = true;
-myLayout.init();
+}
 
 var addNewPlot = function () {
-    myLayout.root.contentItems[0].addChild(plotConfig);
+    if (myLayout.root !== null && myLayout.root.contentItems.length > 0) {
+        myLayout.root.contentItems[0].addChild(plotConfig);
+    }
+    else {
+        //Remove the previous layout
+        var n = document.getElementById("goldenLayout");
+        while(n.firstChild) {
+            n.removeChild(n.firstChild);
+        }
+
+        //Configure new layout
+        var newConfig = {
+            content: [{
+                type: 'row',
+                content: [plotConfig]
+            }]
+        };
+        myLayout = createLayout(newConfig);
+    }
 };
 
-var addNewN2 = function() {
-    myLayout.root.contentItems[0].addChild(n2Config);
+var addNewN2 = function () {
+    if (myLayout.root !== null && myLayout.root.contentItems.length > 0) {
+        myLayout.root.contentItems[0].addChild(n2Config);
+    }
+    else {
+        //Remove the previous layout
+        var n = document.getElementById("goldenLayout");
+        while(n.firstChild) {
+            n.removeChild(n.firstChild);
+        }
+
+        //Configure the new layout
+        var newConfig = {
+            content: [{
+                type: 'row',
+                content: [n2Config]
+            }]
+        };
+        myLayout = createLayout(newConfig);
+    }
 }
+
+myLayout = createLayout(config);
