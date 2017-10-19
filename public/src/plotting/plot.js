@@ -597,7 +597,7 @@ var createPlot = function (container) {
             }
 
             //set the header for the request
-            headers = [{
+            var headers = [{
                 'name': 'cur_max_count',
                 'value': maxCount
             }];

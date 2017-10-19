@@ -1,5 +1,3 @@
-"use strict";
-
 //Indicates whether or not the control panel is active
 var controlPanelOpen = false;
 
