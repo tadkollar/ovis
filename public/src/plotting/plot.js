@@ -1,3 +1,5 @@
+"use strict";
+
 var createPlot = function (container) {
     var deltaPlotheight = 20;
     var deltaSearchWidth = 100;
@@ -90,7 +92,7 @@ var createPlot = function (container) {
         }
 
         var finalData = setNewPlotData(index, variable);
-        updateArraysInControlPanel(finalData, variable);        
+        updateArraysInControlPanel(finalData, variable);
         dataInUse[variable] = finalData;
         updatePlotly(dataInUse);
     };
@@ -207,8 +209,8 @@ var createPlot = function (container) {
     var updateForStackedPlots = function (data, curLayout) {
         //Set the y axis for each of data set and get the total number of unique variables
         var prevYIndex = 1;
-        for(var i = 1; i < data.length; ++i) {
-            if(checkIfNewVariable(data[i].name)) {
+        for (var i = 1; i < data.length; ++i) {
+            if (checkIfNewVariable(data[i].name)) {
                 ++prevYIndex;
             }
 
@@ -222,12 +224,12 @@ var createPlot = function (container) {
         curLayout['yaxis']['domain'] = [0, delta];
 
         //Set layout
-        for(var i = 2; i <= numVars; ++i) {
+        for (var i = 2; i <= numVars; ++i) {
             curLayout['yaxis' + i.toString()] = {
-                domain: [delta * (i-1), delta * i]
+                domain: [delta * (i - 1), delta * i]
             }
 
-            if(logscaleYVal) {
+            if (logscaleYVal) {
                 curLayout['yaxis' + i.toString()]['type'] = 'log';
             }
         }
@@ -242,7 +244,7 @@ var createPlot = function (container) {
      * @param {String} name 
      * @returns {Boolean} true if it's new, false if it's already used in 'data'
      */
-    var checkIfNewVariable = function(name) {
+    var checkIfNewVariable = function (name) {
         //Convert name from 'name[x][y][z]' to 'name|x|y|z|'
         var alteredName = name.replace(/\[/g, "|");
         alteredName = alteredName.replace(/]/g, "|");
@@ -253,9 +255,9 @@ var createPlot = function (container) {
 
         //Check the numbers. If we get one that's greater than 0, then this isn't
         // a new variable
-        for(var i = 0; i < splitName.length; ++i) {
-            if(!isNaN(splitName[i])) {
-                if(splitName[i] > 0) { return false; }
+        for (var i = 0; i < splitName.length; ++i) {
+            if (!isNaN(splitName[i])) {
+                if (splitName[i] > 0) { return false; }
             }
         }
 
@@ -422,7 +424,7 @@ var createPlot = function (container) {
             if (type === 'objective') {
                 selectedObjectives.push(name);
             }
-            
+
             setData(result, name);
         });
     };
@@ -472,7 +474,7 @@ var createPlot = function (container) {
             handleSearch(variable, type);
         }
         else {
-	    tryRemoveVariableFromIndices(variable);
+            tryRemoveVariableFromIndices(variable);
             delete dataInUse[variable];
             var set = selectedDesignVariables;
             if (type === 'objective') {
@@ -496,20 +498,20 @@ var createPlot = function (container) {
      * @param {String} name 
      * @param {String} val 
      */
-    var variableIndicesFun = function(name, val) {
-	var ind = null;
-	for(var i = 0; i < variableIndices.length; ++i) {
-	    if(variableIndices[i].name === name) {
-		ind = variableIndices[i];
-		break;
-	    }
-	}
+    var variableIndicesFun = function (name, val) {
+        var ind = null;
+        for (var i = 0; i < variableIndices.length; ++i) {
+            if (variableIndices[i].name === name) {
+                ind = variableIndices[i];
+                break;
+            }
+        }
 
-	if(ind !== null) {
-	    ind.indices = val;
-	    addIndicesToObject(ind);
-	    updatePlotly(dataInUse);
-	}
+        if (ind !== null) {
+            ind.indices = val;
+            addIndicesToObject(ind);
+            updatePlotly(dataInUse);
+        }
         console.log("Variable Indices Function called");
     }
 
@@ -520,52 +522,64 @@ var createPlot = function (container) {
      * @param {*} data
      * @param {String} name
      */
-    updateArraysInControlPanel = function(data, name) {
+    var updateArraysInControlPanel = function (data, name) {
         //If data's length is > 1 then we're dealing with an array variable
-	if(data.length > 1) {
-	    var newIndices = {
-		'name': name,
-		'indices': '0-' + (data.length-1).toString()
-	    };
-	    addIndicesToObject(newIndices);
-	    variableIndices.push(newIndices);
-	    addVariableIndicesGroup(newIndices.name, newIndices.indices);
-	}
-	
-	console.log(data);
+        if (data.length > 1) {
+            var newIndices = {
+                'name': name,
+                'indices': '0-' + (data.length - 1).toString()
+            };
+            addIndicesToObject(newIndices);
+            variableIndices.push(newIndices);
+            addVariableIndicesGroup(newIndices.name, newIndices.indices);
+        }
+
+        console.log(data);
     }
 
-    tryRemoveVariableFromIndices = function(name) {
-	for(var i = 0; i < variableIndices.length; ++i) {
-	    if(variableIndices[i].name === name) {
-		removeVariableIndicesGroup(name);
-		variableIndices.splice(i, 1);
-	    }
-	}
+    /**
+     * Tries to remove a variable from its indices grouping and
+     * removes it from the control panel
+     * 
+     * @param {String} name
+     */
+    tryRemoveVariableFromIndices = function (name) {
+        for (var i = 0; i < variableIndices.length; ++i) {
+            if (variableIndices[i].name === name) {
+                removeVariableIndicesGroup(name);
+                variableIndices.splice(i, 1);
+            }
+        }
     }
 
-    var addIndicesToObject = function(varIndices) {
-	varIndices['indexSet'] = [];
-	var splitIndices = varIndices.indices.replace(' ', ''); //remove spaces
-	splitIndices = varIndices.indices.split(',');
+    /**
+     * Adds the 'indexSet' parameter to the given 
+     * varIndices object
+     * 
+     * @param {*} varIndices 
+     */
+    var addIndicesToObject = function (varIndices) {
+        varIndices['indexSet'] = [];
+        var splitIndices = varIndices.indices.replace(' ', ''); //remove spaces
+        splitIndices = varIndices.indices.split(',');
 
-	for(var i = 0; i < splitIndices.length; ++i) {
-	    var cur = splitIndices[i];
-	    if(!isNaN(cur)) { //If we're just dealing with a number
-		varIndices.indexSet.push(Number(cur));
-	    }
-	    else { //If we're dealing with something of the form '0-9'
-		var splitCur = cur.split('-');
-		var start = Number(splitCur[0]); //first number
-		var end = Number(splitCur[1]);   //last number
+        for (var i = 0; i < splitIndices.length; ++i) {
+            var cur = splitIndices[i];
+            if (!isNaN(cur)) { //If we're just dealing with a number
+                varIndices.indexSet.push(Number(cur));
+            }
+            else { //If we're dealing with something of the form '0-9'
+                var splitCur = cur.split('-');
+                var start = Number(splitCur[0]); //first number
+                var end = Number(splitCur[1]);   //last number
 
-		for(var j = start; j <= end; ++j) {
-		    varIndices.indexSet.push(j);
-		}
-	    }
-	}
+                for (var j = start; j <= end; ++j) {
+                    varIndices.indexSet.push(j);
+                }
+            }
+        }
     }
-   
+
     /**
      * Tries to update each variable in the plot by setting the 'cur_max_count' header
      */

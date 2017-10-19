@@ -1,3 +1,4 @@
+"use strict";
 
 //Indicates whether or not the control panel is active
 controlPanelOpen = false;
@@ -166,7 +167,7 @@ function indicesChanged(name, val) {
 }
 
 /**
- * Adds an input for the variable indices
+ * Adds an input for the variable indices on the control panel
  * 
  * @param {String} name 
  * @param {String} curIndices 
