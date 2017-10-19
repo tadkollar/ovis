@@ -543,7 +543,7 @@ var createPlot = function (container) {
      * 
      * @param {String} name
      */
-    tryRemoveVariableFromIndices = function (name) {
+    var tryRemoveVariableFromIndices = function (name) {
         for (var i = 0; i < variableIndices.length; ++i) {
             if (variableIndices[i].name === name) {
                 removeVariableIndicesGroup(name);

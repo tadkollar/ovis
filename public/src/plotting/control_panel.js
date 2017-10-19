@@ -191,7 +191,6 @@ function addVariableIndicesGroup(name, curIndices) {
 function removeVariableIndicesGroup(name) {
     var element = document.getElementById("div_" + name);
     element.outerHTML = "";
-    delete element;
 }
 
 /**
