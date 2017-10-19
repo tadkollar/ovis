@@ -472,6 +472,7 @@ var createPlot = function (container) {
             handleSearch(variable, type);
         }
         else {
+	    tryRemoveVariableFromIndices(variable);
             delete dataInUse[variable];
             var set = selectedDesignVariables;
             if (type === 'objective') {
@@ -496,6 +497,19 @@ var createPlot = function (container) {
      * @param {String} val 
      */
     var variableIndicesFun = function(name, val) {
+	var ind = null;
+	for(var i = 0; i < variableIndices.length; ++i) {
+	    if(variableIndices[i].name === name) {
+		ind = variableIndices[i];
+		break;
+	    }
+	}
+
+	if(ind !== null) {
+	    ind.indices = val;
+	    addIndicesToObject(ind);
+	    updatePlotly(dataInUse);
+	}
         console.log("Variable Indices Function called");
     }
 
@@ -507,9 +521,51 @@ var createPlot = function (container) {
      * @param {String} name
      */
     updateArraysInControlPanel = function(data, name) {
-        console.log(data);
+        //If data's length is > 1 then we're dealing with an array variable
+	if(data.length > 1) {
+	    var newIndices = {
+		'name': name,
+		'indices': '0-' + (data.length-1).toString()
+	    };
+	    addIndicesToObject(newIndices);
+	    variableIndices.push(newIndices);
+	    addVariableIndicesGroup(newIndices.name, newIndices.indices);
+	}
+	
+	console.log(data);
     }
 
+    tryRemoveVariableFromIndices = function(name) {
+	for(var i = 0; i < variableIndices.length; ++i) {
+	    if(variableIndices[i].name === name) {
+		removeVariableIndicesGroup(name);
+		variableIndices.splice(i, 1);
+	    }
+	}
+    }
+
+    var addIndicesToObject = function(varIndices) {
+	varIndices['indexSet'] = [];
+	var splitIndices = varIndices.indices.replace(' ', ''); //remove spaces
+	splitIndices = varIndices.indices.split(',');
+
+	for(var i = 0; i < splitIndices.length; ++i) {
+	    var cur = splitIndices[i];
+	    if(!isNaN(cur)) { //If we're just dealing with a number
+		varIndices.indexSet.push(Number(cur));
+	    }
+	    else { //If we're dealing with something of the form '0-9'
+		var splitCur = cur.split('-');
+		var start = Number(splitCur[0]); //first number
+		var end = Number(splitCur[1]);   //last number
+
+		for(var j = start; j <= end; ++j) {
+		    varIndices.indexSet.push(j);
+		}
+	    }
+	}
+    }
+   
     /**
      * Tries to update each variable in the plot by setting the 'cur_max_count' header
      */
