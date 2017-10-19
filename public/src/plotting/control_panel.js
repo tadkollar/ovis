@@ -172,13 +172,25 @@ function indicesChanged(name, val) {
  * @param {String} curIndices 
  */
 function addVariableIndicesGroup(name, curIndices) {
-    var content = "<br/>\r\n<div class='form-group'>\r\n" +
+    var content = "<div id='div_" + name + "'><br/>\r\n<div class='form-group'>\r\n" +
                   name + " Indices\r\n" +
                   "<input type='text' class='form-control' id='var_" + name +"' onchange='indicesChanged(\"" + name + "\", document.getElementById(\"" + 'var_' + name + "\").value)'>\r\n" +
-                  "</div>\r\n";
+                  "</div></div>\r\n";
 
     var variableIndicesDiv = document.getElementById('variableIndices');
     variableIndicesDiv.innerHTML += content;
+}
+
+/**
+ * Removes the available input from the control panel 
+ * which corresponds to the given variable name
+ * 
+ * @param {String} name 
+ */
+function removeVariableIndicesGroup(name) {
+    var element = document.getElementById("div_" + name);
+    element.outerHTML = "";
+    delete element;
 }
 
 /**

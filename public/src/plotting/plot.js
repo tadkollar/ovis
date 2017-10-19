@@ -22,6 +22,7 @@ var createPlot = function (container) {
     var selectedDesignVariables = [];
     var selectedConstraints = [];
     var selectedObjectives = [];
+    var variableIndices = [];
 
     //Setup control panel
     if (options != null) {
@@ -89,12 +90,15 @@ var createPlot = function (container) {
         }
 
         var finalData = setNewPlotData(index, variable);
+        updateArraysInControlPanel(finalData, variable);        
         dataInUse[variable] = finalData;
         updatePlotly(dataInUse);
     };
 
     /**
-     * Called when the selectPicker is clicked. Updates plot with new data
+     * Called when the selectPicker is clicked. Updates plot with new data.
+     * 
+     * NOTE: Currently not used - select picker has been taken out for the moment
      */
     var selectClicked = function () {
         var index = Number(selectPicker.value);
@@ -418,7 +422,7 @@ var createPlot = function (container) {
             if (type === 'objective') {
                 selectedObjectives.push(name);
             }
-
+            
             setData(result, name);
         });
     };
@@ -486,6 +490,27 @@ var createPlot = function (container) {
     }
 
     /**
+     * Changes the indices which are shown for the given variable
+     * 
+     * @param {String} name 
+     * @param {String} val 
+     */
+    var variableIndicesFun = function(name, val) {
+        console.log("Variable Indices Function called");
+    }
+
+    /**
+     * Checks if a variable is an array type and, if so, updates the 
+     * control panel to give an indices input
+     * 
+     * @param {*} data
+     * @param {String} name
+     */
+    updateArraysInControlPanel = function(data, name) {
+        console.log(data);
+    }
+
+    /**
      * Tries to update each variable in the plot by setting the 'cur_max_count' header
      */
     var tryUpdateVariables = function () {
@@ -546,21 +571,21 @@ var createPlot = function (container) {
      * it if it's already open
      */
     var onDoubleClick = function () {
-        var variableIndices = [
-            {
-                name: 'test1',
-                indices: '0-10'
-            },
-            {
-                name: 'test2',
-                indices: '1-3, 5-10'
-            }
-        ];
+        // variableIndices = [
+        //     {
+        //         name: 'test1',
+        //         indices: '0-10'
+        //     },
+        //     {
+        //         name: 'test2',
+        //         indices: '1-3, 5-10'
+        //     }
+        // ];
 
         if (!controlPanelOpen) {
             openNav(logscaleXVal, logscaleYVal, stackedPlotVal, designVariables,
                 objectives, constraints, selectedDesignVariables, selectedObjectives, selectedConstraints, variableIndices,
-                logscaleX, logscaleY, stackedPlot, variableFun);
+                logscaleX, logscaleY, stackedPlot, variableFun, variableIndicesFun);
         }
         else {
             closeNav();
