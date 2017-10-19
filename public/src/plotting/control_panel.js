@@ -1,7 +1,7 @@
 "use strict";
 
 //Indicates whether or not the control panel is active
-controlPanelOpen = false;
+var controlPanelOpen = false;
 
 //Empty function - useful when certain functions haven't been assigned but are called
 function emptyMethod(checked) { }
