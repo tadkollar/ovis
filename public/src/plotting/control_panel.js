@@ -164,6 +164,7 @@ function indicesChanged(name, val) {
     //regex to make sure the input matches our expectation
     // expectation is somehwere along the lines of: x-y, z (where x, y and z are integers in the string)
     if (/^[0-9]+(\-[0-9]+){0,1}(,[0-9]+(\-[0-9]+){0,1})*$/.test(valWithoutSpaces)) {
+        var input = document.getElementById('var_' + name);
         input.className = "form-control"
         if (panelOptions.variableIndicesFunction) {
             panelOptions.variableIndicesFunction(name, val);
