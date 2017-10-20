@@ -173,14 +173,14 @@ function indicesChanged(name, val) {
 function addVariableIndicesGroup(name, curIndices) {
     var content = "<div id='div_" + name + "'><br/>\r\n<div class='form-group'>\r\n" +
                   name + " Indices\r\n" +
-                  "<input type='text' class='form-control' id='var_" + name +"' onchange='indicesChanged(\"" + name + "\", document.getElementById(\"" + 'var_' + name + "\").value)'>\r\n" +
+                  "<input type='text' class='form-control' value=\"" + curIndices + "\" id='var_" + name +"' onchange='indicesChanged(\"" + name + "\", document.getElementById(\"" + 'var_' + name + "\").value)'>\r\n" +
                   "</div></div>\r\n";
 
     var variableIndicesDiv = document.getElementById('variableIndices');
     variableIndicesDiv.innerHTML += content;
 
-    var input = document.getElementById('var_' + name);
-    input.value = curIndices;
+    // var input = document.getElementById('var_' + name);
+    // input.value = curIndices;
 }
 
 /**
