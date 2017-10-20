@@ -612,7 +612,7 @@ var createPlot = function (container) {
      */
     var addIndicesToObject = function (varIndices) {
         varIndices['indexSet'] = [];
-        var splitIndices = varIndices.indices.replace(' ', ''); //remove spaces
+        var splitIndices = varIndices.indices.replace(/ /g, ''); //remove spaces
         splitIndices = varIndices.indices.split(',');
 
         for (var i = 0; i < splitIndices.length; ++i) {

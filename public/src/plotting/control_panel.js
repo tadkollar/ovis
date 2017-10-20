@@ -159,8 +159,8 @@ function variablesSelected(variable, val, type) {
  */
 function indicesChanged(name, val) {
     console.log(name + "'s indices were updated to " + val);
+    var valWithoutSpaces = val.replace(/ /g, '');
 
-    var valWithoutSpaces = val.replace(' ', '');
     //regex to make sure the input matches our expectation
     // expectation is somehwere along the lines of: x-y, z (where x, y and z are integers in the string)
     if (/^[0-9]+(\-[0-9]+){0,1}(,[0-9]+(\-[0-9]+){0,1})*$/.test(valWithoutSpaces)) {
