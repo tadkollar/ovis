@@ -24,8 +24,8 @@ function emptyMethod(checked) { }
  * @param {Method} variableIndicesFunction
  */
 function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariables, objectives, constraints,
-                    checkedDesignVariables, checkedObjectives, checkedConstraints, variableIndexValues,
-                    logscaleXFunction, logscaleYFunction, stackedPlotFunction, variablesFunction, variableIndicesFunction) {
+    checkedDesignVariables, checkedObjectives, checkedConstraints, variableIndexValues,
+    logscaleXFunction, logscaleYFunction, stackedPlotFunction, variablesFunction, variableIndicesFunction) {
     //Set that the control panel is open
     controlPanelOpen = true;
 
@@ -90,7 +90,7 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariabl
 
     //Get rid of all of the variable index inputs and add the new ones
     resetVariableIndices();
-    for(var i = 0; i < variableIndexValues.length; ++i) {
+    for (var i = 0; i < variableIndexValues.length; ++i) {
         addVariableIndicesGroup(variableIndexValues[i].name, variableIndexValues[i].indices);
     }
 
@@ -159,8 +159,20 @@ function variablesSelected(variable, val, type) {
  */
 function indicesChanged(name, val) {
     console.log(name + "'s indices were updated to " + val);
-    if(panelOptions.variableIndicesFunction) {
-        panelOptions.variableIndicesFunction(name, val);
+
+    var valWithoutSpaces = val.replace(' ', '');
+    //regex to make sure the input matches our expectation
+    // expectation is somehwere along the lines of: x-y, z (where x, y and z are integers in the string)
+    if (/^[0-9]+(\-[0-9]+){0,1}(,[0-9]+(\-[0-9]+){0,1})*$/.test(valWithoutSpaces)) {
+        input.className = "form-control"
+        if (panelOptions.variableIndicesFunction) {
+            panelOptions.variableIndicesFunction(name, val);
+        }
+    }
+    else {
+        //find element and add 'text-danger
+        var input = document.getElementById('var_' + name);
+        input.className += " has-error"
     }
 }
 
@@ -172,9 +184,9 @@ function indicesChanged(name, val) {
  */
 function addVariableIndicesGroup(name, curIndices) {
     var content = "<div id='div_" + name + "'><br/>\r\n<div class='form-group'>\r\n" +
-                  name + " Indices\r\n" +
-                  "<input type='text' class='form-control' value=\"" + curIndices + "\" id='var_" + name +"' onchange='indicesChanged(\"" + name + "\", document.getElementById(\"" + 'var_' + name + "\").value)'>\r\n" +
-                  "</div></div>\r\n";
+        name + " Indices\r\n" +
+        "<input type='text' class='form-control' value=\"" + curIndices + "\" id='var_" + name + "' onchange='indicesChanged(\"" + name + "\", document.getElementById(\"" + 'var_' + name + "\").value)'>\r\n" +
+        "</div></div>\r\n";
 
     var variableIndicesDiv = document.getElementById('variableIndices');
     variableIndicesDiv.innerHTML += content;
@@ -196,7 +208,7 @@ function removeVariableIndicesGroup(name) {
  */
 function resetVariableIndices() {
     var variableIndicesDiv = document.getElementById('variableIndices');
-    variableIndicesDiv.innerHTML = "";    
+    variableIndicesDiv.innerHTML = "";
 }
 
 //Structure that keeps track of all of the elements and methods used
