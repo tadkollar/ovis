@@ -149,6 +149,8 @@ var createPlot = function (container) {
 
         var finalData = [];
 
+        data = extractBasedOnIndices(data);
+
         var titleString = '';
         for (var k in data) {
             titleString += k + ' '
@@ -196,6 +198,56 @@ var createPlot = function (container) {
 
         //plot it
         Plotly.newPlot(plotlyElement, finalData, layout);
+    }
+
+    /**
+     * Sorts through the data that's ready for plotly and removes
+     * any data that shouldn't be shown based on the user's selected indices.
+     * 
+     * @param {*} data 
+     * @returns {[*]}
+     */
+    var extractBasedOnIndices = function(data) {
+        var ret = {};
+
+        for(var d in data) {
+            var ind = findVariableInIndices(d);
+
+            if(ind != null) {
+                ret[d] = [];
+                
+                //Go over each index and see if it's in
+                // the index set (the set of indexes to be plotted).
+                // if so, add it to our return array
+                for(var i = 0; i < data[d].length; ++i) {
+                    if(ind.indexSet.indexOf(i) >= 0) {
+                        ret[d].push(data[d][i]);
+                    }
+                }
+            }
+            else { //otherwise it isn't in variableIndices and isn't restricted
+                ret[d] = data[d];
+            }
+        }
+
+        return ret;
+    }
+    
+    /**
+     * Searches through the variableIndices DS to find and return 
+     * the associated variable index object.
+     * 
+     * @param {String} name 
+     * @returns {*} object if found, null otherwise
+     */
+    var findVariableInIndices = function(name) {
+        for(var i = 0; i < variableIndices.length; ++i) {
+            if(variableIndices[i].name === name) {
+                return variableIndices[i];
+            }
+        }
+
+        return null;
     }
 
     /**

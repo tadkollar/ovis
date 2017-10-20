@@ -178,9 +178,6 @@ function addVariableIndicesGroup(name, curIndices) {
 
     var variableIndicesDiv = document.getElementById('variableIndices');
     variableIndicesDiv.innerHTML += content;
-
-    // var input = document.getElementById('var_' + name);
-    // input.value = curIndices;
 }
 
 /**
