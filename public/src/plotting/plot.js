@@ -62,7 +62,7 @@ var createPlot = function (container) {
 
     /**
      * Function which sets plot's data. Searches through to determine
-     * which values to show, then updates plotly
+     * which values to show (based on selected indices), then updates plotly
      * 
      * @param {[Object]} dat 
      */
@@ -693,17 +693,6 @@ var createPlot = function (container) {
      * it if it's already open
      */
     var onDoubleClick = function () {
-        // variableIndices = [
-        //     {
-        //         name: 'test1',
-        //         indices: '0-10'
-        //     },
-        //     {
-        //         name: 'test2',
-        //         indices: '1-3, 5-10'
-        //     }
-        // ];
-
         if (!controlPanelOpen) {
             openNav(logscaleXVal, logscaleYVal, stackedPlotVal, designVariables,
                 objectives, constraints, selectedDesignVariables, selectedObjectives, selectedConstraints, variableIndices,
