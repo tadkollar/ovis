@@ -1681,6 +1681,7 @@ ptn2.initializeTree = function () {
     http.get("case/" + case_id + '/driver_metadata', function (response) {
         var data = JSON.parse(response)[0];
         treeData = JSON.parse(data['model_viewer_data']);
+        treeData.tree.name = 'model'; //Change 'root' to 'model'
         zoomedElement = treeData['tree'];
         lastLeftClickedElement = document.getElementById("ptN2ContentDivId");
         parentDiv = lastLeftClickedElement;
