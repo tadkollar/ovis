@@ -185,7 +185,7 @@ function indicesChanged(name, val) {
  */
 function addVariableIndicesGroup(name, curIndices) {
     var content = "<div id='div_" + name + "'><br/>\r\n<div class='form-group' style='padding-right: 25px'>\r\n" +
-        "<label class='control-label'> " + name + " Indices</label>\r\n" +
+        "<label class='control-label'> " + name + " Indices</label> <span class='glyphicon glyphicon-info-sign'></span>\r\n" +
         "<input type='text' class='form-control' value=\"" + curIndices + "\" id='var_" + name + "' onchange='indicesChanged(\"" + name + "\", document.getElementById(\"" + 'var_' + name + "\").value)'>\r\n" +
         "</div></div>\r\n";
 
