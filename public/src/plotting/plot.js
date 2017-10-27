@@ -478,6 +478,9 @@ var createPlot = function (container) {
             if (type === 'objective') {
                 selectedObjectives.push(name);
             }
+            if (type === 'sysinclude') {
+                selectedSysincludes.push(name);
+            }
 
             setData(result, name);
         });
@@ -536,6 +539,9 @@ var createPlot = function (container) {
             }
             else if (type === 'constraint') {
                 set = selectedConstraints;
+            }
+            else {
+                set = selectedSysincludes;
             }
 
             var index = set.indexOf(variable);
@@ -672,6 +678,7 @@ var createPlot = function (container) {
         designVariables = [];
         objectives = [];
         constraints = [];
+        sysincludes = [];
         for (var i = 0; i < result.length; ++i) {
             if (result[i]['type'] === 'desvar') {
                 designVariables.push(result[i]['name']);
