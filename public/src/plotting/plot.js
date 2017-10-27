@@ -126,8 +126,10 @@ var createPlot = function (container) {
         var finalData = formatData(index, function (obj) { return obj['type'] == 'desvar' }, variableName + ' ');
         var objectivesT = formatData(index, function (obj) { return obj['type'] == 'objective' }, variableName + ' ');
         var constraintT = formatData(index, function (obj) { return obj['type'] == 'constraint' }, variableName + ' ');
+        var sysincludesT = formatData(index, function (obj) { return obj['type'] == 'sysinclude' }, variableName + ' ');
         append(finalData, objectivesT);
         append(finalData, constraintT);
+        append(finalData, sysincludesT);
 
         //Set the precision of the data
         for (var j = 0; j < finalData.length; ++j) {
