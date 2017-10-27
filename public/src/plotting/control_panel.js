@@ -47,6 +47,7 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariabl
     panelOptions.designVariables = designVariables;
     panelOptions.objectives = objectives;
     panelOptions.constraints = constraints;
+    panelOptions.others = sysincludes;
 
     //Remove all previous variables from the dropdowns
     panelOptions.designVariablesSelector.options = [];
@@ -259,5 +260,5 @@ $('#constraintsSelection').on('changed.bs.select', function (e, clickedIndex, ne
 
 //Set the callback for selecting an 'other'
 $('#othersSelection').on('changed.bs.select', function (e, clickedIndex, newValue, oldValue) {
-    variablesSelected(panelOptions.constraints[clickedIndex], newValue, 'sysinclude');
+    variablesSelected(panelOptions.others[clickedIndex], newValue, 'sysinclude');
 });
