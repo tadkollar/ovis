@@ -319,13 +319,14 @@ def get_desvars(case_id):
                 })
                 cache.append(v['name'])
 
-        for v in i['sysincludes']:
-            if v['name'] not in cache:
-                ret.append({
-                    'name': v['name'],
-                    'type': 'sysinclude'
-                })
-                cache.append(v['name'])
+        if 'sysincludes' in i:
+            for v in i['sysincludes']:
+                if v['name'] not in cache:
+                    ret.append({
+                        'name': v['name'],
+                        'type': 'sysinclude'
+                    })
+                    cache.append(v['name'])
 
     return json.dumps(ret)
 

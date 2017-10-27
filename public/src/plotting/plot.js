@@ -21,9 +21,11 @@ var createPlot = function (container) {
     var designVariables = [];
     var constraints = [];
     var objectives = [];
+    var sysincludes = [];
     var selectedDesignVariables = [];
     var selectedConstraints = [];
     var selectedObjectives = [];
+    var selectedSysincludes = [];
     var variableIndices = [];
 
     //Setup control panel
@@ -677,6 +679,9 @@ var createPlot = function (container) {
             else if (result[i]['type'] === 'objective') {
                 objectives.push(result[i]['name']);
             }
+            else if (result[i]['type'] === 'sysinclude') {
+                sysincludes.push(result[i]['name']);
+            }
             else {
                 constraints.push(result[i]['name']);
             }
@@ -695,7 +700,8 @@ var createPlot = function (container) {
     var onDoubleClick = function () {
         if (!controlPanelOpen) {
             openNav(logscaleXVal, logscaleYVal, stackedPlotVal, designVariables,
-                objectives, constraints, selectedDesignVariables, selectedObjectives, selectedConstraints, variableIndices,
+                objectives, constraints, sysincludes, selectedDesignVariables, selectedObjectives,
+                selectedConstraints, selectedSysincludes, variableIndices,
                 logscaleX, logscaleY, stackedPlot, variableFun, variableIndicesFun);
         }
         else {

@@ -13,9 +13,11 @@ function emptyMethod(checked) { }
  * @param {[String]} designVariables 
  * @param {[String]} objectives 
  * @param {[String]} constraints 
+ * @param {[String]} sysincludes
  * @param {[String]]} checkedDesignVariables 
  * @param {[String]]} checkedObjectives 
  * @param {[String]} checkedConstraints 
+ * @param {[String]} checkedSysincludes
  * @param {*} variableIndexValues
  * @param {Method} logscaleXFunction 
  * @param {Method} logscaleYFunction 
@@ -23,8 +25,8 @@ function emptyMethod(checked) { }
  * @param {Method} variablesFunction 
  * @param {Method} variableIndicesFunction
  */
-function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariables, objectives, constraints,
-    checkedDesignVariables, checkedObjectives, checkedConstraints, variableIndexValues,
+function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariables, objectives, constraints, sysincludes,
+    checkedDesignVariables, checkedObjectives, checkedConstraints, checkedSysincludes, variableIndexValues,
     logscaleXFunction, logscaleYFunction, stackedPlotFunction, variablesFunction, variableIndicesFunction) {
     //Set that the control panel is open
     controlPanelOpen = true;
@@ -50,6 +52,7 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariabl
     panelOptions.designVariablesSelector.options = [];
     panelOptions.objectivesSelector.options = [];
     panelOptions.constraintsSelector.options = [];
+    panelOptions.othersSelector.options = [];
     for (var i = 0; i < panelOptions.designVariablesSelector.options.length; ++i) {
         panelOptions.designVariablesSelector.options[i] = null;
     }
@@ -58,6 +61,9 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariabl
     }
     for (var i = 0; i < panelOptions.constraintsSelector.options.length; ++i) {
         panelOptions.constraintsSelector.options[i] = null;
+    }
+    for (var i = 0; i < panelOptions.othersSelector.options.length; ++i) {
+        panelOptions.othersSelector.options[i] = null;
     }
     panelOptions.designVariablesSelector.options.length = 0;
     $('#designVariablesSelection').selectpicker('refresh');
@@ -77,16 +83,22 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariabl
         var option = new Option(constraints[i], constraints[i]);
         panelOptions.constraintsSelector.options.add(option)
     }
+    for (var i = 0; i < sysincludes.length; ++i) {
+        var option = new Option(sysincludes[i], sysincludes[i]);
+        panelOptions.othersSelector.options.add(option)
+    }
 
     //Refresh dropdowns 
     $('#designVariablesSelection').selectpicker('refresh');
     $('#objectivesSelection').selectpicker('refresh');
     $('#constraintsSelection').selectpicker('refresh');
+    $('#othersSelection').selectpicker('refresh');
 
     //Set the checked values for each dropdown
     $('#designVariablesSelection').selectpicker('val', checkedDesignVariables)
     $('#objectivesSelection').selectpicker('val', checkedObjectives)
     $('#constraintsSelection').selectpicker('val', checkedConstraints)
+    $('#othersSelection').selectpicker('val', checkedSysincludes)
 
     //Get rid of all of the variable index inputs and add the new ones
     resetVariableIndices();
@@ -226,7 +238,8 @@ var panelOptions = {
     stackedPlotCheckbox: document.getElementById('stackedPlotCheckbox'),
     designVariablesSelector: document.getElementById('designVariablesSelection'),
     objectivesSelector: document.getElementById('objectivesSelection'),
-    constraintsSelector: document.getElementById('constraintsSelection')
+    constraintsSelector: document.getElementById('constraintsSelection'),
+    othersSelector: document.getElementById('othersSelection')
 };
 
 //Set the callback for selected a design variable
@@ -239,7 +252,12 @@ $('#objectivesSelection').on('changed.bs.select', function (e, clickedIndex, new
     variablesSelected(panelOptions.objectives[clickedIndex], newValue, 'objective');
 });
 
-//Set the constraint for selecting a constraint
+//Set the callback for selecting a constraint
 $('#constraintsSelection').on('changed.bs.select', function (e, clickedIndex, newValue, oldValue) {
     variablesSelected(panelOptions.constraints[clickedIndex], newValue, 'constraint');
+});
+
+//Set the callback for selecting an 'other'
+$('#othersSelection').on('changed.bs.select', function (e, clickedIndex, newValue, oldValue) {
+    variablesSelected(panelOptions.constraints[clickedIndex], newValue, 'sysinclude');
 });
