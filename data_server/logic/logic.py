@@ -281,6 +281,13 @@ def get_driver_iteration_data(case_id, variable):
                 v['type'] = 'constraint'
                 ret.append(v)
 
+        if 'sysincludes' in i:
+            for v in i['sysincludes']:
+                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
+                v['counter'] = i['counter']
+                v['type'] = 'sysinclude'
+                ret.append(v)
+
     return json.dumps(ret)
 
 def get_desvars(case_id):
