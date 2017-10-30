@@ -283,10 +283,11 @@ def get_driver_iteration_data(case_id, variable):
 
         if 'sysincludes' in i:
             for v in i['sysincludes']:
-                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
-                v['counter'] = i['counter']
-                v['type'] = 'sysinclude'
-                ret.append(v)
+                if v['name'] == variable:
+                    v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
+                    v['counter'] = i['counter']
+                    v['type'] = 'sysinclude'
+                    ret.append(v)
 
     return json.dumps(ret)
 
