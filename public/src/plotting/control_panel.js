@@ -70,6 +70,7 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariabl
     $('#designVariablesSelection').selectpicker('refresh');
     $('#objectivesSelection').selectpicker('refresh');
     $('#constraintsSelection').selectpicker('refresh');
+    $('#othersSelection').selectpicker('refresh');
 
     //Add the variables to their dropdowns
     for (var i = 0; i < designVariables.length; ++i) {
