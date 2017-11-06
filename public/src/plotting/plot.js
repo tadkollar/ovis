@@ -375,7 +375,7 @@ var createPlot = function (container) {
                         finalData.push({
                             x: [curData[index][i]['counter']],
                             y: [curData[index][i]['values'][j]],
-                            name: prependName + '[0]'
+                            name: prependName + '[' + j + ']'
                         });
                     }
                     else {
