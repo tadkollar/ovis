@@ -50,10 +50,6 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariabl
     panelOptions.others = sysincludes;
 
     //Remove all previous variables from the dropdowns
-    panelOptions.designVariablesSelector.options = [];
-    panelOptions.objectivesSelector.options = [];
-    panelOptions.constraintsSelector.options = [];
-    panelOptions.othersSelector.options = [];
     updateDropdowns(panelOptions.designVariablesSelector, '#designVariablesSelection', designVariables, checkedDesignVariables);
     updateDropdowns(panelOptions.objectivesSelector, '#objectivesSelection', objectives, checkedObjectives);
     updateDropdowns(panelOptions.constraintsSelector, '#constraintsSelection', constraints, checkedConstraints);
@@ -70,55 +66,34 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariabl
     document.body.style.backgroundColor = "rgba(0,0,0,0.4)";
 }
 
+/**
+ * Removes everything that was previously in the dropdown and replaces it with the new
+ * given values.
+ * 
+ * @param {*} selector 
+ * @param {String} queryName 
+ * @param {[String]} vars 
+ * @param {[String]} checkedVals 
+ */
 function updateDropdowns(selector, queryName, vars, checkedVals) {
+    selector.options = [];
     selector.options.length = 0;
     for (var i = 0; i < selector.options.length; ++i) {
         selector.options[i] = null;
     }
-    // for (var i = 0; i < panelOptions.objectivesSelector.options.length; ++i) {
-    //     panelOptions.objectivesSelector.options[i] = null;
-    // }
-    // for (var i = 0; i < panelOptions.constraintsSelector.options.length; ++i) {
-    //     panelOptions.constraintsSelector.options[i] = null;
-    // }
-    // for (var i = 0; i < panelOptions.othersSelector.options.length; ++i) {
-    //     panelOptions.othersSelector.options[i] = null;
-    // }
-    // panelOptions.designVariablesSelector.options.length = 0;
     $(queryName).selectpicker('refresh');
-    // $('#objectivesSelection').selectpicker('refresh');
-    // $('#constraintsSelection').selectpicker('refresh');
-    // $('#othersSelection').selectpicker('refresh');
 
     //Add the variables to their dropdowns
     for (var i = 0; i < vars.length; ++i) {
         var option = new Option(vars[i], vars[i]);
         selector.options.add(option)
     }
-    // for (var i = 0; i < objectives.length; ++i) {
-    //     var option = new Option(objectives[i], objectives[i]);
-    //     panelOptions.objectivesSelector.options.add(option)
-    // }
-    // for (var i = 0; i < constraints.length; ++i) {
-    //     var option = new Option(constraints[i], constraints[i]);
-    //     panelOptions.constraintsSelector.options.add(option)
-    // }
-    // for (var i = 0; i < sysincludes.length; ++i) {
-    //     var option = new Option(sysincludes[i], sysincludes[i]);
-    //     panelOptions.othersSelector.options.add(option)
-    // }
 
     //Refresh dropdowns 
     $(queryName).selectpicker('refresh');
-    // $('#objectivesSelection').selectpicker('refresh');
-    // $('#constraintsSelection').selectpicker('refresh');
-    // $('#othersSelection').selectpicker('refresh');
 
     //Set the checked values for each dropdown
     $(queryName).selectpicker('val', checkedVals)
-    // $('#objectivesSelection').selectpicker('val', checkedObjectives)
-    // $('#constraintsSelection').selectpicker('val', checkedConstraints)
-    // $('#othersSelection').selectpicker('val', checkedSysincludes)
 }
 
 /**
