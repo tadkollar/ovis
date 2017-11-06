@@ -54,10 +54,10 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariabl
     panelOptions.objectivesSelector.options = [];
     panelOptions.constraintsSelector.options = [];
     panelOptions.othersSelector.options = [];
-    updateDropdowns(panelOptions.designVariablesSelector.options, '#designVariablesSelection', designVariables, checkedDesignVariables);
-    updateDropdowns(panelOptions.objectivesSelector.options, '#objectivesSelection', objectives, checkedObjectives);
-    updateDropdowns(panelOptions.constraintsSelector.options, '#constraintsSelection', constraints, checkedConstraints);
-    updateDropdowns(panelOptions.othersSelector.options, '#othersSelection', sysincludes, checkedSysincludes);
+    updateDropdowns(panelOptions.designVariablesSelector, '#designVariablesSelection', designVariables, checkedDesignVariables);
+    updateDropdowns(panelOptions.objectivesSelector, '#objectivesSelection', objectives, checkedObjectives);
+    updateDropdowns(panelOptions.constraintsSelector, '#constraintsSelection', constraints, checkedConstraints);
+    updateDropdowns(panelOptions.othersSelector, '#othersSelection', sysincludes, checkedSysincludes);
     
     //Get rid of all of the variable index inputs and add the new ones
     resetVariableIndices();
@@ -70,13 +70,9 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariabl
     document.body.style.backgroundColor = "rgba(0,0,0,0.4)";
 }
 
-function updateDropdowns(options, queryName, vars, checkedVals) {
-    // panelOptions.designVariablesSelector.options = [];
-    // panelOptions.objectivesSelector.options = [];
-    // panelOptions.constraintsSelector.options = [];
-    // panelOptions.othersSelector.options = [];
+function updateDropdowns(selector, queryName, vars, checkedVals) {
     for (var i = 0; i < options.length; ++i) {
-        options[i] = null;
+        selector.options[i] = null;
     }
     // for (var i = 0; i < panelOptions.objectivesSelector.options.length; ++i) {
     //     panelOptions.objectivesSelector.options[i] = null;
@@ -96,7 +92,7 @@ function updateDropdowns(options, queryName, vars, checkedVals) {
     //Add the variables to their dropdowns
     for (var i = 0; i < vars.length; ++i) {
         var option = new Option(vars[i], vars[i]);
-        options.add(option)
+        selector.options.add(option)
     }
     // for (var i = 0; i < objectives.length; ++i) {
     //     var option = new Option(objectives[i], objectives[i]);
