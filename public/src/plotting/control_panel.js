@@ -71,7 +71,7 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariabl
 }
 
 function updateDropdowns(selector, queryName, vars, checkedVals) {
-    for (var i = 0; i < options.length; ++i) {
+    for (var i = 0; i < selector.options.length; ++i) {
         selector.options[i] = null;
     }
     // for (var i = 0; i < panelOptions.objectivesSelector.options.length; ++i) {
