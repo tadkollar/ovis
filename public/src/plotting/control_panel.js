@@ -50,6 +50,10 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariabl
     panelOptions.others = sysincludes;
 
     //Remove all previous variables from the dropdowns
+    panelOptions.designVariablesSelector.options = [];
+    panelOptions.objectivesSelector.options = [];
+    panelOptions.constraintsSelector.options = [];
+    panelOptions.othersSelector.options = [];
     updateDropdowns(panelOptions.designVariablesSelector.options, '#designVariablesSelection', designVariables, checkedDesignVariables);
     updateDropdowns(panelOptions.objectivesSelector.options, '#objectivesSelection', objectives, checkedObjectives);
     updateDropdowns(panelOptions.constraintsSelector.options, '#constraintsSelection', constraints, checkedConstraints);
