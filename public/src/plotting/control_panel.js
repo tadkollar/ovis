@@ -108,7 +108,7 @@ function updateDropdowns(options, queryName, vars, checkedVals) {
     // }
 
     //Refresh dropdowns 
-    $(desigqueryName).selectpicker('refresh');
+    $(queryName).selectpicker('refresh');
     // $('#objectivesSelection').selectpicker('refresh');
     // $('#constraintsSelection').selectpicker('refresh');
     // $('#othersSelection').selectpicker('refresh');
