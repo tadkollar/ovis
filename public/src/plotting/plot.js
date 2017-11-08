@@ -1,31 +1,39 @@
 "use strict";
 
 var createPlot = function (container) {
+    //Constants telling the height/weidth for plotly
     var deltaPlotheight = 20;
     var deltaSearchWidth = 100;
 
-    var search;
-    var curData = [];
-    var searchString = '';
-    var plotlyElement = container.getElement()[0].lastChild;
-    var options = container.getElement()[0].children[0];
-    var dataInUse = {};
-    var originalData = {};
+    var curData = []; //The data currently being plotted. In format Plotly expects
+    var plotlyElement = container.getElement()[0].lastChild; //The plotly HTML element
+    var options = container.getElement()[0].children[0]; //The button to open the options sidebar
+    var dataInUse = {}; //Set of names telling what data is in use
+    var originalData = {}; //Set of the original data?
+
+    //Set the original plotly width/height
     plotlyElement.style.width = container.width.toString() + 'px';
     plotlyElement.style.height = (container.height - deltaPlotheight).toString() + 'px';
 
+    //Indicates that we should or should not use logscale x/y and stacked plots
     var logscaleXVal = false;
     var logscaleYVal = false;
     var stackedPlotVal = false;
 
+    //Arrays that keep track of the design variables, constraints, objectives, sysincludes
+    // and their values
     var designVariables = [];
     var constraints = [];
     var objectives = [];
     var sysincludes = [];
+
+    //Arrays that keep track of what variables are currently selected (names) 
     var selectedDesignVariables = [];
     var selectedConstraints = [];
     var selectedObjectives = [];
     var selectedSysincludes = [];
+
+    //Array to keep track of what indices are selected for each selected variable
     var variableIndices = [];
 
     //Setup control panel
@@ -53,7 +61,6 @@ var createPlot = function (container) {
         //Set plotlyElement's dimensions
         plotlyElement.style.width = container.width.toString() + 'px';
         plotlyElement.style.height = (container.height - deltaPlotheight).toString() + 'px';
-        // searchElement.style.width = (container.width - deltaSearchWidth).toString() + 'px';
 
         //Set up plotly's dimensions
         Plotly.relayout(plotlyElement, {
@@ -150,7 +157,6 @@ var createPlot = function (container) {
      * @param{[Object]} finalData - the data to be plotted
      */
     var updatePlotly = function (data) {
-
         var finalData = [];
 
         data = extractBasedOnIndices(data);
@@ -211,20 +217,20 @@ var createPlot = function (container) {
      * @param {*} data 
      * @returns {[*]}
      */
-    var extractBasedOnIndices = function(data) {
+    var extractBasedOnIndices = function (data) {
         var ret = {};
 
-        for(var d in data) {
+        for (var d in data) {
             var ind = findVariableInIndices(d);
 
-            if(ind != null) {
+            if (ind != null) {
                 ret[d] = [];
-                
+
                 //Go over each index and see if it's in
                 // the index set (the set of indexes to be plotted).
                 // if so, add it to our return array
-                for(var i = 0; i < data[d].length; ++i) {
-                    if(ind.indexSet.indexOf(i) >= 0) {
+                for (var i = 0; i < data[d].length; ++i) {
+                    if (ind.indexSet.indexOf(i) >= 0) {
                         ret[d].push(data[d][i]);
                     }
                 }
@@ -236,7 +242,7 @@ var createPlot = function (container) {
 
         return ret;
     }
-    
+
     /**
      * Searches through the variableIndices DS to find and return 
      * the associated variable index object.
@@ -244,9 +250,9 @@ var createPlot = function (container) {
      * @param {String} name 
      * @returns {*} object if found, null otherwise
      */
-    var findVariableInIndices = function(name) {
-        for(var i = 0; i < variableIndices.length; ++i) {
-            if(variableIndices[i].name === name) {
+    var findVariableInIndices = function (name) {
+        for (var i = 0; i < variableIndices.length; ++i) {
+            if (variableIndices[i].name === name) {
                 return variableIndices[i];
             }
         }
@@ -265,8 +271,10 @@ var createPlot = function (container) {
     var updateForStackedPlots = function (data, curLayout) {
         //Set the y axis for each of data set and get the total number of unique variables
         var prevYIndex = 1;
+        curLayout['shapes'] = [];
+
         for (var i = 1; i < data.length; ++i) {
-            if (checkIfNewVariable(data[i].name, data[i-1].name)) {
+            if (checkIfNewVariable(data[i].name, data[i - 1].name)) {
                 ++prevYIndex;
             }
 
@@ -284,11 +292,55 @@ var createPlot = function (container) {
             curLayout['yaxis' + i.toString()] = {
                 domain: [delta * (i - 1), delta * i]
             }
+            curLayout['shapes'].push({
+                'type': 'line',
+                'x0': 0,
+                'y0': delta * (i-1),
+                'x1': 1,
+                'y1': delta * (i-1),
+                'xref': 'paper',
+                'yref': 'paper',
+                'opacity': '0.6',
+                'line': {
+                    'color': 'black',
+                    'width': 2.5,
+                    'dash': 'dot'
+                }
+            });
 
             if (logscaleYVal) {
                 curLayout['yaxis' + i.toString()]['type'] = 'log';
             }
         }
+    }
+
+    /**
+     * Finds the max in a set
+     * 
+     * @param {[Number]} dataset 
+     */
+    var max = function(dataset) {
+        var cur = Number.MIN_VALUE;
+        for(var i = 0; i < dataset.length; ++i) {
+            var num = Number(dataset[i])
+            if(num > cur) { cur = num; }
+        }
+
+        return cur;
+    }
+
+    /**
+     * Finds the min in a set
+     * @param {[Number]} dataset 
+     */
+    var min = function(dataset) {
+        var cur = Number.MAX_VALUE;
+        for(var i = 0; i < dataset.length; ++i) {
+            var num = Number(dataset[i])
+            if(num < cur) { cur = num; }
+        }
+
+        return cur;
     }
 
     /**
@@ -315,7 +367,7 @@ var createPlot = function (container) {
         var splitPrev = alteredPrev.split("|");
 
         //Check the names. If they're different, then we have a new variable
-        if(splitName[0] !== splitPrev[0]) { return true; }
+        if (splitName[0] !== splitPrev[0]) { return true; }
 
         return false;
     }
@@ -470,7 +522,6 @@ var createPlot = function (container) {
     var handleSearch = function (name, type) {
         http.get('case/' + case_id + '/driver_iterations/' + name, function (result) {
             result = JSON.parse(result);
-            searchString = name;
             if (type === 'desvar') {
                 selectedDesignVariables.push(name);
             }
