@@ -300,9 +300,9 @@ var createPlot = function (container) {
                 'y1': delta * (i-1),
                 'xref': 'paper',
                 'yref': 'paper',
-                'opacity': '0.6',
+                'opacity': '0.45',
                 'line': {
-                    'color': 'black',
+                    'color': '#555555',
                     'width': 2.5,
                     'dash': 'dot'
                 }
