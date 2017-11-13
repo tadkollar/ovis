@@ -15,7 +15,7 @@ var createPlot = function (container, componentState) {
     var needSave = false;
 
     //Set the original plotly width/height
-    if (container.width != "") {
+    if (container.width != null) {
         plotlyElement.style.width = container.width.toString() + 'px';
         plotlyElement.style.height = (container.height - deltaPlotheight).toString() + 'px';
     }
