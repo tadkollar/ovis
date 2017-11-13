@@ -94,6 +94,19 @@ def create_case(body, token):
         ret['status'] = 'Failed to create ID'
     return ret
 
+def update_layout(body, case_id):
+    """ update_layout method
+
+    Updates the layout for a given case.
+
+    Args:
+        body (JSON): the body of the POST request
+        case_id (string): the case to be updated
+    Returns:
+        True if success, False otherwies
+    """
+    return data.update_layout(body, case_id)
+
 def generic_get(collection_name, case_id, token, get_many=True):
     """ generic_get method
 

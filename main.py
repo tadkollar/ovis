@@ -30,6 +30,7 @@ if __name__ == "__main__":
         (r"/case/(\d+)", presentation.CaseHandler),
         (r"/case/(\d+)/driver_iterations", presentation.DriverIterationsHandler),
         (r"/case/(\d+)/driver_iterations/([a-zA-Z0-9_.:]+)", presentation.DriverIterationVariableHandler),
+        (r"/case/(\d+)/layout", presentation.LayoutHandler),
         (r"/case/(\d+)/driver_metadata", presentation.DriverMetadataHandler),
         (r"/case/(\d+)/global_iterations", presentation.GlobalIterationsHandler),
         (r"/case/(\d+)/metadata", presentation.MetadataHandler),

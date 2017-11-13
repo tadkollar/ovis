@@ -15,10 +15,9 @@ _TOKEN = 'squavy'
 class IndexHandler(web.RequestHandler):
     """ IndexHandler class
 
-    Contains logic for getting the main page from the server.abs
-    TODO: create and render a new main page to allow sign in and
-        view existing cases.
+    Contains logic for getting the main page from the server.
     """
+
     def get(self):
         self.render("../../public/login.html")
 
@@ -30,6 +29,7 @@ class CaseHandler(web.RequestHandler):
     all cases if it isn't, posting a new case (responding with an ID),
     and deleting everything associated with a given case ID.
     """
+
     def get(self, *params):
         if len(params) == 0:
             self.write(logic.get_all_cases(self.request.headers.get('token')))
@@ -49,12 +49,29 @@ class CaseHandler(web.RequestHandler):
             ret['status'] = 'Failed'
             self.write(ret)
 
+class LayoutHandler(web.RequestHandler):
+    """ LayoutHandler class
+
+    Handles all get/post/delete for /case/case_id/layout, which is used
+    to store and grab layouts for a given case
+    """
+
+    def get(self, *params):
+        _generic_get(collections.LAYOUTS, self, params[0], _TOKEN)
+
+    def post(self, *params):
+        ret = logic.update_layout(json.loads(self.request.body), params[0])
+        write = {}
+        write['status'] = 'Success' if ret else 'Failed'
+        self.write(write)
+
 class DriverIterationsHandler(web.RequestHandler):
     """ DriverIterationsHandler class
 
     Contains logic to get/post/delete data in the driver_iterations
     collection.
     """
+
     def get(self, *params):
         _generic_get(collections.DRIVER_ITERATIONS, self, params[0])
 
@@ -70,6 +87,7 @@ class DriverMetadataHandler(web.RequestHandler):
     Contians logic to get/post/delete data in the driver_metadata
     collection.
     """
+
     def get(self, *params):
         _generic_get(collections.DRIVER_METADATA, self, params[0], _TOKEN)
 
@@ -85,6 +103,7 @@ class GlobalIterationsHandler(web.RequestHandler):
     Containslogic to get/post/delete data in the driver_metadata
     collection.
     """
+
     def get(self, *params):
         _generic_get(collections.GLOBAL_ITERATIONS, self, params[0])
 
@@ -100,6 +119,7 @@ class MetadataHandler(web.RequestHandler):
     Contains logic to get/post/delete data in the metadata
     collection.
     """
+
     def get(self, *params):
         _generic_get(collections.METADATA, self, params[0])
 
@@ -115,6 +135,7 @@ class SolverIterationsHandler(web.RequestHandler):
     Contains logic to get/post/delete data in the solver_iterations
     collection.
     """
+
     def get(self, *params):
         _generic_get(collections.SOLVER_ITERATIONS, self, params[0])
 
@@ -130,6 +151,7 @@ class SolverMetadataHandler(web.RequestHandler):
     Contains logic to get/post/delete data in the solver_metadata
     collection.
     """
+
     def get(self, *params):
         _generic_get(collections.SOLVER_METADATA, self, params[0])
 
@@ -145,6 +167,7 @@ class SystemIterationsHandler(web.RequestHandler):
     Contains logic to get/post/delete data in the system_iterations
     collection.
     """
+
     def get(self, *params):
         _generic_get(collections.SYSTEM_ITERATIONS, self, params[0])
 
@@ -160,6 +183,7 @@ class SystemMetadataHandler(web.RequestHandler):
     Contains logic to get/post/delete data in the system_metadata
     collection.
     """
+
     def get(self, *params):
         _generic_get(collections.SYSTEM_METADATA, self, params[0])
 
@@ -174,6 +198,7 @@ class TokenHandler(web.RequestHandler):
 
     Contains logic to create a new token if passed a username
     """
+
     def post(self, *params):
         body = json.loads(self.request.body)
         token = logic.create_token(body['name'], body['email'])
@@ -191,6 +216,7 @@ class LoginHandler(web.RequestHandler):
 
     Contains logic to determine if login is successfull
     """
+
     def post(self, *params):
         body = json.loads(self.request.body)
         ret = _get_ret()
@@ -210,6 +236,7 @@ class ActivationHandler(web.RequestHandler):
 
     Contains logic for activating an account
     """
+
     def get(self, *params):
         self.write("<html>Account Activated</html>")
         logic.activate_account(params[0])
@@ -221,6 +248,7 @@ class SystemIterationVariableHandler(web.RequestHandler):
     Contains logic to grab the system iteration data for
     a specific variable
     """
+
     def get(self, *params):
         data = logic.get_system_iteration_data(params[0], params[1])
 
@@ -231,6 +259,7 @@ class VariablesHandler(web.RequestHandler):
 
     Contains logic to get variables for a given case
     """
+
     def get(self, *params):
         variables = logic.get_variables(params[0])
 
@@ -242,6 +271,7 @@ class DriverIterationVariableHandler(web.RequestHandler):
     Contains logic to grab the driver iteration data for
     a specific variable
     """
+
     def get(self, *params):
         if 'cur_max_count' in self.request.headers:
             data = logic.get_driver_iteration_based_on_count(params[0], params[1], self.request.headers.get('cur_max_count'))
@@ -255,6 +285,7 @@ class DesvarsHandler(web.RequestHandler):
 
     Contains logic to get Desvars for a given case
     """
+
     def get(self, *params):
         variables = logic.get_desvars(params[0])
 
@@ -273,6 +304,7 @@ def _get_ret():
     Returns:
         hashmap: 'status' set to 'Success'
     """
+
     ret = {}
     ret['status'] = 'Success'
     return ret

@@ -37,6 +37,9 @@ var createLayout = function (newConfig) {
     layout.container = "#goldenLayout";
     layout._isFullPage = true;
     layout.init();
+    layout.on('stateChanged', function() {
+        saveLayout(layout);
+    });
     return layout;
 }
 
@@ -46,14 +49,14 @@ var createLayout = function (newConfig) {
  * 
  * @param {*} layout 
  */
-var registerN2 = function(layout) {
+var registerN2 = function (layout) {
     layout.registerComponent('Partition Tree and N<sup>2</sup>', function (container, componentState) {
         http.get("components/partition_tree_n2.html", function (response) {
             container.getElement().html(response);
             ptn2.initializeTree();
         });
         document.getElementById('addN2Button').disabled = true;
-    
+
         container.on('destroy', function (container) {
             document.getElementById('addN2Button').disabled = false;
         });
@@ -66,7 +69,7 @@ var registerN2 = function(layout) {
  * 
  * @param {*} layout 
  */
-var registerPlot = function(layout) {
+var registerPlot = function (layout) {
     layout.registerComponent('Variable vs. Iterations', function (container, componentState) {
         http.get("components/plot.html", function (response) {
             container.getElement().html(response);
@@ -86,7 +89,7 @@ var addNewPlot = function () {
     else { //Everything was deleted in the dashboard
         //Remove the previous layout
         var n = document.getElementById("goldenLayout");
-        while(n.firstChild) {
+        while (n.firstChild) {
             n.removeChild(n.firstChild);
         }
 
@@ -112,7 +115,7 @@ var addNewN2 = function () {
     else {
         //Remove the previous layout
         var n = document.getElementById("goldenLayout");
-        while(n.firstChild) {
+        while (n.firstChild) {
             n.removeChild(n.firstChild);
         }
 
@@ -127,5 +130,31 @@ var addNewN2 = function () {
     }
 }
 
+/**
+ * Saves the current layout to the server
+ * 
+ * @param {*} layout 
+ */
+var saveLayout = function (layout) {
+    var state = JSON.stringify(layout.toConfig());
+    var body = {
+        'layout': state
+    }
+    http.post('case/' + case_id + '/layout', body, function(response) {
+        console.log("new state: " + state);
+    })
+}
+
 //Create the initial golden layout dashboard
-myLayout = createLayout(config);
+var url = window.location.href;
+var url_split = url.split('/');
+var case_id = url_split[url_split.length - 1];
+http.get('case/' + case_id + '/layout', function(ret) {
+    ret = JSON.parse(ret);
+    if(ret === []) {
+        myLayout = createLayout(config);
+    }
+    else {
+        myLayout = createLayout(JSON.parse(ret[0]['layout']))
+    }
+})

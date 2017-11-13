@@ -140,6 +140,30 @@ def create_case(body, token):
     cases_coll.insert_one(body)
     return case_id
 
+def update_layout(body, case_id):
+    """ update_layout method
+
+    Updates the layout for a given case. Creates new layout if
+    one does not already exist.abs
+
+    Args:
+        body (JSON): the body of the POST request
+        case_id (string): the case to be updated
+    Returns:
+        True if success, False otherwies
+
+    TODO: handle users and don't create if case doesn't exist
+    """
+    if _get(_MDB[collections.CASES], case_id, _GLOBALLY_ACCEPTED_TOKEN) == '[]':
+        return False
+
+    layout_coll = _MDB[collections.LAYOUTS]
+    layout_coll.delete_many({'case_id': int(case_id)})
+    body['case_id'] = int(case_id)
+    body['date'] = str(datetime.datetime.utcnow())
+    layout_coll.insert_one(body)
+    return True
+
 def generic_get(collection_name, case_id, token, get_many=True):
     """ generic_get method
 
@@ -390,6 +414,8 @@ def _create_collections():
         _MDB.create_collection('system_metadata')
     if not 'users' in _MDB.collection_names():
         _MDB.create_collection('users')
+    if not 'layouts' in _MDB.collection_names():
+        _MDB.create_collection('layouts')
 
 def _get(collection, case_id, token, get_many=True):
     """ _get method
