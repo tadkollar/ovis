@@ -1,25 +1,61 @@
-//Golden Layout configuration for plots
-var plotConfig = {
-    type: 'component',
-    componentName: 'Variable vs. Iterations',
-    componentState: { label: 'B' }
-};
+/**
+ * Returns a random number between 0 and 100,000,000
+ */
+var getID = function () {
+    return (Math.floor(Math.random() * 100000000)).toString()
+}
 
-//Golden Layout configuration for N^2
-var n2Config = {
-    type: 'component',
-    componentName: 'Partition Tree and N<sup>2</sup>',
-    componentState: { label: 'A' }
-};
+//The list of callbacks to get configs from plots
+// so that we can update their componentState on the server.
+// NOTE: It's the responsibility of the plot to add its callback.
+// Passing by reference does not work when passing around componentState, unfortunately
+var configCallbacks = [];
+var lastLayout = null;
+
+/**
+ * Get a plot configuration
+ */
+var getPlotConfig = function () {
+    //Golden Layout configuration for plots
+    var plotConfig = {
+        type: 'component',
+        componentName: 'Variable vs. Iterations',
+        componentState: { 
+            label: getID(),
+            localscaleXVal: false,
+            localscaleYVal: false,
+            stackedPlotVal: false,
+            selectedDesignVariables: [],
+            selectedConstraints: [],
+            selectedObjectives: [],
+            selectedSysincludes: [],
+            variableIndices: []
+        }
+    };
+    return plotConfig;
+}
+
+/**
+ * Get an N2 configuration
+ */
+var getN2Config = function () {
+    //Golden Layout configuration for N^2
+    var n2Config = {
+        type: 'component',
+        componentName: 'Partition Tree and N<sup>2</sup>',
+        componentState: { label: getID() }
+    };
+    return n2Config;
+}
 
 //Initial configuration.
 // 2 plots next to an N^2
 var config = {
     content: [{
         type: 'row',
-        content: [n2Config, {
+        content: [getN2Config(), {
             type: 'column',
-            content: [plotConfig, plotConfig]
+            content: [getPlotConfig(), getPlotConfig()]
         }]
     }]
 };
@@ -37,7 +73,7 @@ var createLayout = function (newConfig) {
     layout.container = "#goldenLayout";
     layout._isFullPage = true;
     layout.init();
-    layout.on('stateChanged', function() {
+    layout.on('stateChanged', function () {
         saveLayout(layout);
     });
     return layout;
@@ -71,9 +107,10 @@ var registerN2 = function (layout) {
  */
 var registerPlot = function (layout) {
     layout.registerComponent('Variable vs. Iterations', function (container, componentState) {
+        componentState.localscaleXVal = true;
         http.get("components/plot.html", function (response) {
             container.getElement().html(response);
-            createPlot(container);
+            createPlot(container, componentState);
         });
     });
 }
@@ -84,7 +121,7 @@ var registerPlot = function (layout) {
  */
 var addNewPlot = function () {
     if (myLayout.root !== null && myLayout.root.contentItems.length > 0) {
-        myLayout.root.contentItems[0].addChild(plotConfig);
+        myLayout.root.contentItems[0].addChild(getPlotConfig());
     }
     else { //Everything was deleted in the dashboard
         //Remove the previous layout
@@ -97,7 +134,7 @@ var addNewPlot = function () {
         var newConfig = {
             content: [{
                 type: 'row',
-                content: [plotConfig]
+                content: [getPlotConfig()]
             }]
         };
         myLayout = createLayout(newConfig);
@@ -110,7 +147,7 @@ var addNewPlot = function () {
  */
 var addNewN2 = function () {
     if (myLayout.root !== null && myLayout.root.contentItems.length > 0) {
-        myLayout.root.contentItems[0].addChild(n2Config);
+        myLayout.root.contentItems[0].addChild(getN2Config());
     }
     else {
         //Remove the previous layout
@@ -123,7 +160,7 @@ var addNewN2 = function () {
         var newConfig = {
             content: [{
                 type: 'row',
-                content: [n2Config]
+                content: [getN2Config()]
             }]
         };
         myLayout = createLayout(newConfig);
@@ -136,22 +173,65 @@ var addNewN2 = function () {
  * @param {*} layout 
  */
 var saveLayout = function (layout) {
-    var state = JSON.stringify(layout.toConfig());
+    if(layout == null) { //when plots are trying to save, layout will be null
+        layout = lastLayout;
+    }
+    lastLayout = layout;
+    var state = layout.toConfig();
+    var componentStates = getComponentStates();
+    replaceComponentStates(state, componentStates);
+    state = JSON.stringify(state);
     var body = {
         'layout': state
     }
-    http.post('case/' + case_id + '/layout', body, function(response) {
-        console.log("new state: " + state);
-    })
+    http.post('case/' + case_id + '/layout', body, function() { });
+}
+
+/**
+ * Goes through, finds, and replaces all component states that are 
+ * in the component states map. Used by saveLayout
+ * 
+ * NOTE: recursive method (could be replaced with a stack)
+ * 
+ * @param {*} state 
+ * @param {*} componentStatesMap 
+ */
+var replaceComponentStates = function(state, componentStatesMap) {
+    if(state.hasOwnProperty('componentState')) {
+        var label = state.componentState.label;
+        if(Number(label) in componentStatesMap) {
+            state.componentState = componentStatesMap[label];
+        }
+    }
+
+    if(state.hasOwnProperty('content')) {
+        for(var i = 0; i < state.content.length; ++i) {
+            replaceComponentStates(state.content[i], componentStatesMap);
+        }
+    }
+}
+
+/**
+ * Grabs all componentStates from the configCallbacks array.
+ * Returns a map from label to componentState
+ */
+var getComponentStates = function() {
+    var ret = {};
+    for(var i = 0; i < configCallbacks.length; ++i) {
+        var config = configCallbacks[i]();
+        ret[config['label']] = config;
+    }
+
+    return ret;
 }
 
 //Create the initial golden layout dashboard
 var url = window.location.href;
 var url_split = url.split('/');
 var case_id = url_split[url_split.length - 1];
-http.get('case/' + case_id + '/layout', function(ret) {
+http.get('case/' + case_id + '/layout', function (ret) {
     ret = JSON.parse(ret);
-    if(ret === []) {
+    if (ret.length === 0) {
         myLayout = createLayout(config);
     }
     else {

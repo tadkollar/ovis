@@ -1,6 +1,6 @@
 "use strict";
 
-var createPlot = function (container) {
+var createPlot = function (container, componentState) {
     //Constants telling the height/weidth for plotly
     var deltaPlotheight = 20;
     var deltaSearchWidth = 100;
@@ -11,14 +11,14 @@ var createPlot = function (container) {
     var dataInUse = {}; //Set of names telling what data is in use
     var originalData = {}; //Set of the original data?
 
-    //Set the original plotly width/height
-    plotlyElement.style.width = container.width.toString() + 'px';
-    plotlyElement.style.height = (container.height - deltaPlotheight).toString() + 'px';
+    //Indicates if we need to update/save the config to the server
+    var needSave = false;
 
-    //Indicates that we should or should not use logscale x/y and stacked plots
-    var logscaleXVal = false;
-    var logscaleYVal = false;
-    var stackedPlotVal = false;
+    //Set the original plotly width/height
+    if (container.width != "") {
+        plotlyElement.style.width = container.width.toString() + 'px';
+        plotlyElement.style.height = (container.height - deltaPlotheight).toString() + 'px';
+    }
 
     //Arrays that keep track of the design variables, constraints, objectives, sysincludes
     // and their values
@@ -26,15 +26,6 @@ var createPlot = function (container) {
     var constraints = [];
     var objectives = [];
     var sysincludes = [];
-
-    //Arrays that keep track of what variables are currently selected (names) 
-    var selectedDesignVariables = [];
-    var selectedConstraints = [];
-    var selectedObjectives = [];
-    var selectedSysincludes = [];
-
-    //Array to keep track of what indices are selected for each selected variable
-    var variableIndices = [];
 
     //Setup control panel
     if (options != null) {
@@ -181,12 +172,12 @@ var createPlot = function (container) {
             title: 'Value'
         }
 
-        if (stackedPlotVal) { yaxis.title = ''; }
+        if (componentState.stackedPlotVal) { yaxis.title = ''; }
 
-        if (logscaleXVal) {
+        if (componentState.logscaleXVal) {
             xaxis['type'] = 'log'
         }
-        if (logscaleYVal) {
+        if (componentState.logscaleYVal) {
             yaxis['type'] = 'log'
         }
 
@@ -197,7 +188,7 @@ var createPlot = function (container) {
         };
 
         //Deal with stacked plots
-        if (stackedPlotVal) {
+        if (componentState.stackedPlotVal) {
             updateForStackedPlots(finalData, layout);
         }
         else { //delete the old y-axis values if you used stacked plots previously
@@ -251,9 +242,9 @@ var createPlot = function (container) {
      * @returns {*} object if found, null otherwise
      */
     var findVariableInIndices = function (name) {
-        for (var i = 0; i < variableIndices.length; ++i) {
-            if (variableIndices[i].name === name) {
-                return variableIndices[i];
+        for (var i = 0; i < componentState.variableIndices.length; ++i) {
+            if (componentState.variableIndices[i].name === name) {
+                return componentState.variableIndices[i];
             }
         }
 
@@ -295,9 +286,9 @@ var createPlot = function (container) {
             curLayout['shapes'].push({
                 'type': 'line',
                 'x0': 0,
-                'y0': delta * (i-1),
+                'y0': delta * (i - 1),
                 'x1': 1,
-                'y1': delta * (i-1),
+                'y1': delta * (i - 1),
                 'xref': 'paper',
                 'yref': 'paper',
                 'opacity': '0.8',
@@ -308,7 +299,7 @@ var createPlot = function (container) {
                 }
             });
 
-            if (logscaleYVal) {
+            if (componentState.logscaleYVal) {
                 curLayout['yaxis' + i.toString()]['type'] = 'log';
             }
         }
@@ -319,11 +310,11 @@ var createPlot = function (container) {
      * 
      * @param {[Number]} dataset 
      */
-    var max = function(dataset) {
+    var max = function (dataset) {
         var cur = Number.MIN_VALUE;
-        for(var i = 0; i < dataset.length; ++i) {
+        for (var i = 0; i < dataset.length; ++i) {
             var num = Number(dataset[i])
-            if(num > cur) { cur = num; }
+            if (num > cur) { cur = num; }
         }
 
         return cur;
@@ -333,11 +324,11 @@ var createPlot = function (container) {
      * Finds the min in a set
      * @param {[Number]} dataset 
      */
-    var min = function(dataset) {
+    var min = function (dataset) {
         var cur = Number.MAX_VALUE;
-        for(var i = 0; i < dataset.length; ++i) {
+        for (var i = 0; i < dataset.length; ++i) {
             var num = Number(dataset[i])
-            if(num < cur) { cur = num; }
+            if (num < cur) { cur = num; }
         }
 
         return cur;
@@ -520,19 +511,20 @@ var createPlot = function (container) {
      * @param {string} name 
      */
     var handleSearch = function (name, type) {
+        needSave = true;
         http.get('case/' + case_id + '/driver_iterations/' + name, function (result) {
             result = JSON.parse(result);
             if (type === 'desvar') {
-                selectedDesignVariables.push(name);
+                componentState.selectedDesignVariables.push(name);
             }
             if (type === 'constraint') {
-                selectedConstraints.push(name);
+                componentState.selectedConstraints.push(name);
             }
             if (type === 'objective') {
-                selectedObjectives.push(name);
+                componentState.selectedObjectives.push(name);
             }
             if (type === 'sysinclude') {
-                selectedSysincludes.push(name);
+                componentState.selectedSysincludes.push(name);
             }
 
             setData(result, name);
@@ -545,7 +537,8 @@ var createPlot = function (container) {
      * @param {Boolean} val 
      */
     var logscaleX = function (val) {
-        logscaleXVal = val;
+        componentState.logscaleXVal = val;
+        needSave = true;
         updatePlotly(dataInUse);
     }
 
@@ -555,7 +548,8 @@ var createPlot = function (container) {
      * @param {Boolean} val 
      */
     var logscaleY = function (val) {
-        logscaleYVal = val;
+        componentState.logscaleYVal = val;
+        needSave = true;
         updatePlotly(dataInUse);
     }
 
@@ -566,7 +560,8 @@ var createPlot = function (container) {
      */
     var stackedPlot = function (val) {
         console.log("Changing stackedPlot to: " + val);
-        stackedPlotVal = val;
+        needSave = true;
+        componentState.stackedPlotVal = val;
         updatePlotly(dataInUse);
     }
 
@@ -579,6 +574,7 @@ var createPlot = function (container) {
      * @param {*} type - type of variable
      */
     var variableFun = function (variable, val, type) {
+        needSave = true;
         console.log("variableFun called");
         if (val) {
             handleSearch(variable, type);
@@ -586,15 +582,15 @@ var createPlot = function (container) {
         else {
             tryRemoveVariableFromIndices(variable);
             delete dataInUse[variable];
-            var set = selectedDesignVariables;
+            var set = componentState.selectedDesignVariables;
             if (type === 'objective') {
-                set = selectedObjectives;
+                set = componentState.selectedObjectives;
             }
             else if (type === 'constraint') {
-                set = selectedConstraints;
+                set = componentState.selectedConstraints;
             }
             else {
-                set = selectedSysincludes;
+                set = componentState.selectedSysincludes;
             }
 
             var index = set.indexOf(variable);
@@ -612,10 +608,11 @@ var createPlot = function (container) {
      * @param {String} val 
      */
     var variableIndicesFun = function (name, val) {
+        needSave = true;
         var ind = null;
-        for (var i = 0; i < variableIndices.length; ++i) {
-            if (variableIndices[i].name === name) {
-                ind = variableIndices[i];
+        for (var i = 0; i < componentState.variableIndices.length; ++i) {
+            if (componentState.variableIndices[i].name === name) {
+                ind = componentState.variableIndices[i];
                 break;
             }
         }
@@ -643,7 +640,7 @@ var createPlot = function (container) {
                 'indices': '0-' + (data.length - 1).toString()
             };
             addIndicesToObject(newIndices);
-            variableIndices.push(newIndices);
+            componentState.variableIndices.push(newIndices);
             addVariableIndicesGroup(newIndices.name, newIndices.indices);
         }
 
@@ -657,10 +654,10 @@ var createPlot = function (container) {
      * @param {String} name
      */
     var tryRemoveVariableFromIndices = function (name) {
-        for (var i = 0; i < variableIndices.length; ++i) {
-            if (variableIndices[i].name === name) {
+        for (var i = 0; i < componentState.variableIndices.length; ++i) {
+            if (componentState.variableIndices[i].name === name) {
                 removeVariableIndicesGroup(name);
-                variableIndices.splice(i, 1);
+                componentState.variableIndices.splice(i, 1);
             }
         }
     }
@@ -747,9 +744,38 @@ var createPlot = function (container) {
             }
         }
 
-        var randIndex = Math.floor(Math.random() * designVariables.length);
-        if (randIndex < designVariables.length) {
-            handleSearch(designVariables[randIndex], 'desvar');
+        if (componentState.selectedConstraints.length > 0 || componentState.selectedDesignVariables.length > 0 ||
+            componentState.selectedSysincludes.length > 0 || componentState.selectedObjectives.length > 0) {
+            //Create temporary arrays so we can iterate and change the original arrays
+            var tempConstraints = componentState.selectedConstraints;
+            var tempDesvars = componentState.selectedDesignVariables;
+            var tempSysincludes = componentState.selectedSysincludes;
+            var tempObjectives = componentState.selectedObjectives;
+
+            //Reset all arrays (they'll be set when we do 'handleSearch')
+            componentState.selectedConstraints = [];
+            componentState.selectedDesignVariables = [];
+            componentState.selectedSysincludes = [];
+            componentState.selectedObjectives = [];
+
+            for(var i = 0; i < tempConstraints.length; ++i) {
+                handleSearch(tempConstraints[i], 'constraint');
+            }
+            for(var i = 0; i < tempDesvars.length; ++i) {
+                handleSearch(tempDesvars[i], 'desvar');
+            }
+            for(var i = 0; i < tempSysincludes.length; ++i) {
+                handleSearch(tempSysincludes[i], 'sysinclude');
+            }
+            for(var i = 0; i < tempObjectives.length; ++i) {
+                handleSearch(tempObjectives[i], 'objective');
+            }
+        }
+        else {
+            var randIndex = Math.floor(Math.random() * designVariables.length);
+            if (randIndex < designVariables.length) {
+                handleSearch(designVariables[randIndex], 'desvar');
+            }
         }
     });
 
@@ -759,9 +785,9 @@ var createPlot = function (container) {
      */
     var onDoubleClick = function () {
         if (!controlPanelOpen) {
-            openNav(logscaleXVal, logscaleYVal, stackedPlotVal, designVariables,
-                objectives, constraints, sysincludes, selectedDesignVariables, selectedObjectives,
-                selectedConstraints, selectedSysincludes, variableIndices,
+            openNav(componentState.logscaleXVal, componentState.logscaleYVal, componentState.stackedPlotVal, designVariables,
+                objectives, constraints, sysincludes, componentState.selectedDesignVariables, componentState.selectedObjectives,
+                componentState.selectedConstraints, componentState.selectedSysincludes, variableIndices,
                 logscaleX, logscaleY, stackedPlot, variableFun, variableIndicesFun);
         }
         else {
@@ -772,9 +798,23 @@ var createPlot = function (container) {
     //Start trying to update the variables so data is live
     setInterval(tryUpdateVariables, 5000);
 
+    //Start trying ot save
+    setInterval(function() {
+        if(needSave) {
+            needSave = false;
+            saveLayout(null);
+        }
+    }, 3000)
+
     //Set plotly's event listener to open/close the control panel
     plotlyElement.addEventListener('dblclick', onDoubleClick);
 
     //Set callback on resize
     container.on('resize', resize);
+
+    //Add to layout's configCallbacks so we update our componentState
+    // on the server.
+    configCallbacks.push(function () {
+        return componentState;
+    });
 };
