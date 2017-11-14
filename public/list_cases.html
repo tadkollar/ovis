@@ -39,9 +39,9 @@
                 <tbody>
                     {% for case in cases %}
                     <tr style="cursor: pointer">
-                        <td onclick="window.document.location='/case/{{case["case_id"]}}'">{{case['case_name']}}</td>
-                        <td align="center" onclick="window.document.location='/case/{{case["case_id"]}}'">{{case['case_id']}}</td>
-                        <td align="center" onclick="window.document.location='/case/{{case["case_id"]}}'">{{case['datestring']}}</td>
+                        <td onclick="window.document.location='visualization/case/{{case["case_id"]}}'">{{case['case_name']}}</td>
+                        <td align="center" onclick="window.document.location='visualization/case/{{case["case_id"]}}'">{{case['case_id']}}</td>
+                        <td align="center" onclick="window.document.location='visualization/case/{{case["case_id"]}}'">{{case['datestring']}}</td>
                         <td align="center">
                             <button class="btn btn-sm btn-danger" onClick="deleteCase({{case["case_id"]}}, '{{token}}')">
                                 <i class="fa fa-remove"></i>
