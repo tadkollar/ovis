@@ -32,8 +32,7 @@ var register = function () {
 
 var loginPress = function () {
     var token = document.getElementById('token').value;
-    if(token) {
-        document.cookie = "token=" + token + ";domain=openmdao.org;path=/";
+    if (token) {
         login(token);
     }
     else {
@@ -41,18 +40,18 @@ var loginPress = function () {
     }
 }
 
-var loginRegister = function() {
+var loginRegister = function () {
     login(tempToken);
 }
 
-var login = function(token=-1) {
-    if(token != -1) {
-        http.post('login', {'token': token}, function(result) {
-            if(result.status == "Success") {
-		var newHref = window.location.href + '/login/' + token;
-		console.log(newHref);
+var login = function (token = -1) {
+    if (token != -1) {
+        http.post('login', { 'token': token }, function (result) {
+            if (result.status == "Success") {
+                var newHref = window.location.href;
+                console.log(newHref);
                 window.location.href = newHref;
-            }
+        }
             else {
                 console.log("Failed to login")
             }
@@ -63,20 +62,3 @@ var login = function(token=-1) {
         console.log("Token was -1");
     }
 }
-
-/**
- * Try to find the token cookie. If found, automatically login
- */
-var tryGetTokenFromCookie = function() {
-    var parts = document.cookie.split(/;/g);
-    for(var i = 0; i < parts.length; ++i) {
-        var parts2 = parts[i].split(/=/g);
-        if(parts2.length > 0) {
-            if(parts2[0].replace(/ /g, '') === 'token') {
-                login(parts2[1]);
-            }
-        }
-    }
-}
-
-tryGetTokenFromCookie();

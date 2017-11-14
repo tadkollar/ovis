@@ -41,12 +41,12 @@ if __name__ == "__main__":
         (r"/case/(\d+)/system_metadata", presentation.SystemMetadataHandler),
         (r"/token", presentation.TokenHandler),
         (r"/login", presentation.LoginHandler),
-        (r"/login/([a-zA-Z0-9]+)", presentation.LoginHandler),
+        (r"/login", presentation.LoginHandler),
         (r"/activate/([a-zA-Z0-9]+)", presentation.ActivationHandler),
         (r"/case/(\d+)/variables", presentation.VariablesHandler),
         (r"/case/(\d+)/desvars", presentation.DesvarsHandler),
         (r"/(.*)", web.StaticFileHandler, {'path': public_root})
-        ])
+        ], cookie_secret="tklskdjfsdv8982fj4kj3ookr0")
 
     print("Starting up OpenMDAO server on port: " + str(options.port))
     http_server = tornado.httpserver.HTTPServer(app)

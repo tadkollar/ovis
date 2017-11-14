@@ -19,7 +19,14 @@ class IndexHandler(web.RequestHandler):
     """
 
     def get(self):
-        self.render("../../public/login.html")
+        token = str(self.get_secure_cookie("token"))
+        token = token.replace("b'", '')
+        token = token.replace("'", '')
+        if self.get_secure_cookie("token"):
+            cases = logic.get_all_cases(token)
+            self.render("../../public/list_cases.html", cases=cases, token=token)
+        else:
+            self.render("../../public/login.html")
 
 class CaseHandler(web.RequestHandler):
     """ CaseHandler class
@@ -221,6 +228,7 @@ class LoginHandler(web.RequestHandler):
         body = json.loads(self.request.body)
         ret = _get_ret()
         if logic.token_exists(body['token']):
+            self.set_secure_cookie("token", body['token'])
             self.write(ret)
         else:
             ret['status'] = 'Failed'
@@ -228,8 +236,14 @@ class LoginHandler(web.RequestHandler):
             self.write(ret)
 
     def get(self, *params):
-        cases = logic.get_all_cases(params[0])
-        self.render("../../public/list_cases.html", cases=cases, token=params[0])
+        token = str(self.get_secure_cookie("token"))
+        token = token.replace("b'", '')
+        token = token.replace("'", '')
+        if self.get_secure_cookie("token"):
+            cases = logic.get_all_cases(token)
+            self.render("../../public/list_cases.html", cases=cases, token=token)
+        else:
+            self.render("../../public/login.html")
 
 class ActivationHandler(web.RequestHandler):
     """ Activation Handler class

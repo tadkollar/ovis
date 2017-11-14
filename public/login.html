@@ -34,7 +34,9 @@
                         <label for="name" class="cols-sm-2 control-label">Your Name</label>
                         <div class="cols-sm-10">
                             <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
+                                <span class="input-group-addon">
+                                    <i class="fa fa-user fa" aria-hidden="true"></i>
+                                </span>
                                 <input type="text" class="form-control" name="name" id="name" placeholder="Enter your Name" />
                             </div>
                         </div>
@@ -44,7 +46,9 @@
                         <label for="email" class="cols-sm-2 control-label">Your Email</label>
                         <div class="cols-sm-10">
                             <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-envelope fa" aria-hidden="true"></i></span>
+                                <span class="input-group-addon">
+                                    <i class="fa fa-envelope fa" aria-hidden="true"></i>
+                                </span>
                                 <input type="text" class="form-control" name="email" id="email" placeholder="Enter your Email" />
                             </div>
                         </div>
@@ -63,7 +67,9 @@
                         <label for="name" class="cols-sm-2 control-label">Token</label>
                         <div class="cols-sm-10">
                             <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-circle fa" aria-hidden="true"></i></span>
+                                <span class="input-group-addon">
+                                    <i class="fa fa-circle fa" aria-hidden="true"></i>
+                                </span>
                                 <input type="text" class="form-control" name="name" id="token" placeholder="Enter your Token" />
                             </div>
                         </div>
@@ -75,28 +81,41 @@
                 </form>
             </div>
         </div>
-    </div> 
+    </div>
 
     <!-- Modal -->
     <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                     <h4 class="modal-title" id="successModalTitle" style="text-align: center">Successfully Registered!</h4>
                     <h4 class="modal-title" id="failModalTitle" style="text-align: center; display: none">Failed to Register</h4>
                 </div>
                 <div class="modal-body">
                     <div id="registerSuccessBody" style="display: none">
-                        <strong> Token is:</strong> <i><span id="tokenText"></span></i>
+                        <strong> Token is:</strong>
+                        <i>
+                            <span id="tokenText"></span>
+                        </i>
                         <br/>
                         <br/>
-                        <p>Copy the token and keep it somewhere safe! Use the token in your <i>WebRecorder</i> 
-                        to start logging to the server.</p>
-			<br/>
-			<p><strong>NOTE:</strong> This key needs to be activated by the OpenMDAO Team. You will receive an email when the token is activated.</p>
+                        <p>Copy the token and keep it somewhere safe! Use the token in your
+                            <i>WebRecorder</i>
+                            to start logging to the server.</p>
+                        <br/>
+                        <p>
+                            <strong>NOTE:</strong> This key needs to be activated by the OpenMDAO Team. You will receive an email
+                            when the token is activated.</p>
                     </div>
-                    <div id="registerFailBody" style="display: none"><strong>Failed with reasoning: </strong><i><span id="failedText"></span></i></div>
+                    <div id="registerFailBody" style="display: none">
+                        <strong>Failed with reasoning: </strong>
+                        <i>
+                            <span id="failedText"></span>
+                        </i>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal" id="registerSuccessClose" style="display: none">Close</button>
@@ -110,8 +129,8 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
         crossorigin="anonymous"></script>
-    <script type="text/javascript" src="/visualization/libs/http.js"></script>
-    <script type="text/javascript" src="/visualization/src/login/login.js"></script>
+    <script type="text/javascript" src="../libs/http.js"></script>
+    <script type="text/javascript" src="../src/login/login.js"></script>
 </body>
 
 </html>
