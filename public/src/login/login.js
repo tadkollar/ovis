@@ -33,6 +33,7 @@ var register = function () {
 var loginPress = function () {
     var token = document.getElementById('token').value;
     if(token) {
+        document.cookie = "token=" + token + ";domain=openmdao.org;path=/";
         login(token);
     }
     else {
@@ -62,3 +63,20 @@ var login = function(token=-1) {
         console.log("Token was -1");
     }
 }
+
+/**
+ * Try to find the token cookie. If found, automatically login
+ */
+var tryGetTokenFromCookie = function() {
+    var parts = document.cookie.split(/;/g);
+    for(var i = 0; i < parts.length; ++i) {
+        var parts2 = parts[i].split(/=/g);
+        if(parts2.length > 0) {
+            if(parts2[0] === 'token') {
+                login(parts2[1]);
+            }
+        }
+    }
+}
+
+tryGetTokenFromCookie();
