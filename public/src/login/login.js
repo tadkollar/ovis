@@ -72,7 +72,7 @@ var tryGetTokenFromCookie = function() {
     for(var i = 0; i < parts.length; ++i) {
         var parts2 = parts[i].split(/=/g);
         if(parts2.length > 0) {
-            if(parts2[0] === 'token') {
+            if(parts2[0].replace(/ /g, '') === 'token') {
                 login(parts2[1]);
             }
         }
