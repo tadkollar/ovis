@@ -107,7 +107,6 @@ var registerN2 = function (layout) {
  */
 var registerPlot = function (layout) {
     layout.registerComponent('Variable vs. Iterations', function (container, componentState) {
-        componentState.localscaleXVal = true;
         http.get("components/plot.html", function (response) {
             container.getElement().html(response);
             createPlot(container, componentState);
