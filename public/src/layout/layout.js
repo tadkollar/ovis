@@ -224,6 +224,15 @@ var getComponentStates = function() {
     return ret;
 }
 
+/**
+ * Log out by removing the cookie used to track the user
+ */
+var logout = function() {
+    http.get('logout', function() {
+        window.location = 'http://openmdao.org/visualization'
+    });
+}
+
 //Create the initial golden layout dashboard
 var url = window.location.href;
 var url_split = url.split('/');

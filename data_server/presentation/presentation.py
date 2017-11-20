@@ -28,6 +28,14 @@ class IndexHandler(web.RequestHandler):
         else:
             self.render("../../public/login.html")
 
+class LogoutHandler(web.RequestHandler):
+    """ LogoutHandler class
+
+    Contains logic for logging out a user
+    """
+    def get(self):
+        self.clear_cookie("token")
+
 class CaseHandler(web.RequestHandler):
     """ CaseHandler class
 

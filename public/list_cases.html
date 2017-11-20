@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html>
-    <script>
-        var deleteCase = function(case_id, token) {
-            if(confirm("Are you sure you want to delete this case?") == true) {
-                console.log("deleting case with id: " + case_id)
-                http.delete('case/' + case_id, token, function(response) {
-                    location.reload();
-                });
-            }
+<script>
+    var deleteCase = function (case_id, token) {
+        if (confirm("Are you sure you want to delete this case?") == true) {
+            console.log("deleting case with id: " + case_id)
+            http.delete('case/' + case_id, token, function (response) {
+                location.reload();
+            });
         }
-    </script>
+    }
+
+    if(document.cookie.indexOf("token") < 0) {
+        location.reload(true);
+    }
+</script>
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
