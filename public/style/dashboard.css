@@ -43,15 +43,16 @@
 #variables.variableslist.option {
     margin-left: 5px;
     font-size: 15px;
-    color: #818181;
+    color: #a8a8a8;
 }
 
 .sidenav .closebtn {
-    position: absolute;
-    top: 0;
-    right: 25px;
     font-size: 36px;
-    margin-left: 50px;
+    margin-right: 10px;
+}
+
+.sidenav .closebtn:hover {
+    color: #747474
 }
 
 .input {
