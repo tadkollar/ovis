@@ -94,6 +94,19 @@ def create_case(body, token):
         ret['status'] = 'Failed to create ID'
     return ret
 
+def update_case_name(name, case_id):
+    """ update_case_name method
+
+    Updates a given case to have a specific name
+
+    Args:
+        name (string): the new name of the case
+        case_id (string): the case to be updated
+    Returns:
+        True if success, False otherwise
+    """
+    return data.update_case_name(name, case_id)
+
 def update_layout(body, case_id):
     """ update_layout method
 

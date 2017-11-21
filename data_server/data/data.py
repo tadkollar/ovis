@@ -81,6 +81,24 @@ def get_case_with_id(case_id, token):
     else:
         return {}
 
+def update_case_name(name, case_id):
+    """ update_case_name method
+
+    Updates a given case to have a specific name
+
+    Args:
+        name (string): the new name of the case
+        case_id (string): the case to be updated
+    Returns:
+        True if success, False otherwise
+    """
+    case_id = int(case_id)
+    cases_coll = _MDB[collections.CASES]
+    if cases_coll.find({'case_id': case_id}):
+        cases_coll.update_one({'case_id': case_id}, {'$set': {'case_name': name}})
+        return True
+    return False
+
 def delete_case_with_id(case_id, token):
     """ delete_case_with_id method
 

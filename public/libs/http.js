@@ -73,6 +73,24 @@ function HTTP() {
             }
         });
     }
+
+    /**
+     * function patch - performs HTTP PATCH request at given address (after prepending base URL) 
+     * and calls success or error callback
+     * 
+     * @param {String} path - the URL excluding the base URL (which is automatically prepended)
+     * @param {*} data - the body of the patch
+     * @param {*} success - the success callback
+     * @param {*} error - the error callback
+     */
+    this.patch = function (path, data, success, error) {
+        $.ajax({
+            url: this.baseURL + path,
+            type: 'PATCH',
+            data: JSON.stringify(data),
+            success: function(response) { success(response); }
+        });
+    }
 };
 
 var http = new HTTP();

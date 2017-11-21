@@ -47,7 +47,7 @@ if __name__ == "__main__":
         (r"/case/(\d+)/variables", presentation.VariablesHandler),
         (r"/case/(\d+)/desvars", presentation.DesvarsHandler),
         (r"/(.*)", web.StaticFileHandler, {'path': public_root})
-        ], cookie_secret="tklskdjfsdv8982fj4kj3ookr0")
+        ], cookie_secret="tklskdjfsdv8982fj4kj3ookr0", debug=True)
 
     print("Starting up OpenMDAO server on port: " + str(options.port))
     http_server = tornado.httpserver.HTTPServer(app)

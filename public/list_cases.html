@@ -1,24 +1,7 @@
 <!DOCTYPE html>
 <html>
 <script>
-    var deleteCase = function (case_id, token) {
-        if (confirm("Are you sure you want to delete this case?") == true) {
-            console.log("deleting case with id: " + case_id)
-            http.delete('case/' + case_id, token, function (response) {
-                location.reload();
-            });
-        }
-    }
-
-    if(document.cookie.indexOf("token") < 0) {
-        location.reload(true);
-    }
-
-    var logout = function() {
-    http.get('logout', function() {
-        window.location = 'http://openmdao.org/visualization'
-    });
-}
+    
 </script>
 
 <head>
@@ -59,18 +42,24 @@
                     <th style="width: 40%">Name</th>
                     <th style="width: 20%; text-align: center">Case ID</th>
                     <th style="width: 20%; text-align: center">Date</th>
-                    <th style="text-align: center">Delete</th>
+                    <th style="width: 10%; text-align: center">Edit</th>
+                    <th style="width: 10%; text-align: center">Delete</th>
                 </thead>
                 <tbody>
                     {% for case in cases %}
                     <tr style="cursor: pointer">
-                        <td onclick="window.document.location='../visualization/case/{{case["case_id"]}}'">{{case['case_name']}}</td>
-                        <td align="center" onclick="window.document.location='../visualization/case/{{case["case_id"]}}'">{{case['case_id']}}</td>
-                        <td align="center" onclick="window.document.location='../visualization/case/{{case["case_id"]}}'">{{case['datestring']}}</td>
+                        <td onclick="window.document.location='/case/{{case["case_id"]}}'">{{case['case_name']}}</td>
+                        <td align="center" onclick="window.document.location='/case/{{case["case_id"]}}'">{{case['case_id']}}</td>
+                        <td align="center" onclick="window.document.location='/case/{{case["case_id"]}}'">{{case['datestring']}}</td>
+                        <td align="center">
+                            <button class="btn btn-sm" onClick="updateCaseName({{case["case_id"]}}, this)">
+                                <i class="fa fa-edit"></i>
+                            </button>
+                        </td>
                         <td align="center">
                             <button class="btn btn-sm btn-danger" onClick="deleteCase({{case["case_id"]}}, '{{token}}')">
-                                <i class="fa fa-remove"></i>
-                            </button>
+                                    <i class="fa fa-remove"></i>
+                                </button>
                         </td>
                     </tr>
                     {% end %}
@@ -82,6 +71,7 @@
         </div>
     </div>
     <link rel="stylesheet" type="text/css" href="visualization/style/awesomplete.css">
+    <script type="text/javascript" src="../src/list_cases/list_cases.js"></script>
     <link type="text/css" rel="stylesheet" href="https://golden-layout.com/files/latest/css/goldenlayout-base.css" />
     <link type="text/css" rel="stylesheet" href="https://golden-layout.com/files/latest/css/goldenlayout-light-theme.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">

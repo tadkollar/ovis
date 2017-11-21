@@ -63,6 +63,15 @@ class CaseHandler(web.RequestHandler):
         else:
             ret['status'] = 'Failed'
             self.write(ret)
+    
+    def patch(self, *params):
+        ret = _get_ret()
+        body = json.loads(self.request.body)
+        if logic.update_case_name(body['name'], params[0]):
+            self.write(ret)
+        else:
+            ret['status'] = 'Failed'
+            self.write(ret)
 
 class LayoutHandler(web.RequestHandler):
     """ LayoutHandler class
