@@ -55,7 +55,7 @@ var saveChange = function(case_id, element) {
     var name = newNameEle.value;
     parEle.children[3].innerHTML = "<td align='center'><button class='btn btn-sm' onClick='updateCaseName(\"" + case_id + "\", this)'><i class='fa fa-edit'></i></button></td>";
 
-    parEle.firstElementChild.outerHTML = "<td onclick=\"window.document.location='/case/" + case_id + "'\">" + name + "</td>";
+    parEle.firstElementChild.outerHTML = "<td onclick=\"window.document.location='../visualization/case/" + case_id + "'\">" + name + "</td>";
 
     //Save to DB
     http.patch('case/' + case_id, {'name': name}, function(response) { });
@@ -68,6 +68,6 @@ var saveChange = function(case_id, element) {
 var cancelChange = function(name, element, case_id) {
     var parEle = element.parentElement.parentElement;
     var nameElement = parEle.firstElementChild;
-    nameElement.outerHTML = "<td onclick=\"window.document.location='/case/" + case_id + "'\">" + name + "</td>";
+    nameElement.outerHTML = "<td onclick=\"window.document.location='../visualization/case/" + case_id + "'\">" + name + "</td>";
     parEle.children[3].innerHTML = "<td align='center'><button class='btn btn-sm' onClick='updateCaseName(\"" + case_id + "\", this)'><i class='fa fa-edit'></i></button></td>";
 }
