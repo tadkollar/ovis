@@ -1,0 +1,8 @@
+tr {
+    transition: 0.2s;
+}
+
+tr:hover {
+    transform:scale(1.01, 1.01);
+    transform-origin: center;
+}
