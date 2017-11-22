@@ -58,3 +58,15 @@
 .input {
     padding-right: 20px;
 }
+
+.btn:hover {
+    transform:scale(1.05, 1.05);
+    transform-origin: center;
+    background-color: #a8a8a8;
+}
+
+.myButton:hover {
+    transform: scale(1.05, 1.05);
+    transform-origin: center;
+    background-color: #a8a8a8;
+}
