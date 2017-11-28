@@ -18,8 +18,8 @@ smtplib.SMTP.mock_returns = Mock('smtp_connection')
 def cleanup():
     logic.delete_token(token)
 
+
 class TestLogic(unittest.TestCase):
-    
     def create_system_iteration(self):
         ret = {}
         ret['iteration_coordinate'] = 'it|1'
@@ -36,6 +36,7 @@ class TestLogic(unittest.TestCase):
         ret['desvars'] = [{'name': 'var1'}]
         ret['objectives'] = [{'name': 'var2'}]
         ret['constraints'] = [{'name': 'var3'}]
+        ret['sysincludes'] = [{'name': 'var4'}]
         return ret
 
     def test_create_token(self):
@@ -215,6 +216,7 @@ class TestLogic(unittest.TestCase):
         for i in sys_data3:
             if i['type'] == 'residual':
                 got_resid = True
+        
         self.assertTrue(got_input)
         self.assertTrue(got_output)
         self.assertTrue(got_resid)
@@ -228,9 +230,11 @@ class TestLogic(unittest.TestCase):
         sys_data1 = json.loads(logic.get_driver_iteration_data(new_case['case_id'], 'var1'))
         sys_data2 = json.loads(logic.get_driver_iteration_data(new_case['case_id'], 'var2'))
         sys_data3 = json.loads(logic.get_driver_iteration_data(new_case['case_id'], 'var3'))
+        sys_data4 = json.loads(logic.get_driver_iteration_data(new_case['case_id'], 'var4'))
         got_desvars = False
         got_objectives = False
         got_constraints = False
+        got_sysinclude = False
         for i in sys_data1:
             if i['type'] == 'desvar':
                 got_desvars = True
@@ -240,12 +244,17 @@ class TestLogic(unittest.TestCase):
         for i in sys_data3:
             if i['type'] == 'constraint':
                 got_constraints = True
+        for i in sys_data4:
+            if i['type'] == 'sysinclude':
+                got_sysinclude = True
         self.assertTrue(got_desvars)
         self.assertTrue(got_objectives)
         self.assertTrue(got_constraints)
+        self.assertTrue(got_sysinclude)
         self.assertEqual(sys_data1[0]['name'], 'var1')
         self.assertEqual(sys_data2[0]['name'], 'var2')
         self.assertEqual(sys_data3[0]['name'], 'var3')
+        self.assertEqual(sys_data4[0]['name'], 'var4')
 
     def test_get_variables(self):
         new_case = logic.create_case({}, token)
@@ -328,8 +337,24 @@ class TestLogic(unittest.TestCase):
         finally:
             logic.delete_token(new_token)
 
+    def test_update_case_name(self):
+        new_case = logic.create_case({'case_name': 'test'}, token)
+        new_case_data = json.loads(logic.get_case_with_id(new_case['case_id'], token))
+        self.assertEqual(new_case_data['case_name'], 'test')
+        logic.update_case_name('test_updated', new_case['case_id'])
+        updated_case_data = json.loads(logic.get_case_with_id(new_case['case_id'], token))
+        self.assertEqual(updated_case_data['case_name'], 'test_updated')
+
+    def test_update_layout(self):
+        new_case = logic.create_case({'case_name': 'test'}, token)
+        logic.update_layout({'test':True}, new_case['case_id'])
+        layout_data = json.loads(logic.generic_get(collections.LAYOUTS, new_case['case_id'], data._GLOBALLY_ACCEPTED_TOKEN, False))
+        self.assertTrue(layout_data['test'])
+
 if __name__ == "__main__":
     try:
         unittest.main()
+    except Exception as e:
+        print("Error: " + str(e))
     finally:
         cleanup()

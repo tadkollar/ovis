@@ -213,6 +213,26 @@ class TestData(unittest.TestCase):
     def test_user_not_active_fake_token(self):
         self.assertFalse(data.user_active('fake token'))
 
+    def test_update_case_name(self):
+        new_case = data.create_case({'case_name':'test'}, token)
+        new_case_data = json.loads(data.get_case_with_id(new_case, token))
+        self.assertEqual(new_case_data['case_name'], 'test')
+        data.update_case_name('test_new_name', new_case)
+        updated_case_data = json.loads(data.get_case_with_id(new_case, token))
+        self.assertEqual(updated_case_data['case_name'], 'test_new_name')
+
+    def test_update_case_name_fail(self):
+        self.assertFalse(data.update_case_name('test', 0000))
+
+    def test_update_layout(self):
+        new_case = data.create_case({}, token)
+        data.update_layout({'test': True}, new_case)
+        new_case_layout = json.loads(data.generic_get(collections.LAYOUTS, new_case, data._GLOBALLY_ACCEPTED_TOKEN, False))
+        self.assertTrue(new_case_layout['test'])
+
+    def test_update_layout_fail(self):
+        self.assertFalse(data.update_layout({'test': True}, -1))
+
 if __name__ == "__main__":
     try:
         unittest.main()

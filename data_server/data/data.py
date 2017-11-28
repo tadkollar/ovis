@@ -2,35 +2,6 @@
 Handles any and all connections with databases and contains methods
 to retrieve, delete and alter data. Represents the bottom layer ('data' layer)
 in the 3-tier architecture used in this project.
-
-Public Methods
---------------
-get_model_data : Returns the JSON blob containing the variables and
-    connections
-
-get_all_cases : Returns the list of all available cases
-
-get_case_with_id : Returns the information on the stored case
-    with the given ID
-
-delete_case_with_id : Deletes all documents associated with a given
-    case ID from the DB
-
-create_case : Creates a new case with the given name and returns a unique
-    ID to identify the case
-
-generic_get : Gets all documents with the given ID from the given collection
-
-generic_create : Adds the given document to the given collection
-
-generic_delete : Deletes all documents with the given ID from the given
-    collection
-
-user_exists : Checks if a user exists
-
-get_new_token : generates a new token
-
-token_exists : returns True if the token is used in the User collection
 """
 import os
 import json
@@ -94,7 +65,8 @@ def update_case_name(name, case_id):
     """
     case_id = int(case_id)
     cases_coll = _MDB[collections.CASES]
-    if cases_coll.find({'case_id': case_id}):
+    case = json.loads(_get(_MDB[collections.CASES], case_id, _GLOBALLY_ACCEPTED_TOKEN, False))
+    if case:
         cases_coll.update_one({'case_id': case_id}, {'$set': {'case_name': name}})
         return True
     return False
