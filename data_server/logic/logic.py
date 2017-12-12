@@ -159,9 +159,10 @@ def metadata_create(body, case_id, token):
             'abs2prom': n_abs2prom,
             'prom2abs': n_prom2abs
         }
-        data.generic_create(collections.METADATA, n_body, case_id, token, False)
+        return data.generic_create(collections.METADATA, n_body, case_id, token,
+                            False)
     else:
-        data.generic_create(collections.METADATA, body, case_id, token, False)
+        return data.generic_create(collections.METADATA, body, case_id, token, False)
 
 
 def metadata_get(case_id, token):
@@ -176,7 +177,7 @@ def metadata_get(case_id, token):
     n_abs2prom = {'input': {}, 'output': {}}
     n_prom2abs = {'input': {}, 'output': {}}
 
-    res = json.loads(data.generic_get(collections.METADATA, case_id, token,\
+    res = json.loads(data.generic_get(collections.METADATA, case_id, token,
                      False))
 
     if res is not None and 'abs2prom' in res:
