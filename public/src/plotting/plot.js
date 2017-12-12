@@ -729,7 +729,7 @@ var createPlot = function (container, componentState) {
 
     //Get abs2prom and prom2abs metadata
     http.get('case/' + case_id + '/metadata', function (result) {
-        if (result !== "[]") {
+        if (result !== "[]" && result !== "null") {
             abs2prom = result.abs2prom;
             prom2abs = result.prom2abs;
         }
