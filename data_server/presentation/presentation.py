@@ -12,6 +12,7 @@ import data_server.shared.collections as collections
 
 _TOKEN = 'squavy'
 
+
 class IndexHandler(web.RequestHandler):
     """ IndexHandler class
 
@@ -24,17 +25,21 @@ class IndexHandler(web.RequestHandler):
         token = token.replace("'", '')
         if self.get_secure_cookie("token"):
             cases = logic.get_all_cases(token)
-            self.render("../../public/list_cases.html", cases=cases, token=token)
+            self.render("../../public/list_cases.html",
+                        cases=cases, token=token)
         else:
             self.render("../../public/login.html")
+
 
 class LogoutHandler(web.RequestHandler):
     """ LogoutHandler class
 
     Contains logic for logging out a user
     """
+
     def get(self):
         self.clear_cookie("token")
+
 
 class CaseHandler(web.RequestHandler):
     """ CaseHandler class
@@ -58,12 +63,13 @@ class CaseHandler(web.RequestHandler):
 
     def delete(self, *params):
         ret = _get_ret()
-        if logic.delete_case_with_id(params[0], self.request.headers.get('token')):
+        if logic.delete_case_with_id(params[0],
+                                     self.request.headers.get('token')):
             self.write(ret)
         else:
             ret['status'] = 'Failed'
             self.write(ret)
-    
+
     def patch(self, *params):
         ret = _get_ret()
         body = json.loads(self.request.body)
@@ -72,6 +78,7 @@ class CaseHandler(web.RequestHandler):
         else:
             ret['status'] = 'Failed'
             self.write(ret)
+
 
 class LayoutHandler(web.RequestHandler):
     """ LayoutHandler class
@@ -89,6 +96,7 @@ class LayoutHandler(web.RequestHandler):
         write['status'] = 'Success' if ret else 'Failed'
         self.write(write)
 
+
 class DriverIterationsHandler(web.RequestHandler):
     """ DriverIterationsHandler class
 
@@ -104,6 +112,7 @@ class DriverIterationsHandler(web.RequestHandler):
 
     def delete(self, *params):
         _generic_delete(collections.DRIVER_ITERATIONS, self, params[0])
+
 
 class DriverMetadataHandler(web.RequestHandler):
     """ DriverMetadata class
@@ -121,6 +130,7 @@ class DriverMetadataHandler(web.RequestHandler):
     def delete(self, *params):
         _generic_delete(collections.DRIVER_METADATA, self, params[0])
 
+
 class GlobalIterationsHandler(web.RequestHandler):
     """ GlobalIterationsHandler class
 
@@ -137,6 +147,7 @@ class GlobalIterationsHandler(web.RequestHandler):
     def delete(self, *params):
         _generic_delete(collections.GLOBAL_ITERATIONS, self, params[0])
 
+
 class MetadataHandler(web.RequestHandler):
     """ MetadataHandler class
 
@@ -145,13 +156,20 @@ class MetadataHandler(web.RequestHandler):
     """
 
     def get(self, *params):
-        _generic_get(collections.METADATA, self, params[0])
+        ret = logic.metadata_get(params[0], _TOKEN)
+        self.write(ret)
 
     def post(self, *params):
-        _generic_post(collections.METADATA, self, params[0])
+        body = json.loads(self.request.body)
+        if(logic.metadata_create(body, params[0],
+                                 self.request.headers.get('token'))):
+            self.write({'status': 'Success'})
+        else:
+            self.write({'status': 'Failed'})
 
     def delete(self, *params):
         _generic_delete(collections.METADATA, self, params[0])
+
 
 class SolverIterationsHandler(web.RequestHandler):
     """ SolverIterationsHandler class
@@ -169,6 +187,7 @@ class SolverIterationsHandler(web.RequestHandler):
     def delete(self, *params):
         _generic_delete(collections.SOLVER_ITERATIONS, self, params[0])
 
+
 class SolverMetadataHandler(web.RequestHandler):
     """ SolverMetadataHandler class
 
@@ -184,6 +203,7 @@ class SolverMetadataHandler(web.RequestHandler):
 
     def delete(self, *params):
         _generic_delete(collections.SOLVER_METADATA, self, params[0])
+
 
 class SystemIterationsHandler(web.RequestHandler):
     """ SystemIterationsHandler class
@@ -201,6 +221,7 @@ class SystemIterationsHandler(web.RequestHandler):
     def delete(self, *params):
         _generic_delete(collections.SYSTEM_ITERATIONS, self, params[0])
 
+
 class SystemMetadataHandler(web.RequestHandler):
     """ SystemMetadata class
 
@@ -216,6 +237,7 @@ class SystemMetadataHandler(web.RequestHandler):
 
     def delete(self, *params):
         _generic_delete(collections.SYSTEM_METADATA, self, params[0])
+
 
 class TokenHandler(web.RequestHandler):
     """ Token Handler class
@@ -234,6 +256,7 @@ class TokenHandler(web.RequestHandler):
             logic.send_activation_email(token, body['name'], body['email'])
             ret['token'] = token
         self.write(ret)
+
 
 class LoginHandler(web.RequestHandler):
     """ Login Handler class
@@ -258,9 +281,11 @@ class LoginHandler(web.RequestHandler):
         token = token.replace("'", '')
         if self.get_secure_cookie("token"):
             cases = logic.get_all_cases(token)
-            self.render("../../public/list_cases.html", cases=cases, token=token)
+            self.render("../../public/list_cases.html",
+                        cases=cases, token=token)
         else:
             self.render("../../public/login.html")
+
 
 class ActivationHandler(web.RequestHandler):
     """ Activation Handler class
@@ -272,6 +297,7 @@ class ActivationHandler(web.RequestHandler):
         self.write("<html>Account Activated</html>")
         logic.activate_account(params[0])
         logic.send_activated_email(params[0])
+
 
 class SystemIterationVariableHandler(web.RequestHandler):
     """ System Iteration Variable Handler class
@@ -285,6 +311,7 @@ class SystemIterationVariableHandler(web.RequestHandler):
 
         self.write(data)
 
+
 class VariablesHandler(web.RequestHandler):
     """ Variables handler class
 
@@ -296,6 +323,7 @@ class VariablesHandler(web.RequestHandler):
 
         self.write(variables)
 
+
 class DriverIterationVariableHandler(web.RequestHandler):
     """ Driver Iteration Variable Handler class
 
@@ -305,11 +333,15 @@ class DriverIterationVariableHandler(web.RequestHandler):
 
     def get(self, *params):
         if 'cur_max_count' in self.request.headers:
-            data = logic.get_driver_iteration_based_on_count(params[0], params[1], self.request.headers.get('cur_max_count'))
+            data =\
+                logic.get_driver_iteration_based_on_count(params[0], params[1],
+                                                          self.request.headers.
+                                                          get('cur_max_count'))
         else:
             data = logic.get_driver_iteration_data(params[0], params[1])
 
         self.write(data)
+
 
 class DesvarsHandler(web.RequestHandler):
     """ Desvars handler class
@@ -322,7 +354,8 @@ class DesvarsHandler(web.RequestHandler):
 
         self.write(variables)
 
-#region private_methods
+# region private_methods
+
 
 def _get_ret():
     """ _get_ret private method
@@ -339,6 +372,7 @@ def _get_ret():
     ret = {}
     ret['status'] = 'Success'
     return ret
+
 
 def _generic_get(collection_name, request_handler, case_id, token=None):
     """ _generic_get private method
@@ -361,6 +395,7 @@ def _generic_get(collection_name, request_handler, case_id, token=None):
         token = request_handler.request.headers.get('token')
     request_handler.write(logic.generic_get(collection_name, case_id,
                                             token))
+
 
 def _generic_post(collection_name, request_handler, case_id):
     """ _generic_post private method
@@ -387,6 +422,7 @@ def _generic_post(collection_name, request_handler, case_id):
         ret['status'] = 'Failed'
         request_handler.write(ret)
 
+
 def _generic_delete(collection_name, request_handler, case_id):
     """ _generic_delete private method
 
@@ -410,4 +446,4 @@ def _generic_delete(collection_name, request_handler, case_id):
         ret['status'] = 'Failed'
         request_handler.write(ret)
 
-#endregion
+# endregion

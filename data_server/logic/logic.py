@@ -16,6 +16,8 @@ from email.mime.multipart import MIMEMultipart
 from dateutil import tz
 from datetime import datetime
 import data_server.data.data as data
+import data_server.shared.collections as collections
+
 
 def get_all_cases(token):
     """ get_all_cases method
@@ -36,14 +38,16 @@ def get_all_cases(token):
         from_zone = tz.tzutc()
         to_zone = tz.tzlocal()
         case['date'] = datetime.strptime(case['date'], '%Y-%m-%d %H:%M:%S')
-        case['date'] = case['date'].replace(tzinfo=from_zone).astimezone(to_zone)
+        case['date'] = case['date'].replace(
+            tzinfo=from_zone).astimezone(to_zone)
         case['datestring'] = case['date'].strftime('%b %d, %Y at %I:%M %p')
 
-    #sort by date
+    # sort by date
     cases.sort(key=lambda x: x['date'])
     cases = list(reversed(cases))
 
     return cases
+
 
 def get_case_with_id(c_id, token):
     """ get_case_with_id method
@@ -59,6 +63,7 @@ def get_case_with_id(c_id, token):
     """
     return data.get_case_with_id(c_id, token)
 
+
 def delete_case_with_id(c_id, token):
     """ delete_case_with_id method
 
@@ -73,6 +78,7 @@ def delete_case_with_id(c_id, token):
     """
     return data.delete_case_with_id(c_id, token)
 
+
 def create_case(body, token):
     """ create_case method
 
@@ -81,7 +87,8 @@ def create_case(body, token):
     used for all other queries.
 
     Args:
-        body (JSON): the body of the original POST request to be put in the collection
+        body (JSON): the body of the original POST request to be put in the
+            collection
         token (string): the token to be used for authentication
     Returns:
         Integer case_id to be used in all other HTTP requests
@@ -93,6 +100,7 @@ def create_case(body, token):
     if c_id == -1:
         ret['status'] = 'Failed to create ID'
     return ret
+
 
 def update_case_name(name, case_id):
     """ update_case_name method
@@ -107,6 +115,7 @@ def update_case_name(name, case_id):
     """
     return data.update_case_name(name, case_id)
 
+
 def update_layout(body, case_id):
     """ update_layout method
 
@@ -120,21 +129,93 @@ def update_layout(body, case_id):
     """
     return data.update_layout(body, case_id)
 
+
+def metadata_create(body, case_id, token):
+    """ metadata_create method
+
+    Creates/updates the metadata for a given case
+
+    Args:
+        body (JSON): the body containing abs2prom and prom2abs
+        token (string): the token for verification
+    Returns:
+        True if success, False otherwise
+    """
+    n_abs2prom = {'input': {}, 'output': {}}
+    n_prom2abs = {'input': {}, 'output': {}}
+
+    if 'abs2prom' in body:
+        # replace all '.' with '___' in abs2prom and prom2abs
+        for io in ['input', 'output']:
+            for k in body['abs2prom'][io]:
+                n_k = k.replace('.', '___')
+                n_abs2prom[io][n_k] = body['abs2prom'][io][k]
+
+            for k in body['prom2abs'][io]:
+                n_k = k.replace('.', '___')
+                n_prom2abs[io][n_k] = body['prom2abs'][io][k]
+
+        n_body = {
+            'abs2prom': n_abs2prom,
+            'prom2abs': n_prom2abs
+        }
+        data.generic_create(collections.METADATA, n_body, case_id, token, False)
+    else:
+        data.generic_create(collections.METADATA, body, case_id, token, False)
+
+
+def metadata_get(case_id, token):
+    """ metadata_get method
+
+    Grabs and returns the metadata for a given case
+
+    Args:
+        case_id (string): the case whose metadata needs to be grabbed
+        token (string): the token for verification
+    """
+    n_abs2prom = {'input': {}, 'output': {}}
+    n_prom2abs = {'input': {}, 'output': {}}
+
+    res = json.loads(data.generic_get(collections.METADATA, case_id, token,\
+                     False))
+
+    if 'abs2prom' in res:
+        for io in ['input', 'output']:
+            for k in res['abs2prom'][io]:
+                n_k = k.replace('___', '.')
+                n_abs2prom[io][n_k] = res['abs2prom'][io][k]
+
+            for k in res['prom2abs'][io]:
+                n_k = k.replace('___', '.')
+                n_prom2abs[io][n_k] = res['prom2abs'][io][k]
+
+        res['abs2prom'] = n_abs2prom
+        res['prom2abs'] = n_prom2abs
+
+        return res
+    else:
+        print("No metadata stored")
+        return data.generic_get(collections.METADATA, case_id, token, False)
+
+
 def generic_get(collection_name, case_id, token, get_many=True):
     """ generic_get method
 
     Performs the typical 'get' request, passing the case_id to the data layer
-    and returning the list of documents in the given collection with that case_id.
+    and returning the list of documents in the given collection with that
+    case_id.
 
     Args:
         collection_name (string): the collection to be queried
         case_id (string || int): the case_id for querying
         token (string): the token to be used for authentication
-        get_many (bool): true if you want to get all, false if you only want one
+        get_many (bool): true if you want to get all, false if you only want
+        one
     Returns:
         Array of documents with the given case_id from the given collection
     """
     return data.generic_get(collection_name, case_id, token, get_many)
+
 
 def generic_create(collection_name, body, case_id, token, update):
     """ generic_create method
@@ -148,21 +229,25 @@ def generic_create(collection_name, body, case_id, token, update):
         body (json): document to be added to the collection
         case_id (string || int): the case_id for querying
         token (string): the token to be used for authentication
-        update (string): whether or not we're simply updating an existing recording
+        update (string): whether or not we're simply updating an existing
+            recording
     Returns:
         True if successfull, False otherwise
     """
     converted_update = False
     if update == 'True':
         converted_update = True
-    return data.generic_create(collection_name, body, case_id, token, converted_update)
+    return data.generic_create(collection_name, body, case_id, token,
+                               converted_update)
+
 
 def generic_delete(collection_name, case_id, token):
     """ generic_delete method
 
-    Performs the typical 'delete'. Passes the collection name and ID to the data layer.
-    This should delete all documents in the collection with the given case_id. Returns
-    True if anything was deleted, False otherwise.
+    Performs the typical 'delete'. Passes the collection name and ID to the
+        data layer.
+    This should delete all documents in the collection with the given case_id.
+    Returns True if anything was deleted, False otherwise.
 
     Args:
         collection_name (string): the collection to be queried
@@ -172,6 +257,7 @@ def generic_delete(collection_name, case_id, token):
         True if successfull, False otherwise
     """
     return data.generic_delete(collection_name, case_id, token)
+
 
 def create_token(name, email):
     """ create_token method
@@ -189,6 +275,7 @@ def create_token(name, email):
 
     return data.get_new_token(name, email)
 
+
 def token_exists(token):
     """ token_exists method
 
@@ -201,6 +288,7 @@ def token_exists(token):
     """
     return data.token_exists(token)
 
+
 def delete_token(token):
     """ delete_token method
 
@@ -212,6 +300,7 @@ def delete_token(token):
         None
     """
     data.delete_token(token)
+
 
 def get_system_iteration_data(case_id, variable):
     """ get_system_iteration_data method
@@ -230,26 +319,30 @@ def get_system_iteration_data(case_id, variable):
     for i in dat:
         for v in i['inputs']:
             if v['name'] == variable:
-                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
+                v['iteration'] = _extract_iteration_coordinate(
+                    i['iteration_coordinate'])
                 v['counter'] = i['counter']
                 v['type'] = 'input'
                 ret.append(v)
 
         for v in i['outputs']:
             if v['name'] == variable:
-                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
+                v['iteration'] = _extract_iteration_coordinate(
+                    i['iteration_coordinate'])
                 v['counter'] = i['counter']
                 v['type'] = 'output'
                 ret.append(v)
 
         for v in i['residuals']:
             if v['name'] == variable:
-                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
+                v['iteration'] = _extract_iteration_coordinate(
+                    i['iteration_coordinate'])
                 v['counter'] = i['counter']
                 v['type'] = 'residual'
                 ret.append(v)
 
     return json.dumps(ret)
+
 
 def get_variables(case_id):
     """ get_variables method
@@ -273,6 +366,7 @@ def get_variables(case_id):
 
     return json.dumps(ret)
 
+
 def get_driver_iteration_data(case_id, variable):
     """ get_driver_iteration_data method
 
@@ -290,19 +384,22 @@ def get_driver_iteration_data(case_id, variable):
     for i in dat:
         for v in i['desvars']:
             if v['name'] == variable:
-                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
+                v['iteration'] = _extract_iteration_coordinate(
+                    i['iteration_coordinate'])
                 v['counter'] = i['counter']
                 v['type'] = 'desvar'
                 ret.append(v)
         for v in i['objectives']:
             if v['name'] == variable:
-                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
+                v['iteration'] = _extract_iteration_coordinate(
+                    i['iteration_coordinate'])
                 v['counter'] = i['counter']
                 v['type'] = 'objective'
                 ret.append(v)
         for v in i['constraints']:
             if v['name'] == variable:
-                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
+                v['iteration'] = _extract_iteration_coordinate(
+                    i['iteration_coordinate'])
                 v['counter'] = i['counter']
                 v['type'] = 'constraint'
                 ret.append(v)
@@ -310,12 +407,14 @@ def get_driver_iteration_data(case_id, variable):
         if 'sysincludes' in i:
             for v in i['sysincludes']:
                 if v['name'] == variable:
-                    v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
+                    v['iteration'] = _extract_iteration_coordinate(
+                        i['iteration_coordinate'])
                     v['counter'] = i['counter']
                     v['type'] = 'sysinclude'
                     ret.append(v)
 
     return json.dumps(ret)
+
 
 def get_desvars(case_id):
     """ get_desvars method
@@ -333,21 +432,21 @@ def get_desvars(case_id):
     for i in dat:
         for v in i['desvars']:
             if v['name'] not in cache:
-                ret.append({ 
+                ret.append({
                     'name': v['name'],
                     'type': 'desvar'
-                    })
+                })
                 cache.append(v['name'])
         for v in i['objectives']:
             if v['name'] not in cache:
-                ret.append({ 
+                ret.append({
                     'name': v['name'],
                     'type': 'objective'
                 })
                 cache.append(v['name'])
         for v in i['constraints']:
             if v['name'] not in cache:
-                ret.append({ 
+                ret.append({
                     'name': v['name'],
                     'type': 'constraint'
                 })
@@ -363,6 +462,7 @@ def get_desvars(case_id):
                     cache.append(v['name'])
 
     return json.dumps(ret)
+
 
 def get_driver_iteration_based_on_count(case_id, variable, count):
     """ get_highest_driver_iteartion_count method
@@ -384,6 +484,7 @@ def get_driver_iteration_based_on_count(case_id, variable, count):
 
     return "[]"
 
+
 def send_activated_email(token):
     """ send_activated_email
 
@@ -398,10 +499,12 @@ def send_activated_email(token):
         subject = 'OpenMDAO Visualization Token Activated'
         recipient = user['email']
         message = 'Hey ' + user['name'] + ',\r\n\r\n'
-        message += 'Your OpenMDAO Visualization token has been activated.\r\n\r\n'
+        message += 'Your OpenMDAO Visualization token has been activated.\
+                    \r\n\r\n'
         message += 'Token: ' + user['token'] + '\r\n\r\n'
         message += 'Sincerely,\r\nThe OpenMDAO Team'
         _send_email(recipient, subject, message)
+
 
 def send_activation_email(token, name, email):
     """ send_activation_email method
@@ -414,9 +517,11 @@ def send_activation_email(token, name, email):
         email (string): the person's email
     """
     recipient = os.environ['OPENMDAO_EMAIL']
-    message = 'Activate new user: ' + name + ' with the email: ' + email + '\r\nhttp://openmdao.org/visualization/activate/' + token
+    message = 'Activate new user: ' + name + ' with the email: ' + \
+        email + '\r\nhttp://openmdao.org/visualization/activate/' + token
     subject = 'Activate OpenMDAO Visualization User'
     _send_email(recipient, subject, message)
+
 
 def activate_account(token):
     """ activate_account method
@@ -427,6 +532,7 @@ def activate_account(token):
         token(string): the token that needs activating
     """
     data.activate_account(token)
+
 
 def _send_email(recipient, subject, message):
     """ _send_email private method
@@ -455,6 +561,7 @@ def _send_email(recipient, subject, message):
     mail_server.sendmail(gmail_user, recipient, msg.as_string())
     mail_server.close()
 
+
 def _extract_iteration_coordinate(coord):
     """ private extract_iteration_coordinate method
 
@@ -473,7 +580,7 @@ def _extract_iteration_coordinate(coord):
     while i < len(split_coord):
         node = {}
         node['name'] = split_coord[i]
-        node['iteration'] = split_coord[i+1]
+        node['iteration'] = split_coord[i + 1]
         ret.append(node)
         i += 2
 

@@ -6,7 +6,8 @@ of the 3-tier architecture which can be included at any tier (hence the name
 Constants include:
     CASES, DRIVER_ITERATIONS, DRIVER_METADATA,
     GLOBAL_ITERATIONS, METADATA, SOLVER_ITERATIONS,
-    SOLVER_METADATA, SYSTEM_ITERATIONS, SYSTEM_METADATA
+    SOLVER_METADATA, SYSTEM_ITERATIONS, SYSTEM_METADATA,
+    USERS, LAYOUTS
 """
 CASES = 'cases'
 DRIVER_ITERATIONS = 'driver_iterations'

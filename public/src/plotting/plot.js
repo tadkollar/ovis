@@ -27,6 +27,10 @@ var createPlot = function (container, componentState) {
     var objectives = [];
     var sysincludes = [];
 
+    //Maps promoted variable names to absolute variable names and vice versa
+    var prom2abs = {'input': {}, 'output': {}};
+    var abs2prom = {'input': {}, 'output': {}};
+
     //Setup control panel
     if (options != null) {
         options.onclick = function () {
@@ -154,7 +158,7 @@ var createPlot = function (container, componentState) {
 
         var titleString = '';
         for (var k in data) {
-            titleString += k + ' '
+            titleString += abs2prom.output[k] + ' '
             for (var n = 0; n < data[k].length; ++n) {
                 finalData.push(data[k][n]);
                 finalData[finalData.length - 1]['type'] = 'scatter';
@@ -512,6 +516,7 @@ var createPlot = function (container, componentState) {
      */
     var handleSearch = function (name, type) {
         needSave = true;
+
         http.get('case/' + case_id + '/driver_iterations/' + name, function (result) {
             result = JSON.parse(result);
             if (type === 'desvar') {
@@ -722,61 +727,75 @@ var createPlot = function (container, componentState) {
         }
     }
 
-    //Get the designVariables
-    http.get('case/' + case_id + '/desvars', function (result) {
-        result = JSON.parse(result);
-        designVariables = [];
-        objectives = [];
-        constraints = [];
-        sysincludes = [];
-        for (var i = 0; i < result.length; ++i) {
-            if (result[i]['type'] === 'desvar') {
-                designVariables.push(result[i]['name']);
+    //Get abs2prom and prom2abs metadata
+    http.get('case/' + case_id + '/metadata', function (result) {
+        if (result !== "[]") {
+            abs2prom = result.abs2prom;
+            prom2abs = result.prom2abs;
+        }
+
+        //Get the designVariables
+        http.get('case/' + case_id + '/desvars', function (result) {
+            result = JSON.parse(result);
+            designVariables = [];
+            objectives = [];
+            constraints = [];
+            sysincludes = [];
+            for (var i = 0; i < result.length; ++i) {
+                var name = result[i]['name'];
+
+                //Map to yourself just in case we don't have the metadata
+                if(!(name in prom2abs['output'])) { prom2abs['output'][name] = name; }
+                if(!(name in abs2prom['output'])) { abs2prom['output'][name] = name; }
+
+                if (result[i]['type'] === 'desvar') {
+                    designVariables.push(name);
+                }
+                else if (result[i]['type'] === 'objective') {
+                    objectives.push(name);
+                }
+                else if (result[i]['type'] === 'sysinclude') {
+                    sysincludes.push(name);
+                }
+                else {
+                    constraints.push(name);
+                }
             }
-            else if (result[i]['type'] === 'objective') {
-                objectives.push(result[i]['name']);
-            }
-            else if (result[i]['type'] === 'sysinclude') {
-                sysincludes.push(result[i]['name']);
+
+            if (componentState.selectedConstraints.length > 0 || componentState.selectedDesignVariables.length > 0 ||
+                componentState.selectedSysincludes.length > 0 || componentState.selectedObjectives.length > 0) {
+                //Create temporary arrays so we can iterate and change the original arrays
+                var tempConstraints = componentState.selectedConstraints;
+                var tempDesvars = componentState.selectedDesignVariables;
+                var tempSysincludes = componentState.selectedSysincludes;
+                var tempObjectives = componentState.selectedObjectives;
+
+                //Reset all arrays (they'll be set when we do 'handleSearch')
+                componentState.selectedConstraints = [];
+                componentState.selectedDesignVariables = [];
+                componentState.selectedSysincludes = [];
+                componentState.selectedObjectives = [];
+
+                for (var i = 0; i < tempConstraints.length; ++i) {
+                    handleSearch(tempConstraints[i], 'constraint');
+                }
+                for (var i = 0; i < tempDesvars.length; ++i) {
+                    handleSearch(tempDesvars[i], 'desvar');
+                }
+                for (var i = 0; i < tempSysincludes.length; ++i) {
+                    handleSearch(tempSysincludes[i], 'sysinclude');
+                }
+                for (var i = 0; i < tempObjectives.length; ++i) {
+                    handleSearch(tempObjectives[i], 'objective');
+                }
             }
             else {
-                constraints.push(result[i]['name']);
+                var randIndex = Math.floor(Math.random() * designVariables.length);
+                if (randIndex < designVariables.length) {
+                    handleSearch(designVariables[randIndex], 'desvar');
+                }
             }
-        }
-
-        if (componentState.selectedConstraints.length > 0 || componentState.selectedDesignVariables.length > 0 ||
-            componentState.selectedSysincludes.length > 0 || componentState.selectedObjectives.length > 0) {
-            //Create temporary arrays so we can iterate and change the original arrays
-            var tempConstraints = componentState.selectedConstraints;
-            var tempDesvars = componentState.selectedDesignVariables;
-            var tempSysincludes = componentState.selectedSysincludes;
-            var tempObjectives = componentState.selectedObjectives;
-
-            //Reset all arrays (they'll be set when we do 'handleSearch')
-            componentState.selectedConstraints = [];
-            componentState.selectedDesignVariables = [];
-            componentState.selectedSysincludes = [];
-            componentState.selectedObjectives = [];
-
-            for(var i = 0; i < tempConstraints.length; ++i) {
-                handleSearch(tempConstraints[i], 'constraint');
-            }
-            for(var i = 0; i < tempDesvars.length; ++i) {
-                handleSearch(tempDesvars[i], 'desvar');
-            }
-            for(var i = 0; i < tempSysincludes.length; ++i) {
-                handleSearch(tempSysincludes[i], 'sysinclude');
-            }
-            for(var i = 0; i < tempObjectives.length; ++i) {
-                handleSearch(tempObjectives[i], 'objective');
-            }
-        }
-        else {
-            var randIndex = Math.floor(Math.random() * designVariables.length);
-            if (randIndex < designVariables.length) {
-                handleSearch(designVariables[randIndex], 'desvar');
-            }
-        }
+        });
     });
 
     /**
@@ -788,7 +807,7 @@ var createPlot = function (container, componentState) {
             openNav(componentState.logscaleXVal, componentState.logscaleYVal, componentState.stackedPlotVal, designVariables,
                 objectives, constraints, sysincludes, componentState.selectedDesignVariables, componentState.selectedObjectives,
                 componentState.selectedConstraints, componentState.selectedSysincludes, variableIndices,
-                logscaleX, logscaleY, stackedPlot, variableFun, variableIndicesFun);
+                logscaleX, logscaleY, stackedPlot, variableFun, variableIndicesFun, abs2prom, prom2abs);
         }
         else {
             closeNav();
@@ -799,8 +818,8 @@ var createPlot = function (container, componentState) {
     setInterval(tryUpdateVariables, 5000);
 
     //Start trying ot save
-    setInterval(function() {
-        if(needSave) {
+    setInterval(function () {
+        if (needSave) {
             needSave = false;
             saveLayout(null);
         }

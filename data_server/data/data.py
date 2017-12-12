@@ -16,8 +16,9 @@ import data_server.shared.collections as collections
 
 _MCLIENT = MongoClient('localhost', 27017)
 _MDB = _MCLIENT.openmdao_blue
-_MAX_ID_ATTEMPTS = 1000 #maximum number of attempts to try to create an ID
+_MAX_ID_ATTEMPTS = 1000  # maximum number of attempts to try to create an ID
 _GLOBALLY_ACCEPTED_TOKEN = 'squavy'
+
 
 def get_all_cases(token):
     """ get_all_cases method
@@ -33,6 +34,7 @@ def get_all_cases(token):
     cases_coll = _MDB[collections.CASES]
     ret = cases_coll.find({'users': token}, {'_id': False})
     return dumps(ret)
+
 
 def get_case_with_id(case_id, token):
     """ get_case_with_id method
@@ -52,6 +54,7 @@ def get_case_with_id(case_id, token):
     else:
         return {}
 
+
 def update_case_name(name, case_id):
     """ update_case_name method
 
@@ -65,11 +68,14 @@ def update_case_name(name, case_id):
     """
     case_id = int(case_id)
     cases_coll = _MDB[collections.CASES]
-    case = json.loads(_get(_MDB[collections.CASES], case_id, _GLOBALLY_ACCEPTED_TOKEN, False))
+    case = json.loads(_get(_MDB[collections.CASES],
+                           case_id, _GLOBALLY_ACCEPTED_TOKEN, False))
     if case:
-        cases_coll.update_one({'case_id': case_id}, {'$set': {'case_name': name}})
+        cases_coll.update_one({'case_id': case_id}, {
+                              '$set': {'case_name': name}})
         return True
     return False
+
 
 def delete_case_with_id(case_id, token):
     """ delete_case_with_id method
@@ -84,7 +90,7 @@ def delete_case_with_id(case_id, token):
     Returns:
         True if anything was deleted, False otherwise.
     """
-    #delete in all collections except 'cases'
+    # delete in all collections except 'cases'
     generic_delete('driver_iterations', case_id, token)
     generic_delete('driver_metadata', case_id, token)
     generic_delete('global_iterations', case_id, token)
@@ -94,14 +100,16 @@ def delete_case_with_id(case_id, token):
     generic_delete('system_iterations', case_id, token)
     generic_delete('system_metadata', case_id, token)
 
-    #delete the case in the 'cases' collection
+    # delete the case in the 'cases' collection
     cases_coll = _MDB[collections.CASES]
-    queried = cases_coll.find({'$and': [{'case_id': int(case_id)}, {'users': token}]})
+    queried = cases_coll.find(
+        {'$and': [{'case_id': int(case_id)}, {'users': token}]})
     if queried.count() == 0:
         return False
 
     cases_coll.delete_one({'case_id': int(case_id)})
     return True
+
 
 def create_case(body, token):
     """ create_case method
@@ -130,6 +138,7 @@ def create_case(body, token):
     cases_coll.insert_one(body)
     return case_id
 
+
 def update_layout(body, case_id):
     """ update_layout method
 
@@ -144,7 +153,8 @@ def update_layout(body, case_id):
 
     TODO: handle users and don't create if case doesn't exist
     """
-    if _get(_MDB[collections.CASES], case_id, _GLOBALLY_ACCEPTED_TOKEN) == '[]':
+    if _get(_MDB[collections.CASES], case_id,
+            _GLOBALLY_ACCEPTED_TOKEN) == '[]':
         return False
 
     layout_coll = _MDB[collections.LAYOUTS]
@@ -153,6 +163,7 @@ def update_layout(body, case_id):
     body['date'] = str(datetime.datetime.utcnow())
     layout_coll.insert_one(body)
     return True
+
 
 def generic_get(collection_name, case_id, token, get_many=True):
     """ generic_get method
@@ -169,6 +180,7 @@ def generic_get(collection_name, case_id, token, get_many=True):
         JSON array of documents returned from the query
     """
     return _get(_MDB[collection_name], case_id, token, get_many)
+
 
 def generic_create(collection_name, body, case_id, token, update):
     """ generic_create method
@@ -188,6 +200,7 @@ def generic_create(collection_name, body, case_id, token, update):
     """
     return _create(_MDB[collection_name], body, case_id, token, update)
 
+
 def generic_delete(collection_name, case_id, token):
     """ generic_delete method
 
@@ -203,6 +216,7 @@ def generic_delete(collection_name, case_id, token):
         True if successfull, False otherwise
     """
     return _delete(_MDB[collection_name], case_id, token)
+
 
 def user_exists(email=None, token=None):
     """ user_exists method
@@ -221,10 +235,12 @@ def user_exists(email=None, token=None):
     else:
         return users_coll.find({'token': token}).count() > 0
 
+
 def get_user(token):
     """ get_user method
 
-    Returns a user represented as a dictionary or an empty dictionary if user doesn't exist
+    Returns a user represented as a dictionary or an empty dictionary if user
+    doesn't exist
 
     Args:
         token (string): the token associated with the user
@@ -236,6 +252,7 @@ def get_user(token):
 
     return users_coll.find_one({'token': token})
 
+
 def user_active(token):
     """ user_active method
 
@@ -246,11 +263,12 @@ token(string): the token to be checked
     """
     users_coll = _MDB[collections.USERS]
     user = users_coll.find_one({'token': token})
-    if not user is None:
+    if user is not None:
         if 'active' in user:
             return user['active']
 
     return False
+
 
 def get_new_token(name, email):
     """ get_new_token method
@@ -265,8 +283,10 @@ def get_new_token(name, email):
     """
     token = _create_token()
     users_coll = _MDB[collections.USERS]
-    users_coll.insert_one({'name': name, 'token': token, 'email': email, 'active': False})
+    users_coll.insert_one({'name': name, 'token': token,
+                           'email': email, 'active': False})
     return token
+
 
 def delete_token(token):
     """ delete_token method
@@ -284,6 +304,7 @@ def delete_token(token):
         users_coll = _MDB[collections.USERS]
         users_coll.delete_many({'token': token})
 
+
 def token_exists(token):
     """ token_exists method
 
@@ -296,6 +317,7 @@ def token_exists(token):
     """
     users_coll = _MDB[collections.USERS]
     return users_coll.find({'token': token}).count() > 0
+
 
 def get_system_iteration_data(case_id):
     """ get_system_iteration_data method
@@ -310,6 +332,7 @@ def get_system_iteration_data(case_id):
     collection = _MDB[collections.SYSTEM_ITERATIONS]
     return collection.find({'case_id': int(case_id)})
 
+
 def get_driver_iteration_data(case_id):
     """ get_driver_iteration_data method
 
@@ -323,15 +346,17 @@ def get_driver_iteration_data(case_id):
     collection = _MDB[collections.DRIVER_ITERATIONS]
     return collection.find({'case_id': int(case_id)})
 
+
 def activate_account(token):
     """ activate_account method
 
     Activates the account associated with a given token
     """
     collection = _MDB[collections.USERS]
-    collection.update_one({'token':token}, {'$set': {'active':True}})
+    collection.update_one({'token': token}, {'$set': {'active': True}})
 
-#region private
+# region private
+
 
 def _create_token():
     """ _create_token method
@@ -345,19 +370,21 @@ def _create_token():
     """
     attempts = 0
     while True:
-        token = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
+        token = ''.join(random.choice(string.ascii_uppercase +
+                                      string.digits) for _ in range(10))
         attempts += 1
         if _MDB.users.find({'token': token}).count() == 0:
             return token
         elif attempts >= _MAX_ID_ATTEMPTS:
             return -1
 
+
 def _get_case_id():
     """ _get_case_id method
 
     Attempts to create an integer that does not already exist in the DB
-    as a case_id. Attempts _MAX_ID_ATTEMPTS times before giving up and returning
-    -1.
+    as a case_id. Attempts _MAX_ID_ATTEMPTS times before giving up and
+    returning -1.
 
     Args:
         None
@@ -370,8 +397,9 @@ def _get_case_id():
         case_id = random.randint(0, 2147483647)
         if _MDB.cases.find({'case_id': case_id}).count() == 0:
             return case_id
-        elif attempts >= _MAX_ID_ATTEMPTS: #max attempts
+        elif attempts >= _MAX_ID_ATTEMPTS:  # max attempts
             return -1
+
 
 def _create_collections():
     """ _create_collections method
@@ -384,28 +412,29 @@ def _create_collections():
     Returns:
         None
     """
-    if not 'cases' in _MDB.collection_names():
+    if 'cases' not in _MDB.collection_names():
         _MDB.create_collection('cases')
-    if not 'driver_iterations' in _MDB.collection_names():
+    if 'driver_iterations' not in _MDB.collection_names():
         _MDB.create_collection('driver_iterations')
-    if not 'driver_metadata' in _MDB.collection_names():
+    if 'driver_metadata' not in _MDB.collection_names():
         _MDB.create_collection('driver_metadata')
-    if not 'global_iterations' in _MDB.collection_names():
+    if 'global_iterations' not in _MDB.collection_names():
         _MDB.create_collection('global_iterations')
-    if not 'metadata' in _MDB.collection_names():
+    if 'metadata' not in _MDB.collection_names():
         _MDB.create_collection('metadata')
-    if not 'solver_iterations' in _MDB.collection_names():
+    if 'solver_iterations' not in _MDB.collection_names():
         _MDB.create_collection('solver_iterations')
-    if not 'solver_metadata' in _MDB.collection_names():
+    if 'solver_metadata' not in _MDB.collection_names():
         _MDB.create_collection('solver_metadata')
-    if not 'system_iterations' in _MDB.collection_names():
+    if 'system_iterations' not in _MDB.collection_names():
         _MDB.create_collection('system_iterations')
-    if not 'system_metadata' in _MDB.collection_names():
+    if 'system_metadata' not in _MDB.collection_names():
         _MDB.create_collection('system_metadata')
-    if not 'users' in _MDB.collection_names():
+    if 'users' not in _MDB.collection_names():
         _MDB.create_collection('users')
-    if not 'layouts' in _MDB.collection_names():
+    if 'layouts' not in _MDB.collection_names():
         _MDB.create_collection('layouts')
+
 
 def _get(collection, case_id, token, get_many=True):
     """ _get method
@@ -424,17 +453,22 @@ def _get(collection, case_id, token, get_many=True):
     """
     if get_many:
         if token == _GLOBALLY_ACCEPTED_TOKEN:
-            return dumps(collection.find({'case_id': int(case_id)}, {'_id': False}))
+            return dumps(collection.find({'case_id': int(case_id)},
+                                         {'_id': False}))
         else:
             return dumps(collection.find({'$and': [{'case_id': int(case_id)},
-                                         {'users': token}]}, {'_id': False}))
+                                                   {'users': token}]},
+                                         {'_id': False}))
     else:
         if token == _GLOBALLY_ACCEPTED_TOKEN:
             return dumps(collection.find_one({'case_id': int(case_id)},
                                              {'_id': False}))
         else:
-            return dumps(collection.find_one({'$and': [{'case_id': int(case_id)},
-                                             {'users': token}]}, {'_id': False}))
+            return dumps(collection.find_one({'$and':
+                                             [{'case_id': int(case_id)},
+                                              {'users': token}]},
+                                             {'_id': False}))
+
 
 def _create(collection, body, case_id, token, update):
     """ _create method
@@ -453,6 +487,7 @@ def _create(collection, body, case_id, token, update):
         True if successfull, False otherwise
     """
     if not user_exists(token=token):
+        print("User does not exist, not storing data")
         return False
 
     if update:
@@ -460,13 +495,15 @@ def _create(collection, body, case_id, token, update):
             return False
         if 'iteration_coordinate' in body:
             collection.delete_many({'$and': [{'case_id': int(case_id)},
-                                   {'iteration_coordinate': body['iteration_coordinate']}]})
+                                             {'iteration_coordinate':
+                                             body['iteration_coordinate']}]})
         elif 'counter' in body:
             collection.delete_many({'$and': [{'case_id': int(case_id)},
-                                   {'counter': body['counter']}]})
+                                             {'counter': body['counter']}]})
         elif 'solver_class' in body:
             collection.delete_many({'$and': [{'case_id': int(case_id)},
-                                   {'solver_class': body['solver_class']}]})
+                                             {'solver_class':
+                                             body['solver_class']}]})
         else:
             collection.delete_many({'case_id': int(case_id)})
 
@@ -475,6 +512,7 @@ def _create(collection, body, case_id, token, update):
     body['users'] = [token]
     collection.insert_one(body)
     return True
+
 
 def _delete(collection, case_id, token):
     """ _delete method
@@ -490,12 +528,15 @@ def _delete(collection, case_id, token):
     Returns:
         True if successfull, False otherwise
     """
-    queried = collection.find({'$and': [{'case_id': int(case_id)}, {'users': token}]})
+    queried = collection.find(
+        {'$and': [{'case_id': int(case_id)}, {'users': token}]})
     if queried.count() == 0:
         return False
-    collection.delete_many({'$and': [{'case_id': int(case_id)}, {'users': token}]})
+    collection.delete_many(
+        {'$and': [{'case_id': int(case_id)}, {'users': token}]})
     return True
 
-#endregion
+# endregion
+
 
 _create_collections()

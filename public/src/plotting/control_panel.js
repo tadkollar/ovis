@@ -24,10 +24,12 @@ function emptyMethod(checked) { }
  * @param {Method} stackedPlotFunction 
  * @param {Method} variablesFunction 
  * @param {Method} variableIndicesFunction
+ * @param {*} abs2prom
+ * @param {*} prom2abs
  */
 function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariables, objectives, constraints, sysincludes,
     checkedDesignVariables, checkedObjectives, checkedConstraints, checkedSysincludes, variableIndexValues,
-    logscaleXFunction, logscaleYFunction, stackedPlotFunction, variablesFunction, variableIndicesFunction) {
+    logscaleXFunction, logscaleYFunction, stackedPlotFunction, variablesFunction, variableIndicesFunction, abs2prom, prom2abs) {
     //Set that the control panel is open
     controlPanelOpen = true;
 
@@ -37,24 +39,26 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariabl
     panelOptions.stackedPlotFunction = stackedPlotFunction;
     panelOptions.variablesFunction = variablesFunction;
     panelOptions.variableIndicesFunction = variableIndicesFunction;
-
+    
     //Set the check boxes
     panelOptions.logscaleXCheckbox.checked = logscaleXValue;
     panelOptions.logscaleYCheckbox.checked = logscaleYValue;
     panelOptions.stackedPlotCheckbox.checked = stackedPlotValue;
-
+    
     //Set variables
     panelOptions.designVariables = designVariables;
     panelOptions.objectives = objectives;
     panelOptions.constraints = constraints;
     panelOptions.others = sysincludes;
+    panelOptions.abs2prom = abs2prom;
+    panelOptions.prom2abs = prom2abs;
 
     //Remove all previous variables from the dropdowns
     updateDropdowns(panelOptions.designVariablesSelector, '#designVariablesSelection', designVariables, checkedDesignVariables);
     updateDropdowns(panelOptions.objectivesSelector, '#objectivesSelection', objectives, checkedObjectives);
     updateDropdowns(panelOptions.constraintsSelector, '#constraintsSelection', constraints, checkedConstraints);
     updateDropdowns(panelOptions.othersSelector, '#othersSelection', sysincludes, checkedSysincludes);
-    
+
     //Get rid of all of the variable index inputs and add the new ones
     resetVariableIndices();
     for (var i = 0; i < variableIndexValues.length; ++i) {
@@ -85,7 +89,7 @@ function updateDropdowns(selector, queryName, vars, checkedVals) {
 
     //Add the variables to their dropdowns
     for (var i = 0; i < vars.length; ++i) {
-        var option = new Option(vars[i], vars[i]);
+        var option = new Option(panelOptions.abs2prom.output[vars[i]], vars[i]);
         selector.options.add(option)
     }
 
