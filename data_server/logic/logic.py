@@ -144,7 +144,7 @@ def metadata_create(body, case_id, token):
     n_abs2prom = {'input': {}, 'output': {}}
     n_prom2abs = {'input': {}, 'output': {}}
 
-    if 'abs2prom' in body:
+    if body is not None and 'abs2prom' in body:
         # replace all '.' with '___' in abs2prom and prom2abs
         for io in ['input', 'output']:
             for k in body['abs2prom'][io]:
@@ -179,7 +179,7 @@ def metadata_get(case_id, token):
     res = json.loads(data.generic_get(collections.METADATA, case_id, token,\
                      False))
 
-    if 'abs2prom' in res:
+    if res is not None and 'abs2prom' in res:
         for io in ['input', 'output']:
             for k in res['abs2prom'][io]:
                 n_k = k.replace('___', '.')
