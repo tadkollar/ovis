@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>OpenMDAO Visualization</title>
+</head>
+
+<body>
+
+  <div class="wrapper">
+    <div id="leftbar">
+      <button class="btn navbar-btn btn" onclick="addNewPlot()">
+        <span class="glyphicon glyphicon-stats"></span>
+      </button>
+      <button class="btn navbar-btn btn" id="addN2Button" onclick="addNewN2()">
+        <span class="glyphicon glyphicon-th">
+      </button>
+    </div>
+    <div id="sidebar">
+      <div class="sidebarHeader">
+        <h1>No File Selected</h1>
+      </div>
+      <button class="myButton" id="returnToRootButtonId" disabled="disabled" title="Return To Root">
+        <i class="icon-home"></i>
+      </button>
+      <button class="myButton" id="backButtonId" disabled="disabled" title="Back">
+        <i class="icon-left-big"></i>
+      </button>
+      <button class="myButton" id="forwardButtonId" disabled="disabled" title="Forward">
+        <i class="icon-right-big"></i>
+      </button>
+      <button class="myButton" id="upOneLevelButtonId" disabled="disabled" title="Up One Level">
+        <i class="icon-up-big"></i>
+      </button>
+      <button class="myButton" id="uncollapseInViewButtonId" title="Uncollapse In View Only">
+        <i class="icon-resize-full"></i>
+      </button>
+      <button class="myButton" id="uncollapseAllButtonId" title="Uncollapse All">
+        <i class="icon-resize-full bigger-font"></i>
+      </button>
+      <button class="myButton" id="collapseInViewButtonId" title="Collapse Outputs In View Only">
+        <i class="icon-resize-small"></i>
+      </button>
+      <button class="myButton" id="collapseAllButtonId" title="Collapse All Outputs">
+        <i class="icon-resize-small bigger-font"></i>
+      </button>
+      <div class="dropdown">
+        <button class="myButton" title="Collapse Depth">
+          <i class="icon-sort-number-up"></i>
+        </button>
+        <div id="idCollapseDepthDiv" class="dropdown-content">
+          <span class="fakeLink">Collapse Depth</span>
+        </div>
+      </div>
+      <button class="myButton" id="clearArrowsAndConnectsButtonId" title="Clear Arrows and Connections">
+        <i class="icon-eraser"></i>
+      </button>
+      <button class="myButton" id="showCurrentPathButtonId" title="Show Path">
+        <i class="icon-terminal"></i>
+      </button>
+      <button class="myButton" id="showLegendButtonId" title="Show Legend">
+        <i class="icon-map-signs"></i>
+      </button>
+      <button class="myButton" id="showParamsButtonId" type="checkbox" title="Show Params">
+        <i class="icon-exchange"></i>
+      </button>
+      <div class="dropdown">
+        <button class="myButton" title="Font Size">
+          <i class="icon-text-height"></i>
+        </button>
+        <div class="dropdown-content">
+          <span class="fakeLink">Font Size</span>
+          <span class="fakeLink" id="idFontSize8px">8px</span>
+          <span class="fakeLink" id="idFontSize9px">9px</span>
+          <span class="fakeLink" id="idFontSize10px">10px</span>
+          <span class="fakeLink" id="idFontSize11px">
+            <b>11px</b>
+          </span>
+          <span class="fakeLink" id="idFontSize12px">12px</span>
+          <span class="fakeLink" id="idFontSize13px">13px</span>
+          <span class="fakeLink" id="idFontSize14px">14px</span>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="myButton" title="Vertically Resize">
+          <i class="icon-resize-vertical"></i>
+        </button>
+        <div class="dropdown-content">
+          <span class="fakeLink">Model Height</span>
+          <span class="fakeLink" id="idVerticalResize600px">
+            <b>600px</b>
+          </span>
+          <span class="fakeLink" id="idVerticalResize650px">650px</span>
+          <span class="fakeLink" id="idVerticalResize700px">700px</span>
+          <span class="fakeLink" id="idVerticalResize750px">750px</span>
+          <span class="fakeLink" id="idVerticalResize800px">800px</span>
+          <span class="fakeLink" id="idVerticalResize850px">850px</span>
+          <span class="fakeLink" id="idVerticalResize900px">900px</span>
+          <span class="fakeLink" id="idVerticalResize950px">950px</span>
+          <span class="fakeLink" id="idVerticalResize1000px">1000px</span>
+        </div>
+      </div>
+      <button class="myButton" id="saveSvgButtonId" title="Save SVG">
+        <i class="icon-floppy"></i>
+      </button>
+      <button class="myButton" id="helpButtonId" title="Help">
+        <i class="icon-help"></i>
+      </button>
+      <div style="margin-top:5px;">
+        <input type="text" id="awesompleteId" />
+        <button class="myButton" id="searchButtonId" title="Search">
+          <i class="icon-search"></i>
+        </button>
+        <label id="searchCountId"></label>
+      </div>
+    </div>
+    <div id="goldenLayout"></div>
+
+    <div id="mySidenav" class="sidenav" style='padding-top: 0px'>
+      <div class="jumbotron jumbotron-fluid" style='padding-bottom: 10px; padding-top: 20px; background-color: #e8e8e8'>
+        <button type='button' class='close closebtn' aria-label='Close' onclick='closeNav()' style='opacity: 0.65'>
+          <span aria-hidden='true' style='opacity: 0.65'>&times;</span>
+        </button>
+        <h1 class='display-3' style='font-size: 50px; text-align: center; padding-top: 20px'>Plot Options</h1>
+      </div>
+      <div class="varname">
+        <table class="optionstable">
+          <tr>
+            <td width="25%">
+              <input type="checkbox" class="checkbox" id='logscaleXCheckbox' onclick="logscaleX()">
+            </td>
+            <td>Logarithmic x-axis</td>
+          </tr>
+          <tr>
+            <td width="25%">
+              <input type="checkbox" class="checkbox" id='logscaleYCheckbox' onclick="logscaleY()">
+            </td>
+            <td>Logarithmic y-axis</td>
+          </tr>
+          <tr>
+            <td width="25%">
+              <input type="checkbox" class="checkbox" id='stackedPlotCheckbox' onclick="stackedPlot()">
+            </td>
+            <td>Stacked Plot</td>
+          </tr>
+        </table>
+        <br/> Design Variables
+        <select class="selectpicker varname" data-live-search="true" multiple id='designVariablesSelection'>
+        </select>
+
+        <br/>
+        <br/> Objectives
+        <select class="selectpicker varname" data-live-search="true" multiple id='objectivesSelection'>
+        </select>
+
+        <br/>
+        <br/>Constraints
+        <select class="selectpicker varname" data-live-search="true" multiple id='constraintsSelection'>
+        </select>
+
+        <br/>
+        <br/>Other Variables
+        <select class="selectpicker varname" data-live-search="true" multiple id='othersSelection'>
+        </select>
+
+        <div id="variableIndices">
+
+        </div>
+      </div>
+    </div>
+
+    <!-- modal -->
+    <div id="selectIndicesModal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Select Indices</h4>
+          </div>
+          <div class="modal-body">
+            <p>Select individual indices and ranges to be plotted. Make sure these values are separated by commas. For example,
+              to select indices 0, 1, and 15 through 20 the input should be:
+              <br/>
+              <br/>
+
+              <code>0, 1, 15-20</code>
+              <br/>
+              <br/> Order and spaces do not matter.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</body>
+
+<script>if (typeof module === 'object') { window.module = module; module = undefined; }</script>
+
+<link rel="stylesheet" type="text/css" href="style/awesomplete.css">
+<link rel="stylesheet" type="text/css" href="style/partition_tree.css">
+<link rel="stylesheet" type="text/css" href="style/dashboard.css">
+<link rel="stylesheet" type="text/css" href="style/goldenlayout-base.css" />
+<link rel="stylesheet" type="text/css" href="style/goldenlayout-light-theme.css" />
+<link rel="stylesheet" type="text/css" href="style/bootstrap-glyphicons.css">
+<link rel="stylesheet" type="text/css" href="style/bootstrap-select.min.css">
+<link rel="stylesheet" type="text/css" href="style/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="style/bootstrap.min.css">
+<script type="text/javascript" src="libs/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="libs/bootstrap.min.js"></script>
+<script type="text/javascript" src="libs/bootstrap-select.min.js"></script>
+<script type="text/javascript" src="libs/goldenlayout.min.js"></script>
+<script type="text/javascript" src="libs/plotly-latest.min.js"></script>
+<script type="text/javascript" src="libs/d3.v4.min.js"></script>
+<script type="text/javascript" src="libs/awesomplete.js"></script>
+<script type="text/javascript" src="libs/vkBeautify.js"></script>
+<script type="text/javascript" src="libs/http.js"></script>
+<script type="text/javascript" src="src/layout/layout.js"></script>
+<script type="text/javascript" src="src/partition_tree/constants.js"></script>
+<script type="text/javascript" src="src/partition_tree/modal.js"></script>
+<script type="text/javascript" src="src/partition_tree/svg.js"></script>
+<script type="text/javascript" src="src/partition_tree/search.js"></script>
+<script type="text/javascript" src="src/partition_tree/legend.js"></script>
+<script type="text/javascript" src="src/partition_tree/draw.js"></script>
+<script type="text/javascript" src="src/partition_tree/ptN2.js"></script>
+<script type="text/javascript" src="src/plotting/plot.js"></script>
+<script type="text/javascript" src="src/plotting/control_panel.js"></script>
+
+<script>if (window.module) module = window.module;</script>
+
+</html>

@@ -15,8 +15,22 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dateutil import tz
 from datetime import datetime
-import data_server.data.data as data
-import data_server.shared.collections as collections
+from data.mongo_data import MongoData
+from data.sqlite_data import SqliteData
+import shared.collections as collections
+import shared.data_type as db_type
+
+is_sqlite = db_type.DB_TYPE == 'SQLite'
+
+if not is_sqlite:
+    data = MongoData()
+    data.connect()
+else:
+    data = SqliteData()
+
+def connect(location):
+    if is_sqlite:
+        return data.connect(location)
 
 
 def get_all_cases(token):
@@ -159,10 +173,11 @@ def metadata_create(body, case_id, token):
             'abs2prom': n_abs2prom,
             'prom2abs': n_prom2abs
         }
-        return data.generic_create(collections.METADATA, n_body, case_id, token,
-                            False)
+        return data.generic_create(collections.METADATA, n_body, case_id,
+                                   token, False)
     else:
-        return data.generic_create(collections.METADATA, body, case_id, token, False)
+        return data.generic_create(collections.METADATA, body, case_id, token,
+                                   False)
 
 
 def metadata_get(case_id, token):
@@ -178,7 +193,7 @@ def metadata_get(case_id, token):
     n_prom2abs = {'input': {}, 'output': {}}
 
     res = json.loads(data.generic_get(collections.METADATA, case_id, token,
-                     False))
+                                      False))
 
     if res is not None and 'abs2prom' in res:
         for io in ['input', 'output']:
@@ -381,6 +396,8 @@ def get_driver_iteration_data(case_id, variable):
         Array of data
     """
     dat = data.get_driver_iteration_data(case_id)
+    print(dat[5])
+    print("BLAH BLAH BLAH\r\n\r\n\r\n\r\n")
     ret = []
     for i in dat:
         for v in i['desvars']:
@@ -413,6 +430,7 @@ def get_driver_iteration_data(case_id, variable):
                     v['counter'] = i['counter']
                     v['type'] = 'sysinclude'
                     ret.append(v)
+        print(ret)
 
     return json.dumps(ret)
 

@@ -1,0 +1,103 @@
+.wrapper {
+    display: grid;
+    width: 99.8vw;
+    height:99.8vh;
+    grid-template: 100% / 55px 230px 1fr;
+}
+
+#leftbar {
+    background-color: rgb(32, 32, 32);
+    text-align: center;
+}
+
+#sidebar {
+    background-color: #525153;
+}
+
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    background-color: rgb(31, 31, 31);
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.sidebarHeader {
+    height: 60px;
+    text-align: left;
+    padding-left: 20px;
+}
+
+.sidebarHeader:hover {
+    background-color: rgb(100, 100, 100);
+}
+
+.sidebarHeader h1 {
+    font-size: 25px;
+    color: rgb(201, 194, 194);
+}
+
+.varname {
+    padding: 8px 8px 8px 32px;
+    font-size: 25px;
+    color: #d6d6d6;
+    width: 350px;
+}
+
+.sidenav h1 {
+    text-align: center;
+    text-decoration: none;
+    color: #f0eeee;
+    display: block;
+}
+
+.inline {
+    display: inline;
+}
+
+.checkbox {
+    height: 18px;
+    width: 18px;
+}
+
+#variables.variableslist {
+    height: 150px;
+    width: 200px;
+    margin-left: 32px;
+}
+
+#variables.variableslist.option {
+    margin-left: 5px;
+    font-size: 15px;
+    color: #a8a8a8;
+}
+
+.sidenav .closebtn {
+    font-size: 36px;
+    margin-right: 10px;
+}
+
+.sidenav .closebtn:hover {
+    color: #747474
+}
+
+.input {
+    padding-right: 20px;
+}
+
+.btn:hover {
+    transform:scale(1.05, 1.05);
+    transform-origin: center;
+    background-color: #a8a8a8;
+}
+
+.myButton:hover {
+    transform: scale(1.05, 1.05);
+    transform-origin: center;
+    background-color: #a8a8a8;
+}

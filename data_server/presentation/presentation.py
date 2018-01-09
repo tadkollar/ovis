@@ -7,8 +7,8 @@ outside of main.py. In the 3-tier architecture being used, this is the top
 """
 import tornado.web as web
 import json
-import data_server.logic.logic as logic
-import data_server.shared.collections as collections
+import logic.logic as logic
+import shared.collections as collections
 
 _TOKEN = 'squavy'
 
@@ -29,6 +29,21 @@ class IndexHandler(web.RequestHandler):
                         cases=cases, token=token)
         else:
             self.render("../../public/login.html")
+
+
+class ConnectHandler(web.RequestHandler):
+    """ ConnectHandler class
+
+    Contains logic to tell Logic/Data layers to connect to the given
+    DB.
+    """
+
+    def post(self):
+        db_location = json.loads(self.request.body)['location']
+        if logic.connect(db_location):
+            self.write({"Success": True})
+        else:
+            self.write({"Success": False})
 
 
 class LogoutHandler(web.RequestHandler):
