@@ -206,16 +206,13 @@ class SqliteData(BaseData):
 
                 ret.append(n_row)
 
-        print(ret)
-        print("ORIG ORIG ORIG\r\n\r\n\r\n")
-
         final_ret = []
-        desvars_array = []
-        responses_array = []
-        objectives_array = []
-        constraints_array = []
-        sysincludes_array = []
         for data in ret:
+            desvars_array = []
+            responses_array = []
+            objectives_array = []
+            constraints_array = []
+            sysincludes_array = []
             if data['desvars']:
                 for name in data['desvars'].dtype.names:
                     desvars_array.append({

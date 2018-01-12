@@ -396,7 +396,7 @@ def get_driver_iteration_data(case_id, variable):
         Array of data
     """
     dat = data.get_driver_iteration_data(case_id)
-    print(dat[5])
+    print(dat)
     print("BLAH BLAH BLAH\r\n\r\n\r\n\r\n")
     ret = []
     for i in dat:
