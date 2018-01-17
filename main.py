@@ -25,6 +25,7 @@ if __name__ == "__main__":
     # Set up endpoints
     app = tornado.web.Application(handlers=[
         (r"/", presentation.IndexHandler),
+        (r"/connect", presentation.ConnectHandler),
         (r"/logout", presentation.LogoutHandler),
         (r"/case", presentation.CaseHandler),
         (r"/case/([a-zA-Z]+)/(.*)",

@@ -15,10 +15,11 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dateutil import tz
 from datetime import datetime
-from data.mongo_data import MongoData
-from data.sqlite_data import SqliteData
-import shared.collections as collections
-import shared.data_type as db_type
+from six import PY2, PY3
+import data_server.shared.collections as collections
+import data_server.shared.data_type as db_type
+from data_server.data.mongo_data import MongoData
+from data_server.data.sqlite_data import SqliteData
 
 is_sqlite = db_type.DB_TYPE == 'SQLite'
 
@@ -29,6 +30,14 @@ else:
     data = SqliteData()
 
 def connect(location):
+    """ connect method
+
+    Attempts to create a connection with the given DB at the given
+    location for SQLite files
+
+    Returns:
+        bool: True if connection established, False otherwise
+    """
     if is_sqlite:
         return data.connect(location)
 
@@ -396,8 +405,6 @@ def get_driver_iteration_data(case_id, variable):
         Array of data
     """
     dat = data.get_driver_iteration_data(case_id)
-    print(dat)
-    print("BLAH BLAH BLAH\r\n\r\n\r\n\r\n")
     ret = []
     for i in dat:
         for v in i['desvars']:
@@ -430,7 +437,6 @@ def get_driver_iteration_data(case_id, variable):
                     v['counter'] = i['counter']
                     v['type'] = 'sysinclude'
                     ret.append(v)
-        print(ret)
 
     return json.dumps(ret)
 
