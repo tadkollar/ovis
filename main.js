@@ -1,8 +1,13 @@
 const electron = require('electron')
+
 // Module to control application life.
 const app = electron.app
+const Menu = electron.Menu;
+
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
+
+const dialog = require('electron').dialog;
 
 const path = require('path')
 const url = require('url')
@@ -53,8 +58,48 @@ app.on('activate', function () {
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
     createWindow()
-  }
+    mainWindow.maximize();
+}
 })
+
+const template = [
+  {
+    label: 'File',
+    submenu: [
+      {
+        role: 'open',
+        label: 'Open',
+        click () {
+          dialog.showOpenDialog((fileNames) => {
+            if(fileNames === undefined) {
+              console.log("No file selected");
+              return;
+            }
+
+            mainWindow.webContents.send('connect', fileNames);
+            mainWindow.loadURL(url.format({
+              pathname: path.join(__dirname, 'index.html'),
+              protocol: 'file:',
+              slashes: true
+            }))
+          });
+        }
+      }
+    ]
+  },
+  {
+    label: 'View',
+    submenu: [
+      {
+        role: 'toggle dev tools',
+        label: 'Toggle Developer Tools',
+        click () { mainWindow.webContents.openDevTools(); }
+      }
+    ]
+  }
+]
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+const menu = Menu.buildFromTemplate(template);
+Menu.setApplicationMenu(menu);

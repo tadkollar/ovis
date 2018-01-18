@@ -648,8 +648,6 @@ var createPlot = function (container, componentState) {
             componentState.variableIndices.push(newIndices);
             addVariableIndicesGroup(newIndices.name, newIndices.indices);
         }
-
-        console.log(data);
     }
 
     /**
