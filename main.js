@@ -7,7 +7,8 @@ const Menu = electron.Menu;
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
 
-const dialog = require('electron').dialog;
+const dialog = require('electron').dialog
+const ipcMain = require('electron').ipcMain
 
 const path = require('path')
 const url = require('url')
@@ -16,13 +17,13 @@ const url = require('url')
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
-function createWindow () {
+function createWindow() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600})
+  mainWindow = new BrowserWindow({ width: 800, height: 600 })
 
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'index.html'),
+    pathname: path.join(__dirname, 'need_load.html'),
     protocol: 'file:',
     slashes: true
   }))
@@ -59,8 +60,24 @@ app.on('activate', function () {
   if (mainWindow === null) {
     createWindow()
     mainWindow.maximize();
-}
+  }
 })
+
+function findFile() {
+  dialog.showOpenDialog((fileNames) => {
+    if (fileNames === undefined) {
+      console.log("No file selected");
+      return;
+    }
+
+    mainWindow.webContents.send('connect', fileNames);
+    mainWindow.loadURL(url.format({
+      pathname: path.join(__dirname, 'index.html'),
+      protocol: 'file:',
+      slashes: true
+    }))
+  });
+}
 
 const template = [
   {
@@ -69,20 +86,9 @@ const template = [
       {
         role: 'open',
         label: 'Open',
-        click () {
-          dialog.showOpenDialog((fileNames) => {
-            if(fileNames === undefined) {
-              console.log("No file selected");
-              return;
-            }
-
-            mainWindow.webContents.send('connect', fileNames);
-            mainWindow.loadURL(url.format({
-              pathname: path.join(__dirname, 'index.html'),
-              protocol: 'file:',
-              slashes: true
-            }))
-          });
+        accelerator: 'CmdOrCtrl+o',
+        click() {
+          findFile();
         }
       }
     ]
@@ -91,13 +97,24 @@ const template = [
     label: 'View',
     submenu: [
       {
+        accelerator: 'CmdOrCtrl+Shift+i',
         role: 'toggle dev tools',
         label: 'Toggle Developer Tools',
-        click () { mainWindow.webContents.openDevTools(); }
+        click() { mainWindow.webContents.openDevTools(); }
+      },
+      {
+        accelerator: 'CmdOrCtrl+r',
+        role: 'refresh',
+        label: 'Refresh Page',
+        click() { mainWindow.webContents.reloadIgnoringCache(); }
       }
     ]
   }
 ]
+
+ipcMain.on('openFile', (event, arg) => {
+  findFile();
+});
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

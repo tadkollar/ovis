@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>OpenMDAO Visualization</title>
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <div id="leftbar">
+            <button class="btn navbar-btn btn" onclick="addNewPlot()" disabled>
+                <span class="glyphicon glyphicon-stats"></span>
+            </button>
+            <button class="btn navbar-btn btn" id="addN2Button" onclick="addNewN2()" disabled>
+                <span class="glyphicon glyphicon-th">
+            </button>
+        </div>
+        <div id="sidebar">
+            <div class="sidebarHeader">
+                <h1>No File Selected</h1>
+            </div>
+        </div>
+        <div style="background-color: #dddddd; color: #525252">
+            <div style="padding-left: 5%">
+                <h1 style='padding-top: 6%; color: #3a3a3a; font-size: 3.25em'>No recording selected</h1>
+                <h2>Click the button below (or <strong>Cmd/Ctrl + O</strong>) to select your recording file</h2>
+
+                <br/><br/>
+
+                <button type='button' class='btn btn-secondary btn-large' style='font-size: 2em; background: #adadad; color: #3a3a3a' onclick="openFile()">
+                    <span class="glyphicon glyphicon-folder-open" ></span>&emsp;Open
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>if (typeof module === 'object') { window.module = module; module = undefined; }</script>
+
+<link rel="stylesheet" type="text/css" href="style/awesomplete.css">
+<link rel="stylesheet" type="text/css" href="style/partition_tree.css">
+<link rel="stylesheet" type="text/css" href="style/dashboard.css">
+<link rel="stylesheet" type="text/css" href="style/goldenlayout-base.css" />
+<link rel="stylesheet" type="text/css" href="style/goldenlayout-light-theme.css" />
+<link rel="stylesheet" type="text/css" href="style/bootstrap-glyphicons.css">
+<link rel="stylesheet" type="text/css" href="style/bootstrap-select.min.css">
+<link rel="stylesheet" type="text/css" href="style/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="style/bootstrap.min.css">
+<script type="text/javascript" src="libs/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="libs/bootstrap.min.js"></script>
+<script type="text/javascript" src="libs/bootstrap-select.min.js"></script>
+<script type="text/javascript" src="libs/goldenlayout.min.js"></script>
+<script type="text/javascript" src="libs/plotly-latest.min.js"></script>
+<script type="text/javascript" src="libs/d3.v4.min.js"></script>
+<script type="text/javascript" src="libs/awesomplete.js"></script>
+<script type="text/javascript" src="libs/vkBeautify.js"></script>
+<script type="text/javascript" src="libs/http.js"></script>
+<script type="text/javascript" src="src/need_load.js"></script>
+
+<script>if (window.module) module = window.module;</script>
+
+</html>

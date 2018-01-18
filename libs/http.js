@@ -94,18 +94,3 @@ function HTTP() {
 };
 
 var http = new HTTP();
-
-require('electron').ipcRenderer.on('connect', (event, message) => {
-    http.post("connect", {'location': message[0]}, (response) => {
-        if(response['Success']) {
-            console.log("Opened connection with DB");
-            //Load up window
-        }
-        else {
-            console.log("Failed to open file");
-            //Report to user
-        }
-    });
-});
-
-// http.post("connect", {'location': 'C:\\Users\\rfarr2\\Development\\Shared_OpenMDAO\\test_data.db'}, ()=>{});
