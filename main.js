@@ -1,5 +1,9 @@
+'use strict'
+
 const electron = require('electron')
 const spawn = require('child_process').spawn
+const request = require('request')
+const querystring = require('querystring')
 
 // Module to control application life.
 const app = electron.app
@@ -28,9 +32,6 @@ function createWindow() {
     protocol: 'file:',
     slashes: true
   }))
-
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -72,6 +73,17 @@ function findFile() {
     }
 
     console.log("Sending 'connect' with: " + fileNames[0])
+
+    request.post('http://127.0.0.1:18403/connect',
+                 {json: {'location': fileNames[0]}},
+                 function(error, response, body) {
+                   if(error) {
+                     console.log("ERROR: " + error.toString())
+                     return;
+                   }
+                   console.log("Connected to DB");
+                 });
+
     mainWindow.webContents.send('connect', fileNames)
     mainWindow.loadURL(url.format({
       pathname: path.join(__dirname, 'index.html'),
@@ -115,22 +127,21 @@ const template = [
 ]
 
 ipcMain.on('openFile', (event, arg) => {
+  mainWindow.webContents.send('test', ['blah'])
   findFile();
+  console.log('Opening file')
+  mainWindow.webContents.send('test')
 });
 
 function startServer() {
   let resourceLocation = process.resourcesPath;
-  py = spawn('python', ['main.py'])
+  let py = spawn('python', [resourceLocation + '/app/main.py'])
   py.stdout.on('data', function (data) {
     console.log("STDOUT: " + data);
   })
   py.stderr.on('data', function (data) {
     console.log("ERROR: " + data)
   })
-
-  // , function(err, stdout, stderr) {
-  //   console.log(stdout)
-  // })//[resourceLocation + '/app/main.py'])
 }
 
 // In this file you can include the rest of your app's specific main process
