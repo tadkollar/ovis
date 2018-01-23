@@ -21,6 +21,8 @@
       <div class="sidebarHeader">
         <h1>No File Selected</h1>
       </div>
+
+      <div id="controls"></div>
       <button class="myButton" id="returnToRootButtonId" disabled="disabled" title="Return To Root">
         <i class="icon-home"></i>
       </button>
@@ -115,88 +117,89 @@
         <label id="searchCountId"></label>
       </div>
     </div>
-    <div id="goldenLayout"></div>
+  </div>
+  <div id="goldenLayout"></div>
 
-    <div id="mySidenav" class="sidenav" style='padding-top: 0px'>
-      <div class="jumbotron jumbotron-fluid" style='padding-bottom: 10px; padding-top: 20px; background-color: #e8e8e8'>
-        <button type='button' class='close closebtn' aria-label='Close' onclick='closeNav()' style='opacity: 0.65'>
-          <span aria-hidden='true' style='opacity: 0.65'>&times;</span>
-        </button>
-        <h1 class='display-3' style='font-size: 50px; text-align: center; padding-top: 20px'>Plot Options</h1>
-      </div>
-      <div class="varname">
-        <table class="optionstable">
-          <tr>
-            <td width="25%">
-              <input type="checkbox" class="checkbox" id='logscaleXCheckbox' onclick="logscaleX()">
-            </td>
-            <td>Logarithmic x-axis</td>
-          </tr>
-          <tr>
-            <td width="25%">
-              <input type="checkbox" class="checkbox" id='logscaleYCheckbox' onclick="logscaleY()">
-            </td>
-            <td>Logarithmic y-axis</td>
-          </tr>
-          <tr>
-            <td width="25%">
-              <input type="checkbox" class="checkbox" id='stackedPlotCheckbox' onclick="stackedPlot()">
-            </td>
-            <td>Stacked Plot</td>
-          </tr>
-        </table>
-        <br/> Design Variables
-        <select class="selectpicker varname" data-live-search="true" multiple id='designVariablesSelection'>
-        </select>
-
-        <br/>
-        <br/> Objectives
-        <select class="selectpicker varname" data-live-search="true" multiple id='objectivesSelection'>
-        </select>
-
-        <br/>
-        <br/>Constraints
-        <select class="selectpicker varname" data-live-search="true" multiple id='constraintsSelection'>
-        </select>
-
-        <br/>
-        <br/>Other Variables
-        <select class="selectpicker varname" data-live-search="true" multiple id='othersSelection'>
-        </select>
-
-        <div id="variableIndices">
-
-        </div>
-      </div>
+  <div id="mySidenav" class="sidenav" style='padding-top: 0px'>
+    <div class="jumbotron jumbotron-fluid" style='padding-bottom: 10px; padding-top: 20px; background-color: #e8e8e8'>
+      <button type='button' class='close closebtn' aria-label='Close' onclick='closeNav()' style='opacity: 0.65'>
+        <span aria-hidden='true' style='opacity: 0.65'>&times;</span>
+      </button>
+      <h1 class='display-3' style='font-size: 50px; text-align: center; padding-top: 20px'>Plot Options</h1>
     </div>
+    <div class="varname">
+      <table class="optionstable">
+        <tr>
+          <td width="25%">
+            <input type="checkbox" class="checkbox" id='logscaleXCheckbox' onclick="logscaleX()">
+          </td>
+          <td>Logarithmic x-axis</td>
+        </tr>
+        <tr>
+          <td width="25%">
+            <input type="checkbox" class="checkbox" id='logscaleYCheckbox' onclick="logscaleY()">
+          </td>
+          <td>Logarithmic y-axis</td>
+        </tr>
+        <tr>
+          <td width="25%">
+            <input type="checkbox" class="checkbox" id='stackedPlotCheckbox' onclick="stackedPlot()">
+          </td>
+          <td>Stacked Plot</td>
+        </tr>
+      </table>
+      <br/> Design Variables
+      <select class="selectpicker varname" data-live-search="true" multiple id='designVariablesSelection'>
+      </select>
 
-    <!-- modal -->
-    <div id="selectIndicesModal" class="modal fade" role="dialog">
-      <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Select Indices</h4>
-          </div>
-          <div class="modal-body">
-            <p>Select individual indices and ranges to be plotted. Make sure these values are separated by commas. For example,
-              to select indices 0, 1, and 15 through 20 the input should be:
-              <br/>
-              <br/>
+      <br/>
+      <br/> Objectives
+      <select class="selectpicker varname" data-live-search="true" multiple id='objectivesSelection'>
+      </select>
 
-              <code>0, 1, 15-20</code>
-              <br/>
-              <br/> Order and spaces do not matter.
-            </p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div>
+      <br/>
+      <br/>Constraints
+      <select class="selectpicker varname" data-live-search="true" multiple id='constraintsSelection'>
+      </select>
+
+      <br/>
+      <br/>Other Variables
+      <select class="selectpicker varname" data-live-search="true" multiple id='othersSelection'>
+      </select>
+
+      <div id="variableIndices">
 
       </div>
     </div>
+  </div>
+
+  <!-- modal -->
+  <div id="selectIndicesModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Select Indices</h4>
+        </div>
+        <div class="modal-body">
+          <p>Select individual indices and ranges to be plotted. Make sure these values are separated by commas. For example,
+            to select indices 0, 1, and 15 through 20 the input should be:
+            <br/>
+            <br/>
+
+            <code>0, 1, 15-20</code>
+            <br/>
+            <br/> Order and spaces do not matter.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
   </div>
 </body>
 
@@ -220,6 +223,7 @@
 <script type="text/javascript" src="libs/awesomplete.js"></script>
 <script type="text/javascript" src="libs/vkBeautify.js"></script>
 <script type="text/javascript" src="libs/http.js"></script>
+<script type="text/javascript" src="libs/ipc.js"></script>
 <script type="text/javascript" src="src/layout/layout.js"></script>
 <script type="text/javascript" src="src/partition_tree/constants.js"></script>
 <script type="text/javascript" src="src/partition_tree/modal.js"></script>
@@ -230,7 +234,6 @@
 <script type="text/javascript" src="src/partition_tree/ptN2.js"></script>
 <script type="text/javascript" src="src/plotting/plot.js"></script>
 <script type="text/javascript" src="src/plotting/control_panel.js"></script>
-<script type="text/javascript" src="src/need_load.js"></script>
 
 <script>if (window.module) module = window.module;</script>
 

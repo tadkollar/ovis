@@ -1,4 +1,5 @@
 const electron = require('electron')
+const spawn = require('child_process').spawn
 
 // Module to control application life.
 const app = electron.app
@@ -70,13 +71,14 @@ function findFile() {
       return;
     }
 
-    mainWindow.webContents.send('connect', fileNames);
+    console.log("Sending 'connect' with: " + fileNames[0])
+    mainWindow.webContents.send('connect', fileNames)
     mainWindow.loadURL(url.format({
       pathname: path.join(__dirname, 'index.html'),
       protocol: 'file:',
       slashes: true
     }))
-  });
+  })
 }
 
 const template = [
@@ -116,7 +118,25 @@ ipcMain.on('openFile', (event, arg) => {
   findFile();
 });
 
+function startServer() {
+  let resourceLocation = process.resourcesPath;
+  py = spawn('python', ['main.py'])
+  py.stdout.on('data', function (data) {
+    console.log("STDOUT: " + data);
+  })
+  py.stderr.on('data', function (data) {
+    console.log("ERROR: " + data)
+  })
+
+  // , function(err, stdout, stderr) {
+  //   console.log(stdout)
+  // })//[resourceLocation + '/app/main.py'])
+}
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 const menu = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menu);
+
+//Start the server
+startServer()

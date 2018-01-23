@@ -1,26 +1,24 @@
 {
-  "name": "electron-quick-start",
+  "name": "OpenMDAOVis",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "A visualization tool for OpenMDAO",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "rebuild": "electron-rebuild -f -w sqlite3"
   },
-  "repository": "https://github.com/electron/electron-quick-start",
+  "repository": "https://github.com/OpenMDAO/zune",
   "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
+    "OpenMDAO",
+    "Visualization"
   ],
   "author": "GitHub",
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "~1.7.8",
     "electron-packager": "^10.1.1",
-    "electron-rebuild": "^1.6.0"
+    "electron-rebuild": "^1.6.0",
+    "electron-winstaller": "^2.6.4"
   },
   "dependencies": {
     "pickle": "^0.2.0",

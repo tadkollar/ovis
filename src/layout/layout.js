@@ -90,7 +90,8 @@ var createLayout = function (newConfig) {
  */
 var registerN2 = function (layout) {
     layout.registerComponent('Partition Tree and N<sup>2</sup>', function (container, componentState) {
-        fs.readFile('components/partition_tree_n2.html', function (err, data) {
+        let resourceLocation = process.resourcesPath;
+        fs.readFile(resourceLocation + '/app/components/partition_tree_n2.html', function (err, data) {
             container.getElement().html(data.toString());
             ptn2.initializeTree(container);
         });
@@ -110,7 +111,8 @@ var registerN2 = function (layout) {
  */
 var registerPlot = function (layout) {
     layout.registerComponent('Variable vs. Iterations', function (container, componentState) {
-        fs.readFile('components/plot.html', function (err, data) {
+        let resourceLocation = process.resourcesPath;
+        fs.readFile(resourceLocation + '/app/components/plot.html', function (err, data) {
             container.getElement().html(data.toString());
             createPlot(container, componentState);
         });
