@@ -251,3 +251,8 @@ http.get('case/' + case_id + '/layout', function (ret) {
         myLayout = createLayout(JSON.parse(ret[0]['layout']));
     }
 })
+
+getFilename(function(filename) {
+    document.getElementById('sidebarHeaderContent').innerHTML = filename;
+    console.log(filename);
+});

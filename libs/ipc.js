@@ -1,6 +1,7 @@
 'use strict'
 
 var {ipcRenderer, remote} = require('electron')
+let filenameCallback = null;
 
 /**
 * function openFile - Sends an IPC message to the main process to
@@ -30,6 +31,15 @@ function connect(url) {
     });
 }
 
-ipcRenderer.on('test', function(event, data) {
-    console.log("Test working on client")
+ipcRenderer.on('filenameReply', (event, arg) => {
+    if(filenameCallback != null) {
+        filenameCallback(arg);
+    }
+
+    filenameCallback = null;
 })
+
+function getFilename(callback) {
+    filenameCallback = callback;
+    ipcRenderer.send('getFilename');
+}
