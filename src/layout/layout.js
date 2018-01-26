@@ -253,6 +253,10 @@ http.get('case/' + case_id + '/layout', function (ret) {
 })
 
 getFilename(function(filename) {
+    if(filename.length > 14) {
+        filename = filename.substring(0, 14) + '...';
+    }
+
     document.getElementById('sidebarHeaderContent').innerHTML = filename;
     console.log(filename);
 });

@@ -1600,6 +1600,12 @@ ptn2.resize = function () {
 ptn2.initializeTree = function (container) {
     ptn2.container = container;
     ptn2.container.on('resize', ptn2.resize)
+
+    container._contentElement[0].onclick= () => {
+        document.getElementById('n2Controls').style.display = "block";
+        document.getElementById('plotControls').style.display = "none";
+    }
+
     http.get("case/" + case_id + '/driver_metadata', function (response) {
         var data = JSON.parse(response)[0];
         treeData = data['model_viewer_data'];

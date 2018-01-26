@@ -31,7 +31,7 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariabl
     checkedDesignVariables, checkedObjectives, checkedConstraints, checkedSysincludes, variableIndexValues,
     logscaleXFunction, logscaleYFunction, stackedPlotFunction, variablesFunction, variableIndicesFunction, abs2prom, prom2abs) {
     //Set that the control panel is open
-    controlPanelOpen = true;
+    // controlPanelOpen = true;
 
     //Set the callback functions
     panelOptions.logscaleXFunction = logscaleXFunction;
@@ -65,9 +65,8 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariabl
         addVariableIndicesGroup(variableIndexValues[i].name, variableIndexValues[i].indices);
     }
 
-    //Set width and background color
-    document.getElementById("mySidenav").style.width = "350px";
-    document.body.style.backgroundColor = "rgba(0,0,0,0.4)";
+    document.getElementById('n2Controls').style.display = "none";
+    document.getElementById('plotControls').style.display = "block";
 }
 
 /**
@@ -105,8 +104,8 @@ function updateDropdowns(selector, queryName, vars, checkedVals) {
  */
 function closeNav() {
     controlPanelOpen = false;
-    document.getElementById("mySidenav").style.width = "0";
-    document.body.style.backgroundColor = "white";
+    // document.getElementById("mySidenav").style.width = "0";
+    // document.body.style.backgroundColor = "white";
 }
 
 /**
