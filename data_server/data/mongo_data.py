@@ -13,7 +13,7 @@ import datetime
 from six import PY2, PY3
 from pymongo import MongoClient
 from bson.json_util import dumps
-import data_server.shared.collections as collections
+import data_server.shared.collection_names as collections
 from data_server.data.data import BaseData
 
 

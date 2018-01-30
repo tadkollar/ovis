@@ -8,7 +8,7 @@ outside of main.py. In the 3-tier architecture being used, this is the top
 import tornado.web as web
 import json
 import data_server.logic.logic as logic
-import data_server.shared.collections as collections
+import data_server.shared.collection_names as collections
 
 _TOKEN = 'squavy'
 

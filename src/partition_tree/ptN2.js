@@ -1573,7 +1573,7 @@ var hasInputConn;
 var treeData, connectionList;
 var url = window.location.href;
 var url_split = url.split('/');
-var case_id = "1885148375";//url_split[url_split.length - 1];
+var case_id = "1885148375";
 var modal;
 var search;
 
@@ -1621,4 +1621,3 @@ ptn2.initializeTree = function (container) {
         ptn2.resize();
     });
 };
-

@@ -5,7 +5,7 @@ import io
 import numpy as np
 from six import PY2, PY3, iteritems
 from data_server.data.data import BaseData
-import data_server.shared.collections as collections
+import data_server.shared.collection_names as collections
 
 if PY2:
     import cPickle as pickle

@@ -165,3 +165,5 @@ venv.bak/
 # mypy
 .mypy_cache/
 release-builds
+OpenMDAOVis-win32-x64
+OpenMDAOVis-linux-x64

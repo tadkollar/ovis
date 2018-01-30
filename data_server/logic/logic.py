@@ -16,7 +16,7 @@ from email.mime.multipart import MIMEMultipart
 from dateutil import tz
 from datetime import datetime
 from six import PY2, PY3
-import data_server.shared.collections as collections
+import data_server.shared.collection_names as collections
 import data_server.shared.data_type as db_type
 from data_server.data.mongo_data import MongoData
 from data_server.data.sqlite_data import SqliteData
