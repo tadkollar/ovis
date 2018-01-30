@@ -5,8 +5,8 @@ HTTP requests based on the URLs given. These classes ought not be used
 outside of main.py. In the 3-tier architecture being used, this is the top
 (presentation) layer.
 """
-import tornado.web as web
 import json
+import tornado.web as web
 import data_server.logic.logic as logic
 import data_server.shared.collection_names as collections
 
