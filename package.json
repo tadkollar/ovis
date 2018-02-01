@@ -16,13 +16,14 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "~1.7.8",
-    "electron-packager": "^10.1.1",
+    "electron-packager": "^10.1.2",
     "electron-rebuild": "^1.6.0"
   },
   "dependencies": {
     "pickle": "^0.2.0",
     "promise": "^8.0.1",
+    "request": "^2.83.0",
     "sqlite3": "^3.1.13",
-    "request": "^2.83.0"
+    "wine": "^0.9.8"
   }
 }
