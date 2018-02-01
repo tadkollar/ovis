@@ -1130,7 +1130,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
 
         //do this so you save old index for the exit()
         gridLines = [];
-        if (d3RightTextNodesArrayZoomed.length < ptn2.LEVEL_OF_DETAIL_THRESHOLD) {
+        if (d3RightTextNodesArrayZoomed.length < ptn2.LEVEL_OF_DETAIL_THRESHOLD){
             for (var i = 0; i < d3RightTextNodesArrayZoomed.length; ++i) {
                 var obj = d3RightTextNodesArrayZoomed[i];
                 var gl = { "i": i, "obj": obj };
@@ -1579,8 +1579,9 @@ var search;
 
 ptn2.resize = function () {
     var container = ptn2.container;
-    ptn2.HEIGHT_PX = container.width < container.height ? container.width : container.height;
-    ptn2.WIDTH_N2_PX = ptn2.HEIGHT_PX * 0.75;
+    ptn2.HEIGHT_PX = container.width < container.height ? container.width*0.75 : container.height;
+    if(ptn2.HEIGHT_PX > 900) { ptn2.HEIGHT_PX *= 0.75; }
+    ptn2.WIDTH_N2_PX = ptn2.HEIGHT_PX;
     ptn2.PARENT_NODE_WIDTH_PX = 40 * (ptn2.HEIGHT_PX / 600);
     ptn2.xScalerPTree = d3.scaleLinear().range([0, ptn2.widthPTreePx]);
     ptn2.yScalerPTree = d3.scaleLinear().range([0, ptn2.HEIGHT_PX]);
