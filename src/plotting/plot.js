@@ -28,8 +28,8 @@ var createPlot = function (container, componentState) {
     var sysincludes = [];
 
     //Maps promoted variable names to absolute variable names and vice versa
-    var prom2abs = {'input': {}, 'output': {}};
-    var abs2prom = {'input': {}, 'output': {}};
+    var prom2abs = { 'input': {}, 'output': {} };
+    var abs2prom = { 'input': {}, 'output': {} };
 
     //Setup control panel
     if (options != null) {
@@ -395,8 +395,8 @@ var createPlot = function (container, componentState) {
         var gotFirstProp = false;
         for (var i = 0; i < curData[index].length; ++i) {
             for (var j = 0; j < curData[index][i]['values'].length; ++j) {
-                if (curData[index][i]['values'][0].hasOwnProperty('length')) {
-                    for (var k = 0; k < curData[index][i]['values'][0].length; ++k){
+                if (curData[index][i]['values'][0].hasOwnProperty('length') && curData[index][i]['values'][0][0].length) {
+                    for (var k = 0; k < curData[index][i]['values'][0].length; ++k) {
                         if (typeFunc(curData[index][i]) && !gotFirstProp) {
                             gotFirstProp = true;
                             finalData.push({
@@ -414,6 +414,26 @@ var createPlot = function (container, componentState) {
                             }
                         }
                     }
+                }
+                else if (curData[index][i]['values'][0].hasOwnProperty('length')) {
+                    for (var k = 0; k < curData[index][i]['values'][0].length; ++k) {
+                        if ((typeFunc(curData[index][i]) && !gotFirstProp) ||
+                            (typeFunc(curData[index][i]) && j >= finalData.length)) {
+                            finalData.push({
+                                x: [curData[index][i]['counter']],
+                                y: [curData[index][i]['values'][j][k]],
+                                name: prependName + '[' + k + ']'
+                            });
+                        }
+                        else {
+                            if (typeFunc(curData[index][i])) {
+                                finalData[k].x.push(curData[index][i]['counter']);
+                                finalData[k].y.push(curData[index][i]['values'][j][k]);
+                                finalData[k].name = prependName + '[' + k + ']';
+                            }
+                        }
+                    }
+                    gotFirstProp = true;
                 }
                 else {
                     if ((typeFunc(curData[index][i]) && !gotFirstProp) ||
@@ -644,9 +664,20 @@ var createPlot = function (container, componentState) {
                 'name': name,
                 'indices': '0-' + (data.length - 1).toString()
             };
-            addIndicesToObject(newIndices);
-            componentState.variableIndices.push(newIndices);
-            addVariableIndicesGroup(newIndices.name, newIndices.indices);
+
+            var duplicate = false;
+            for (var i = 0; i < componentState.variableIndices.length; ++i) {
+                if (componentState.variableIndices[i].name === name) {
+                    duplicate = true;
+                    break;
+                }
+            }
+
+            if (!duplicate) {
+                addIndicesToObject(newIndices);
+                componentState.variableIndices.push(newIndices);
+                addVariableIndicesGroup(newIndices.name, newIndices.indices);
+            }
         }
     }
 
@@ -743,8 +774,8 @@ var createPlot = function (container, componentState) {
                 var name = result[i]['name'];
 
                 //Map to yourself just in case we don't have the metadata
-                if(!(name in prom2abs['output'])) { prom2abs['output'][name] = name; }
-                if(!(name in abs2prom['output'])) { abs2prom['output'][name] = name; }
+                if (!(name in prom2abs['output'])) { prom2abs['output'][name] = name; }
+                if (!(name in abs2prom['output'])) { abs2prom['output'][name] = name; }
 
                 if (result[i]['type'] === 'desvar') {
                     designVariables.push(name);
@@ -804,7 +835,7 @@ var createPlot = function (container, componentState) {
         if (!controlPanelOpen) {
             openNav(componentState.logscaleXVal, componentState.logscaleYVal, componentState.stackedPlotVal, designVariables,
                 objectives, constraints, sysincludes, componentState.selectedDesignVariables, componentState.selectedObjectives,
-                componentState.selectedConstraints, componentState.selectedSysincludes, variableIndices,
+                componentState.selectedConstraints, componentState.selectedSysincludes, componentState.variableIndices,
                 logscaleX, logscaleY, stackedPlot, variableFun, variableIndicesFun, abs2prom, prom2abs);
         }
         else {

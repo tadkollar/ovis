@@ -39,12 +39,12 @@ function openNav(logscaleXValue, logscaleYValue, stackedPlotValue, designVariabl
     panelOptions.stackedPlotFunction = stackedPlotFunction;
     panelOptions.variablesFunction = variablesFunction;
     panelOptions.variableIndicesFunction = variableIndicesFunction;
-    
+
     //Set the check boxes
     panelOptions.logscaleXCheckbox.checked = logscaleXValue;
     panelOptions.logscaleYCheckbox.checked = logscaleYValue;
     panelOptions.stackedPlotCheckbox.checked = stackedPlotValue;
-    
+
     //Set variables
     panelOptions.designVariables = designVariables;
     panelOptions.objectives = objectives;
@@ -185,8 +185,8 @@ function indicesChanged(name, val) {
  */
 function addVariableIndicesGroup(name, curIndices) {
     var content = "<div id='div_" + name + "'><br/>\r\n<div class='form-group' style='padding-right: 25px'>\r\n" +
-        "<label class='control-label'> " + name + " Indices <button type='button' class='btn btn-sm btn-primary' data-toggle='modal' data-target='#selectIndicesModal'><span class='glyphicon glyphicon-info-sign'></span></button></label>\r\n" +
-        "<input type='text' class='form-control' value=\"" + curIndices + "\" id='var_" + name + "' onchange='indicesChanged(\"" + name + "\", document.getElementById(\"" + 'var_' + name + "\").value)'>\r\n" +
+        "<div class='sidebarBodyPlots reduceWidth'> " + name + " Indices <button type='button' class='btn btn-sm btn-primary' data-toggle='modal' data-target='#selectIndicesModal'><span class='glyphicon glyphicon-info-sign'></span></button></div>\r\n" +
+        "<input type='text' class='form-control varname reducedWidth' value=\"" + curIndices + "\" id='var_" + name + "' onchange='indicesChanged(\"" + name + "\", document.getElementById(\"" + 'var_' + name + "\").value)'>\r\n" +
         "</div></div>\r\n";
 
     var variableIndicesDiv = document.getElementById('variableIndices');
@@ -201,7 +201,9 @@ function addVariableIndicesGroup(name, curIndices) {
  */
 function removeVariableIndicesGroup(name) {
     var element = document.getElementById("div_" + name);
-    element.outerHTML = "";
+    if (element != null) {
+        element.outerHTML = "";
+    }
 }
 
 /**
@@ -249,3 +251,6 @@ $('#constraintsSelection').on('changed.bs.select', function (e, clickedIndex, ne
 $('#othersSelection').on('changed.bs.select', function (e, clickedIndex, newValue, oldValue) {
     variablesSelected(panelOptions.others[clickedIndex], newValue, 'sysinclude');
 });
+
+//Make sidebar resizeable
+$('.sidebar').setResizable(true);

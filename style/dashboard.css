@@ -2,7 +2,7 @@
     display: grid;
     width: 99.8vw;
     height:99.8vh;
-    grid-template: 100% / 55px 230px 1fr;
+    grid-template: 100% / 55px 260px 1fr;
 }
 
 #leftbar {
@@ -12,6 +12,7 @@
 
 #sidebar {
     background-color: #525153;
+    overflow: scroll;
 }
 
 .sidenav {
