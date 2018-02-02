@@ -396,7 +396,7 @@ var createPlot = function (container, componentState) {
         for (var i = 0; i < curData[index].length; ++i) {
             for (var j = 0; j < curData[index][i]['values'].length; ++j) {
                 if (curData[index][i]['values'][0].hasOwnProperty('length')) {
-                    for (var k = 0; k < curData[index][i]['values'][0].length; ++k) {
+                    for (var k = 0; k < curData[index][i]['values'][0].length; ++k){
                         if (typeFunc(curData[index][i]) && !gotFirstProp) {
                             gotFirstProp = true;
                             finalData.push({
@@ -408,9 +408,9 @@ var createPlot = function (container, componentState) {
                         else {
                             if (typeFunc(curData[index][i])) {
                                 var k_len = curData[index][i]['values'][0].length;
-                                finalData[k_len * j + k].x.push(curData[index][i]['counter']);
-                                finalData[k_len * j + k].y.push(curData[index][i]['values'][j][k]);
-                                finalData[k_len * j + k].name = prependName + '[' + j + '][' + k + ']';
+                                finalData[k_len * j].x.push(curData[index][i]['counter']);
+                                finalData[k_len * j].y.push(curData[index][i]['values'][j][k]);
+                                finalData[k_len * j].name = prependName + '[' + j + '][' + k + ']';
                             }
                         }
                     }
