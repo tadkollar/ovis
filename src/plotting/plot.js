@@ -397,23 +397,25 @@ var createPlot = function (container, componentState) {
             for (var j = 0; j < curData[index][i]['values'].length; ++j) {
                 if (curData[index][i]['values'][0].hasOwnProperty('length') && curData[index][i]['values'][0][0].length) {
                     for (var k = 0; k < curData[index][i]['values'][0].length; ++k) {
-                        if (typeFunc(curData[index][i]) && !gotFirstProp) {
-                            gotFirstProp = true;
-                            finalData.push({
-                                x: [curData[index][i]['counter']],
-                                y: [curData[index][i]['values'][j][k]],
-                                name: prependName + '[0][0]'
-                            });
-                        }
-                        else {
-                            if (typeFunc(curData[index][i])) {
-                                var k_len = curData[index][i]['values'][0].length;
-                                finalData[k_len * j].x.push(curData[index][i]['counter']);
-                                finalData[k_len * j].y.push(curData[index][i]['values'][j][k]);
-                                finalData[k_len * j].name = prependName + '[' + j + '][' + k + ']';
+                        for (var l = 0; l < curData[index][i]['values'][0][0].length; ++l) {
+                            if (!gotFirstProp && typeFunc(curData[index][i])) {
+                                finalData.push({
+                                    x: [curData[index][i]['counter']],
+                                    y: [curData[index][i]['values'][j][k][l]],
+                                    name: prependName + '[' + k + ']'  + '[' + l + ']'
+                                });
+                            }
+                            else {
+                                if (typeFunc(curData[index][i])) {
+                                    var l_len = curData[index][i]['values'][0][0].length;
+                                    finalData[k + (l_len * l)].x.push(curData[index][i]['counter']);
+                                    finalData[k + (l_len * l)].y.push(curData[index][i]['values'][j][k][l]);
+                                    finalData[k + (l_len * l)].name = prependName + '[' + k + '][' + l + ']';
+                                }
                             }
                         }
                     }
+                    gotFirstProp = true;
                 }
                 else if (curData[index][i]['values'][0].hasOwnProperty('length')) {
                     for (var k = 0; k < curData[index][i]['values'][0].length; ++k) {

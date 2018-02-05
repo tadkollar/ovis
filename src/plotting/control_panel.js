@@ -186,7 +186,7 @@ function indicesChanged(name, val) {
 function addVariableIndicesGroup(name, curIndices) {
     var content = "<div id='div_" + name + "'><br/>\r\n<div class='form-group' style='padding-right: 25px'>\r\n" +
         "<div class='sidebarBodyPlots reduceWidth'> " + name + " Indices <button type='button' class='btn btn-sm btn-primary' data-toggle='modal' data-target='#selectIndicesModal'><span class='glyphicon glyphicon-info-sign'></span></button></div>\r\n" +
-        "<input type='text' class='form-control varname reducedWidth' value=\"" + curIndices + "\" id='var_" + name + "' onchange='indicesChanged(\"" + name + "\", document.getElementById(\"" + 'var_' + name + "\").value)'>\r\n" +
+        "<input type='text' class='form-control varname reducedWidth' style='width: 60%' value=\"" + curIndices + "\" id='var_" + name + "' onchange='indicesChanged(\"" + name + "\", document.getElementById(\"" + 'var_' + name + "\").value)'>\r\n" +
         "</div></div>\r\n";
 
     var variableIndicesDiv = document.getElementById('variableIndices');
@@ -251,6 +251,3 @@ $('#constraintsSelection').on('changed.bs.select', function (e, clickedIndex, ne
 $('#othersSelection').on('changed.bs.select', function (e, clickedIndex, newValue, oldValue) {
     variablesSelected(panelOptions.others[clickedIndex], newValue, 'sysinclude');
 });
-
-//Make sidebar resizeable
-$('.sidebar').setResizable(true);

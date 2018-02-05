@@ -167,3 +167,6 @@ venv.bak/
 release-builds
 OpenMDAOVis-win32-x64
 OpenMDAOVis-linux-x64
+OVis-win32-x64
+OVis-linux-x64
+OVis-mas-x64
