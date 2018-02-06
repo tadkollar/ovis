@@ -114,6 +114,27 @@ class SqliteData(BaseData):
         """
         return self._get_driver_iterations()
 
+    def is_new_data(self, case_id, count):
+        """ is_new_data method
+
+        Determines if there's new data based on the count
+
+        Args:
+            case_id (string): the case to use for querying
+            count (int): the current max counter value
+        Returns:
+            True if new data is available, False otherwise
+        """
+        self.cursor = self.connection.cursor()
+        self.cursor.execute(
+            "SELECT counter FROM driver_iterations WHERE counter > "\
+            + str(count))
+        rows = self.cursor.fetchall()
+
+        if len(rows) > 0:
+            return True
+        return False
+
     def is_valid_sqlite3_db(self, filename):
         """
         Return true if the given filename contains a valid SQLite3

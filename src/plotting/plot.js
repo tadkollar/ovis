@@ -13,6 +13,7 @@ var createPlot = function (container, componentState) {
 
     //Indicates if we need to update/save the config to the server
     var needSave = false;
+    var updated_var = true;
 
     //Set the original plotly width/height
     if (container.width != null) {
@@ -402,7 +403,7 @@ var createPlot = function (container, componentState) {
                                 finalData.push({
                                     x: [curData[index][i]['counter']],
                                     y: [curData[index][i]['values'][j][k][l]],
-                                    name: prependName + '[' + k + ']'  + '[' + l + ']'
+                                    name: prependName + '[' + k + ']' + '[' + l + ']'
                                 });
                             }
                             else {
@@ -748,13 +749,18 @@ var createPlot = function (container, componentState) {
                 'value': maxCount
             }];
 
-            //Send the request to see if data needs to be updated
-            http.get('case/' + case_id + '/driver_iterations/' + variable, function (result) {
-                result = JSON.parse(result);
-                if (result.length > 0) { //if data needs to be updated, update
-                    setData(result, variable);
-                }
-            }, null, headers);
+            if (updated_var) {
+                updated_var = false;
+
+                //Send the request to see if data needs to be updated
+                http.get('case/' + case_id + '/driver_iterations/' + variable, function (result) {
+                    updated_var = true;
+                    result = JSON.parse(result);
+                    if (result.length > 0) { //if data needs to be updated, update
+                        setData(result, variable);
+                    }
+                }, null, headers);
+            }
         }
     }
 

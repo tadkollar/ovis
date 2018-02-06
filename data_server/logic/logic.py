@@ -501,11 +501,9 @@ def get_driver_iteration_based_on_count(case_id, variable, count):
     Returns:
         JSON string of '[]' if no update necessary or the data
     """
-    s_data = get_driver_iteration_data(case_id, variable)
-    data = json.loads(s_data)
-    for d in data:
-        if int(d['counter']) > int(count):
-            return s_data
+    if data.is_new_data(case_id, count):
+        s_data = get_driver_iteration_data(case_id, variable)
+        return s_data
 
     return "[]"
 
