@@ -17,6 +17,7 @@ const ipcMain = require('electron').ipcMain
 
 const path = require('path')
 const url = require('url')
+var py = null;
 
 let filename = 'No File Selected'
 
@@ -77,14 +78,14 @@ function findFile() {
     console.log("Sending 'connect' with: " + fileNames[0])
 
     request.post('http://127.0.0.1:18403/connect',
-                 {json: {'location': fileNames[0]}},
-                 function(error, response, body) {
-                   if(error) {
-                     console.log("ERROR: " + error.toString())
-                     return;
-                   }
-                   console.log("Connected to DB");
-                 });
+      { json: { 'location': fileNames[0] } },
+      function (error, response, body) {
+        if (error) {
+          console.log("ERROR: " + error.toString())
+          return;
+        }
+        console.log("Connected to DB");
+      });
 
     filename = fileNames[0]
     mainWindow.webContents.send('connect', fileNames)
@@ -145,7 +146,7 @@ ipcMain.on('getFilename', (event, arg) => {
 
 function startServer() {
   let resourceLocation = process.resourcesPath;
-  let py = spawn('python', [resourceLocation + '/app/main.py'])
+  py = spawn('python', [resourceLocation + '/app/main.py'])
   py.stdout.on('data', function (data) {
     console.log("STDOUT: " + data);
   })
@@ -153,6 +154,11 @@ function startServer() {
     console.log("ERROR: " + data)
   })
 }
+
+electron.app.once('window-all-closed', electron.app.quit);
+electron.app.once('before-quit', () => {
+  mainWindow.removeAllListeners('close');
+})
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
