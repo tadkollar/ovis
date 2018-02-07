@@ -54,6 +54,10 @@ app.on('ready', createWindow)
 app.on('window-all-closed', function () {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
+  py.stdin.pause();
+  py.stderr.pause();
+  py.stdout.pause();
+  py.kill();
   if (process.platform !== 'darwin') {
     app.quit()
   }
@@ -238,11 +242,6 @@ function startServer() {
     console.log("ERROR: " + data)
   })
 }
-
-electron.app.once('window-all-closed', electron.app.quit);
-electron.app.once('before-quit', () => {
-  mainWindow.removeAllListeners('close');
-})
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
