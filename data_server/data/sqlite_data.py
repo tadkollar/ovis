@@ -127,7 +127,7 @@ class SqliteData(BaseData):
         """
         self.cursor = self.connection.cursor()
         self.cursor.execute(
-            "SELECT counter FROM driver_iterations WHERE counter > "\
+            "SELECT counter FROM driver_iterations WHERE counter > "
             + str(count))
         rows = self.cursor.fetchall()
 
