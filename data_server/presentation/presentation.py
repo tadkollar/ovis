@@ -5,10 +5,10 @@ HTTP requests based on the URLs given. These classes ought not be used
 outside of main.py. In the 3-tier architecture being used, this is the top
 (presentation) layer.
 """
-import tornado.web as web
 import json
+import tornado.web as web
 import data_server.logic.logic as logic
-import data_server.shared.collections as collections
+import data_server.shared.collection_names as collections
 
 _TOKEN = 'squavy'
 
@@ -29,6 +29,21 @@ class IndexHandler(web.RequestHandler):
                         cases=cases, token=token)
         else:
             self.render("../../public/login.html")
+
+
+class ConnectHandler(web.RequestHandler):
+    """ ConnectHandler class
+
+    Contains logic to tell Logic/Data layers to connect to the given
+    DB.
+    """
+
+    def post(self):
+        db_location = json.loads(self.request.body)['location']
+        if logic.connect(db_location):
+            self.write({"Success": True})
+        else:
+            self.write({"Success": False})
 
 
 class LogoutHandler(web.RequestHandler):

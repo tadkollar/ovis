@@ -1,0 +1,133 @@
+.wrapper {
+    display: grid;
+    width: 99.8vw;
+    height:99.8vh;
+    grid-template: 100% / 55px 260px 1fr;
+}
+
+#leftbar {
+    background-color: rgb(32, 32, 32);
+    text-align: center;
+}
+
+#sidebar {
+    background-color: #525153;
+    overflow: scroll;
+}
+
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    background-color: rgb(31, 31, 31);
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.sidebarHeader {
+    height: 60px;
+    text-align: left;
+    padding-left: 20px;
+}
+
+.sidebarHeader h1 {
+    font-size: 25px;
+    color: rgb(224, 216, 216);
+    padding-right: 20px;
+    word-wrap: break-word;
+}
+
+.sidebarBody {
+    font-size: 20px;
+    color: rgb(201, 194, 194);
+    text-align: center;
+}
+
+.sidebarBodyPlots {
+    font-size: 20px;
+    color: rgb(201, 194, 194);
+    text-align: left;
+    padding-bottom: 30px;
+}
+
+.btn-group.bootstrap-select.show-tick.varname {
+    width: 60% !important;
+}
+
+.sidebarTableText {
+    font-size: 20px;
+    color: rgb(201, 194, 194);
+    text-align: left;
+}
+
+.sidebarBody h3 {
+    text-align: left;
+}
+
+.sidebarBodyArea:hover {
+    /* background-color: rgb(90, 90, 90); */
+}
+
+.varname {
+    font-size: 25px;
+    color: #d6d6d6;
+    width: 350px;
+    padding-left: 5%;
+}
+
+.sidenav h1 {
+    text-align: center;
+    text-decoration: none;
+    color: #f0eeee;
+    display: block;
+}
+
+.inline {
+    display: inline;
+}
+
+.checkbox {
+    height: 18px;
+    width: 18px;
+}
+
+#variables.variableslist {
+    height: 150px;
+    width: 200px;
+    margin-left: 32px;
+}
+
+#variables.variableslist.option {
+    margin-left: 5px;
+    font-size: 15px;
+    color: #a8a8a8;
+}
+
+.sidenav .closebtn {
+    font-size: 36px;
+    margin-right: 10px;
+}
+
+.sidenav .closebtn:hover {
+    color: #747474
+}
+
+.input {
+    padding-right: 20px;
+}
+
+.btn:hover {
+    transform:scale(1.05, 1.05);
+    transform-origin: center;
+    background-color: #a8a8a8;
+}
+
+.myButton:hover {
+    transform: scale(1.05, 1.05);
+    transform-origin: center;
+    background-color: #a8a8a8;
+}

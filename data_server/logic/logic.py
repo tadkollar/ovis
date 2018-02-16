@@ -15,8 +15,31 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dateutil import tz
 from datetime import datetime
-import data_server.data.data as data
-import data_server.shared.collections as collections
+from six import PY2, PY3
+import data_server.shared.collection_names as collections
+import data_server.shared.data_type as db_type
+from data_server.data.mongo_data import MongoData
+from data_server.data.sqlite_data import SqliteData
+
+is_sqlite = db_type.DB_TYPE == 'SQLite'
+
+if not is_sqlite:
+    data = MongoData()
+    data.connect()
+else:
+    data = SqliteData()
+
+def connect(location):
+    """ connect method
+
+    Attempts to create a connection with the given DB at the given
+    location for SQLite files
+
+    Returns:
+        bool: True if connection established, False otherwise
+    """
+    if is_sqlite:
+        return data.connect(location)
 
 
 def get_all_cases(token):
@@ -159,10 +182,11 @@ def metadata_create(body, case_id, token):
             'abs2prom': n_abs2prom,
             'prom2abs': n_prom2abs
         }
-        return data.generic_create(collections.METADATA, n_body, case_id, token,
-                            False)
+        return data.generic_create(collections.METADATA, n_body, case_id,
+                                   token, False)
     else:
-        return data.generic_create(collections.METADATA, body, case_id, token, False)
+        return data.generic_create(collections.METADATA, body, case_id, token,
+                                   False)
 
 
 def metadata_get(case_id, token):
@@ -178,7 +202,7 @@ def metadata_get(case_id, token):
     n_prom2abs = {'input': {}, 'output': {}}
 
     res = json.loads(data.generic_get(collections.METADATA, case_id, token,
-                     False))
+                                      False))
 
     if res is not None and 'abs2prom' in res:
         for io in ['input', 'output']:
@@ -477,11 +501,9 @@ def get_driver_iteration_based_on_count(case_id, variable, count):
     Returns:
         JSON string of '[]' if no update necessary or the data
     """
-    s_data = get_driver_iteration_data(case_id, variable)
-    data = json.loads(s_data)
-    for d in data:
-        if int(d['counter']) > int(count):
-            return s_data
+    if data.is_new_data(case_id, count):
+        s_data = get_driver_iteration_data(case_id, variable)
+        return s_data
 
     return "[]"
 
