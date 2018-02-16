@@ -1,21 +1,17 @@
 {
-  "name": "OpenMDAOVis",
+  "name": "OOVis",
   "version": "1.0.0",
   "description": "A visualization tool for OpenMDAO",
   "main": "main.js",
-  "scripts": {
-    "start": "electron .",
-    "rebuild": "electron-rebuild -f -w sqlite3"
-  },
   "repository": "https://github.com/OpenMDAO/zune",
   "keywords": [
     "OpenMDAO",
     "Visualization"
   ],
-  "author": "GitHub",
-  "license": "CC0-1.0",
+  "author": "NASA Glenn Research Center",
   "devDependencies": {
     "electron": "~1.7.8",
+    "electron-builder": "^20.0.5",
     "electron-packager": "^10.1.2",
     "electron-rebuild": "^1.6.0"
   },
@@ -25,5 +21,17 @@
     "request": "^2.83.0",
     "sqlite3": "^3.1.13",
     "wine": "^0.9.8"
+  },
+  "build": {
+    "appId": "nasa.grc.ovis",
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    }
+  },
+  "scripts": {
+    "postinstall": "install-app-deps",
+    "start": "electron ./app --enable-logging",
+    "dev": "NODE_ENV='development' npm run start",
+    "dist": "build -mwl --x64 --ia32"
   }
 }
