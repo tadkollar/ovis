@@ -1,5 +1,5 @@
 {
-  "name": "OOVis",
+  "name": "OVis",
   "version": "1.0.0",
   "description": "A visualization tool for OpenMDAO",
   "main": "main.js",
@@ -16,6 +16,7 @@
     "electron-rebuild": "^1.6.0"
   },
   "dependencies": {
+    "electron-log": "^2.2.14",
     "pickle": "^0.2.0",
     "promise": "^8.0.1",
     "request": "^2.83.0",
@@ -26,7 +27,23 @@
     "appId": "nasa.grc.ovis",
     "mac": {
       "category": "public.app-category.developer-tools"
-    }
+    },
+    "extraResources": [
+      "data_server",
+      "fonts",
+      "images",
+      "libs",
+      "src",
+      "style",
+      "main.py"
+    ]
+  },
+  "config":{
+    "files": [
+      "dist/ZuneServerReqs-1.0-py2.py3-none-any.whl",
+      "./install_server_requirements.cmd",
+      "./install_server_requirements.sh"
+    ]
   },
   "scripts": {
     "postinstall": "install-app-deps",

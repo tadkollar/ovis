@@ -4,7 +4,7 @@ const electron = require('electron')
 const spawn = require('child_process').spawn
 const request = require('request')
 const querystring = require('querystring')
-const {Console} = require('console')
+const logger = require('electron-log');
 const fs = require('fs')
 
 // Module to control application life.
@@ -19,10 +19,6 @@ const ipcMain = require('electron').ipcMain
 
 const path = require('path')
 const url = require('url')
-
-const output = fs.createWriteStream('stdout.log');
-const errorOutput = fs.createWriteStream('stderr.log');
-const logger = new Console(output, errorOutput);
 
 let filename = 'No File Selected'
 var py = null;
@@ -84,20 +80,20 @@ app.on('will-quit', function() {
 function findFile() {
   dialog.showOpenDialog((fileNames) => {
     if (fileNames === undefined) {
-      logger.log("No file selected");
+      logger.info("No file selected");
       return;
     }
 
-    logger.log("Sending 'connect' with: " + fileNames[0])
+    logger.info("Sending 'connect' with: " + fileNames[0])
 
     request.post('http://127.0.0.1:18403/connect',
       { json: { 'location': fileNames[0] } },
       function (error, response, body) {
         if (error) {
-          logger.log("ERROR: " + error.toString())
+          logger.error("ERROR: " + error.toString())
           return;
         }
-        logger.log("Connected to DB");
+        logger.info("Connected to DB");
       });
 
     filename = fileNames[0]
@@ -232,7 +228,7 @@ if (process.platform === 'darwin') {
 ipcMain.on('openFile', (event, arg) => {
   mainWindow.webContents.send('test', ['blah'])
   findFile();
-  logger.log('Opening file')
+  logger.info('Opening file')
   mainWindow.webContents.send('test')
 });
 
@@ -243,12 +239,12 @@ ipcMain.on('getFilename', (event, arg) => {
 
 function startServer() {
   let resourceLocation = process.resourcesPath;
-  py = spawn('python', [resourceLocation + '/app/main.py'])
+  py = spawn('python', [resourceLocation + '/main.py'])
   py.stdout.on('data', function (data) {
-    logger.log("STDOUT: " + data);
+    logger.info("STDOUT: " + data);
   })
   py.stderr.on('data', function (data) {
-    logger.log("ERROR: " + data)
+    logger.error("ERROR: " + data)
   })
 }
 
