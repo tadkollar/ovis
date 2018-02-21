@@ -2,6 +2,10 @@
 python setup.py bdist_wheel
 
 # Create the build dirs
+rm -rf dist/mac-x64
+rm -rf dist/win-x64
+rm -rf dist/linux-x64
+rm -rf dist/Release
 mkdir dist/mac-x64
 mkdir dist/win-x64
 mkdir dist/linux-x64
