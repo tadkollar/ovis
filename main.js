@@ -8,8 +8,7 @@ const logger = require('electron-log');
 const fs = require('fs')
 
 // Module to control application life.
-const app = electron.app
-const Menu = electron.Menu;
+const { app, Menu } = require('electron')
 
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
@@ -25,32 +24,13 @@ var py = null;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
+let mainWindow = null
 
-function createWindow() {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({ width: 800, height: 600 })
-
-  // and load the index.html of the app.
-  mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'need_load.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
-
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function () {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null
-  })
-}
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-
+const mainWindowUrl = url.format({
+  pathname: path.join(__dirname, "need_load.html"),
+  protocol: "file:",
+  slashes: true
+});
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -70,7 +50,7 @@ app.on('activate', function () {
   }
 })
 
-app.on('will-quit', function() {
+app.on('will-quit', function () {
   py.stdin.pause();
   py.stderr.pause();
   py.stdout.pause();
@@ -106,125 +86,6 @@ function findFile() {
   })
 }
 
-
-
-// const template = [
-//   {
-//     label: 'File',
-//     submenu: [
-//       {
-//         role: 'open',
-//         label: 'Open',
-//         accelerator: 'CmdOrCtrl+o',
-//         click() {
-//           findFile();
-//         }
-//       }
-//     ]
-//   },
-//   {
-//     label: 'View',
-//     submenu: [
-//       {
-//         accelerator: 'CmdOrCtrl+Shift+i',
-//         role: 'toggle dev tools',
-//         label: 'Toggle Developer Tools',
-//         click() { mainWindow.webContents.openDevTools(); }
-//       },
-//       {
-//         accelerator: 'CmdOrCtrl+r',
-//         role: 'refresh',
-//         label: 'Refresh Page',
-//         click() { mainWindow.webContents.reloadIgnoringCache(); }
-//       }
-//     ]
-//   }
-// ]
-const template = [
-  {
-    label: 'Edit',
-    submenu: [
-      { role: 'undo' },
-      { role: 'redo' },
-      { type: 'separator' },
-      { role: 'cut' },
-      { role: 'copy' },
-      { role: 'paste' },
-      { role: 'pasteandmatchstyle' },
-      { role: 'delete' },
-      { role: 'selectall' }
-    ]
-  },
-  {
-    label: 'View',
-    submenu: [
-      { role: 'reload' },
-      { role: 'forcereload' },
-      { role: 'toggledevtools' },
-      { type: 'separator' },
-      { role: 'resetzoom' },
-      { role: 'zoomin' },
-      { role: 'zoomout' },
-      { type: 'separator' },
-      { role: 'togglefullscreen' }
-    ]
-  },
-  {
-    role: 'window',
-    submenu: [
-      { role: 'minimize' },
-      { role: 'close' }
-    ]
-  },
-  {
-    role: 'help',
-    submenu: [
-      {
-        label: 'Learn More',
-        click() { require('electron').shell.openExternal('https://electronjs.org') }
-      }
-    ]
-  }
-]
-
-if (process.platform === 'darwin') {
-  template.unshift({
-    label: app.getName(),
-    submenu: [
-      // { role: 'about' },
-      { type: 'separator' },
-      { role: 'services', submenu: [] },
-      { type: 'separator' },
-      { role: 'hide' },
-      { role: 'hideothers' },
-      { role: 'unhide' },
-      { type: 'separator' },
-      { role: 'quit' }
-    ]
-  })
-
-  // Edit menu
-  template[1].submenu.push(
-    { type: 'separator' },
-    {
-      label: 'Speech',
-      submenu: [
-        { role: 'startspeaking' },
-        { role: 'stopspeaking' }
-      ]
-    }
-  )
-
-  // Window menu
-  template[3].submenu = [
-    { role: 'close' },
-    { role: 'minimize' },
-    { role: 'zoom' },
-    { type: 'separator' },
-    { role: 'front' }
-  ]
-}
-
 ipcMain.on('openFile', (event, arg) => {
   mainWindow.webContents.send('test', ['blah'])
   findFile();
@@ -248,12 +109,142 @@ function startServer() {
   })
 }
 
-const menu = Menu.buildFromTemplate(template);
-Menu.setApplicationMenu(menu);
+const template = [
+  {
+    label: 'File',
+    submenu: [
+      {
+        role: 'open',
+        label: 'Open',
+        accelerator: 'CmdOrCtrl+o',
+        click() {
+          findFile();
+        }
+      },
+      {
+        role: 'quit',
+        label: 'Quit',
+        accelerator: 'CmdOrCtrl+q',
+        click() {
+          const remote = require('electron').remote
+          let w = remote.getCurrentWindow()
+          w.close()
+        }
+      }
+    ]
+  },
+  {
+    label: 'View',
+    submenu: [
+      {
+        accelerator: 'CmdOrCtrl+Shift+i',
+        role: 'toggle dev tools',
+        label: 'Toggle Developer Tools',
+        click() { mainWindow.webContents.openDevTools(); }
+      },
+      {
+        accelerator: 'CmdOrCtrl+r',
+        role: 'refresh',
+        label: 'Refresh Page',
+        click() { mainWindow.webContents.reloadIgnoringCache(); }
+      }
+    ]
+  }
+]
+// const template = [
+//   {
+//     label: 'Edit',
+//     submenu: [
+//       {role: 'undo'},
+//       {role: 'redo'},
+//       {type: 'separator'},
+//       {role: 'cut'},
+//       {role: 'copy'},
+//       {role: 'paste'},
+//       {role: 'pasteandmatchstyle'},
+//       {role: 'delete'},
+//       {role: 'selectall'}
+//     ]
+//   },
+//   {
+//     label: 'View',
+//     submenu: [
+//       {role: 'reload'},
+//       {role: 'forcereload'},
+//       {role: 'toggledevtools'},
+//       {type: 'separator'},
+//       {role: 'resetzoom'},
+//       {role: 'zoomin'},
+//       {role: 'zoomout'},
+//       {type: 'separator'},
+//       {role: 'togglefullscreen'}
+//     ]
+//   },
+//   {
+//     role: 'window',
+//     submenu: [
+//       {role: 'minimize'},
+//       {role: 'close'}
+//     ]
+//   },
+//   {
+//     role: 'help',
+//     submenu: [
+//       {
+//         label: 'Learn More',
+//         click () { require('electron').shell.openExternal('https://electronjs.org') }
+//       }
+//     ]
+//   }
+// ]
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-app.on('ready', createWindow, function() {
-})
+// if (process.platform === 'darwin') {
+//   template.unshift({
+//     label: app.getName(),
+//     submenu: [
+//       {role: 'about'},
+//       {type: 'separator'},
+//       {role: 'services', submenu: []},
+//       {type: 'separator'},
+//       {role: 'hide'},
+//       {role: 'hideothers'},
+//       {role: 'unhide'},
+//       {type: 'separator'},
+//       {role: 'quit'}
+//     ]
+//   })
+
+//   // Edit menu
+//   template[1].submenu.push(
+//     {type: 'separator'},
+//     {
+//       label: 'Speech',
+//       submenu: [
+//         {role: 'startspeaking'},
+//         {role: 'stopspeaking'}
+//       ]
+//     }
+//   )
+
+//   // Window menu
+//   template[3].submenu = [
+//     {role: 'close'},
+//     {role: 'minimize'},
+//     {role: 'zoom'},
+//     {type: 'separator'},
+//     {role: 'front'}
+//   ]
+// }
+
+const onAppReady = () => {
+  let menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+
+  mainWindow = new BrowserWindow({});
+  mainWindow.loadURL(mainWindowUrl);
+};
+
+app.on("ready", onAppReady);
+
 //Start the server
 startServer()

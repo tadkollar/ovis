@@ -1,3 +1,6 @@
+# Delete dist to start from scratch
+rm -rf dist
+
 # Build the python wheel
 python setup.py bdist_wheel
 
