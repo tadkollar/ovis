@@ -23,11 +23,13 @@ from data_server.data.sqlite_data import SqliteData
 
 is_sqlite = db_type.DB_TYPE == 'SQLite'
 
+data = None
 if not is_sqlite:
     data = MongoData()
     data.connect()
 else:
     data = SqliteData()
+
 
 def connect(location):
     """ connect method
@@ -38,8 +40,11 @@ def connect(location):
     Returns:
         bool: True if connection established, False otherwise
     """
-    if is_sqlite:
+    if db_type.DB_TYPE == 'SQLite':
         return data.connect(location)
+    else:
+        data = MongoData()
+        return data.connect()
 
 
 def get_all_cases(token):

@@ -142,7 +142,7 @@ class MongoData(BaseData):
         Returns:
             Integer case_id. -1 if no case_id could be created.
         """
-        if not user_exists(token=token) or not user_active(token):
+        if not self.user_exists(token=token) or not self.user_active(token):
             return -1
 
         case_id = self._get_case_id()
@@ -259,7 +259,7 @@ class MongoData(BaseData):
         Args:
             token (string): the token associated with the user
         """
-        if not user_exists(token=token):
+        if not self.user_exists(token=token):
             return {}
 
         users_coll = self._MDB[collections.USERS]
@@ -307,10 +307,10 @@ class MongoData(BaseData):
         Args:
             token (string): the token to be deleted
         """
-        if token_exists(token):
-            all_cases = json.loads(get_all_cases(token))
+        if self.token_exists(token):
+            all_cases = json.loads(self.get_all_cases(token))
             for c in all_cases:
-                delete_case_with_id(c['case_id'], token)
+                self.delete_case_with_id(c['case_id'], token)
 
             users_coll = self._MDB[collections.USERS]
             users_coll.delete_many({'token': token})
@@ -361,6 +361,24 @@ class MongoData(BaseData):
         """
         collection = self._MDB[collections.USERS]
         collection.update_one({'token': token}, {'$set': {'active': True}})
+
+    def is_new_data(self, case_id, count):
+        """ is_new_data method
+
+        Determines if there's new data based on the count
+
+        Args:
+            case_id (string): the case to use for querying
+            count (int): the current max counter value
+        Returns:
+            True if new data is available, False otherwise
+        """
+        collection = self._MDB[collections.DRIVER_ITERATIONS]
+        res = collection.find({'$and': [{'case_id': int(case_id)}, {'counter':
+                              {'$gt': int(count)}}]})
+        for r in res:
+            return True
+        return False
 
     # region private
 
@@ -490,12 +508,12 @@ class MongoData(BaseData):
         Returns:
             True if successfull, False otherwise
         """
-        if not user_exists(token=token):
+        if not self.user_exists(token=token):
             print("User does not exist, not storing data")
             return False
 
         if update:
-            if _get(self._MDB[collections.CASES], case_id, token) == '[]':
+            if self._get(self._MDB[collections.CASES], case_id, token) == '[]':
                 return False
             if 'iteration_coordinate' in body:
                 collection.delete_many({'$and': [{'case_id': int(case_id)},

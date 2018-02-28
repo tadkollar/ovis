@@ -252,21 +252,24 @@ class SqliteData(BaseData):
                 for name in data['objectives'].dtype.names:
                     objectives_array.append({
                         'name': name,
-                        'values': self.convert_to_list(data['objectives'][name])
+                        'values': self.convert_to_list(
+                            data['objectives'][name])
                     })
 
             if data['constraints']:
                 for name in data['constraints'].dtype.names:
                     constraints_array.append({
                         'name': name,
-                        'values': self.convert_to_list(data['constraints'][name])
+                        'values': self.convert_to_list(
+                            data['constraints'][name])
                     })
 
             if data['sysincludes']:
                 for name in data['sysincludes'].dtype.names:
                     sysincludes_array.append({
                         'name': name,
-                        'values': self.convert_to_list(data['sysincludes'][name])
+                        'values': self.convert_to_list(
+                            data['sysincludes'][name])
                     })
 
             final_ret.append({

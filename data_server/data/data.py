@@ -258,3 +258,16 @@ class BaseData(object):
         Activates the account associated with a given token
         """
         raise NotImplementedError()
+
+    def is_new_data(self, case_id, count):
+        """ is_new_data method
+
+        Determines if there's new data based on the count
+
+        Args:
+            case_id (string): the case to use for querying
+            count (int): the current max counter value
+        Returns:
+            True if new data is available, False otherwise
+        """
+        raise NotImplementedError()

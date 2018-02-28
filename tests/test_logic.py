@@ -1,3 +1,4 @@
+
 import unittest
 import sys
 import os.path
@@ -5,11 +6,14 @@ import json
 import smtplib
 from bson.json_util import dumps
 from minimock import Mock
+
 sys.path.append(os.path.abspath(os.path.join(
     os.path.dirname(__file__), os.path.pardir)))
+import data_server.shared.data_type as db_type
+db_type.DB_TYPE = 'MongoDB'
+
 from data_server.logic import logic
-from data_server.shared import collections
-from data_server.data import data
+from data_server.shared import collection_names as collections
 
 token = logic.create_token('Unit Test', 'UnitTestLogic4@fake.com')
 logic.activate_account(token)
@@ -166,36 +170,40 @@ class TestLogic(unittest.TestCase):
     def test_generic_create_bad_token(self):
         new_case = logic.create_case({}, token)
         result = logic.generic_create(collections.DRIVER_ITERATIONS, {
-                                      'test': 1}, new_case['case_id'], 'bad token', 'False')
+                                      'test': 1}, new_case['case_id'],
+                                      'bad token', 'False')
         self.assertFalse(result)
 
     def test_generic_get(self):
         new_case = logic.create_case({}, token)
         logic.generic_create(collections.DRIVER_ITERATIONS, {
-                             'test': True}, new_case['case_id'], token, 'False')
+                             'test': True}, new_case['case_id'], token,
+                             'False')
         driv_iter = json.loads(logic.generic_get(
             collections.DRIVER_ITERATIONS, new_case['case_id'], token, False))
         self.assertTrue(driv_iter['test'])
 
     def test_generic_get_bad_token(self):
         new_case = logic.create_case({}, token)
-        logic.generic_create(collections.DRIVER_ITERATIONS, {
-                             'test': 1}, new_case['case_id'], 'bad token', 'False')
-        driv_iter = json.loads(logic.generic_get(
-            collections.DRIVER_ITERATIONS, new_case['case_id'], 'bad token', False))
+        logic.generic_create(collections.DRIVER_ITERATIONS, {'test': 1},
+                             new_case['case_id'], 'bad token', 'False')
+        driv_iter = json.loads(logic.generic_get(collections.DRIVER_ITERATIONS,
+                               new_case['case_id'], 'bad token', False))
         self.assertEqual(driv_iter, None)
 
     def test_generic_delete(self):
         new_case = logic.create_case({}, token)
         logic.generic_create(collections.DRIVER_ITERATIONS, {
-                             'test': True}, new_case['case_id'], token, 'False')
+                             'test': True}, new_case['case_id'], token,
+                             'False')
         self.assertTrue(logic.generic_delete(
             collections.DRIVER_ITERATIONS, new_case['case_id'], token))
 
     def test_generic_delete2(self):
         new_case = logic.create_case({}, token)
         logic.generic_create(collections.DRIVER_ITERATIONS, {
-                             'test': True}, new_case['case_id'], token, 'False')
+                             'test': True}, new_case['case_id'], token,
+                             'False')
         logic.generic_delete(collections.DRIVER_ITERATIONS,
                              new_case['case_id'], token)
         result = logic.generic_get(
@@ -205,7 +213,8 @@ class TestLogic(unittest.TestCase):
     def test_delete_bad_token(self):
         new_case = logic.create_case({}, token)
         logic.generic_create(collections.DRIVER_ITERATIONS, {
-                             'test': True}, new_case['case_id'], token, 'False')
+                             'test': True}, new_case['case_id'], token,
+                             'False')
         self.assertFalse(logic.generic_delete(
             collections.DRIVER_ITERATIONS, new_case['case_id'], 'bad token'))
 
@@ -235,8 +244,9 @@ class TestLogic(unittest.TestCase):
 
     def test_get_system_iteration_data(self):
         new_case = logic.create_case({}, token)
-        logic.generic_create(collections.SYSTEM_ITERATIONS, self.create_system_iteration(
-        ), new_case['case_id'], token, False)
+        logic.generic_create(collections.SYSTEM_ITERATIONS,
+                             self.create_system_iteration(),
+                             new_case['case_id'], token, False)
         sys_data1 = json.loads(
             logic.get_system_iteration_data(new_case['case_id'], 'var1'))
         sys_data2 = json.loads(
@@ -265,8 +275,9 @@ class TestLogic(unittest.TestCase):
 
     def test_get_driver_iteration_data(self):
         new_case = logic.create_case({}, token)
-        logic.generic_create(collections.DRIVER_ITERATIONS, self.create_driver_iteration(
-        ), new_case['case_id'], token, False)
+        logic.generic_create(collections.DRIVER_ITERATIONS,
+                             self.create_driver_iteration(),
+                             new_case['case_id'], token, False)
         sys_data1 = json.loads(
             logic.get_driver_iteration_data(new_case['case_id'], 'var1'))
         sys_data2 = json.loads(
@@ -302,8 +313,9 @@ class TestLogic(unittest.TestCase):
 
     def test_get_variables(self):
         new_case = logic.create_case({}, token)
-        logic.generic_create(collections.SYSTEM_ITERATIONS, self.create_system_iteration(
-        ), new_case['case_id'], token, False)
+        logic.generic_create(collections.SYSTEM_ITERATIONS,
+                             self.create_system_iteration(),
+                             new_case['case_id'], token, False)
         variables = json.loads(logic.get_variables(new_case['case_id']))
         got_var1 = False
         got_var2 = False
@@ -317,8 +329,9 @@ class TestLogic(unittest.TestCase):
 
     def test_get_desvars(self):
         new_case = logic.create_case({}, token)
-        logic.generic_create(collections.DRIVER_ITERATIONS, self.create_driver_iteration(
-        ), new_case['case_id'], token, False)
+        logic.generic_create(collections.DRIVER_ITERATIONS,
+                             self.create_driver_iteration(),
+                             new_case['case_id'], token, False)
         variables = json.loads(logic.get_desvars(new_case['case_id']))
         got_var1 = False
         got_var2 = False
@@ -364,7 +377,7 @@ class TestLogic(unittest.TestCase):
         logic.generic_create(collections.DRIVER_ITERATIONS,
                              di2, new_case['case_id'], token, False)
         dat = json.loads(logic.get_driver_iteration_based_on_count(
-            new_case['case_id'], 'var1', 1))
+            new_case['case_id'], 'var1', 0))
         self.assertEqual(len(dat), 2)
 
     def test_get_case_without_validation(self):
@@ -405,7 +418,8 @@ class TestLogic(unittest.TestCase):
         new_case = logic.create_case({'case_name': 'test'}, token)
         logic.update_layout({'test': True}, new_case['case_id'])
         layout_data = json.loads(logic.generic_get(
-            collections.LAYOUTS, new_case['case_id'], data._GLOBALLY_ACCEPTED_TOKEN, False))
+            collections.LAYOUTS, new_case['case_id'],
+            logic.data._GLOBALLY_ACCEPTED_TOKEN, False))
         self.assertTrue(layout_data['test'])
 
     def test_create_metadata_empty(self):
@@ -434,11 +448,13 @@ class TestLogic(unittest.TestCase):
             }
         }
 
-        self.assertTrue(logic.metadata_create(metadata, new_case['case_id'], token))
+        self.assertTrue(logic.metadata_create(
+            metadata, new_case['case_id'], token))
 
     def test_read_metadata_empty(self):
         new_case = logic.create_case({}, token)
-        self.assertEqual(logic.metadata_get(new_case['case_id'], token), 'null')
+        self.assertEqual(logic.metadata_get(
+            new_case['case_id'], token), 'null')
 
     def test_read_metadata_standard(self):
         new_case = logic.create_case({}, token)
@@ -469,6 +485,7 @@ class TestLogic(unittest.TestCase):
         self.assertEqual(ret['abs2prom']['output']['py.y'][0], 'y')
         self.assertEqual(ret['prom2abs']['input']['x'][0], 'px.x')
         self.assertEqual(ret['prom2abs']['output']['y'][0], 'py.y')
+
 
 if __name__ == "__main__":
     try:
