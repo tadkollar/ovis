@@ -13,7 +13,7 @@ from data_server.data.mongo_data import MongoData
 from data_server.shared import collection_names as collections
 
 data = MongoData()
-data.connect('')
+data.connect()
 token = data.get_new_token('Unit Test', 'UnitTestData@fake.com')
 data.activate_account(token)
 
@@ -301,6 +301,21 @@ class TestData(unittest.TestCase):
 
     def test_update_layout_fail(self):
         self.assertFalse(data.update_layout({'test': True}, -1))
+
+    def test_no_new_data(self):
+        self.assertFalse(data.is_new_data(1234, 1))
+
+    def test_new_data(self):
+        new_case = data.create_case({}, token)
+        data.generic_create(collections.DRIVER_ITERATIONS, {
+                            'iteration_coordinate': '123', 'data': 1,
+                            'counter': 1}, new_case, token, False)
+        self.assertFalse(data.is_new_data(new_case, 1))
+        data.generic_create(collections.DRIVER_ITERATIONS, {
+                            'iteration_coordinate': '124', 'data': 2,
+                            'counter': 2}, new_case, token, False)
+        driv_iters = dumps(data.get_driver_iteration_data(new_case))
+        self.assertTrue(data.is_new_data(new_case, 1))
 
 
 if __name__ == "__main__":
