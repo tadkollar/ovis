@@ -34,8 +34,16 @@ class SqliteData(BaseData):
 
         Closes the DB connection if it is still open
         """
+        self.disconnect()
+
+    def disconnect(self):
+        """ disconnect method
+
+        Closes the DB connection if it is still open
+        """
         if self.connection is not None:
             self.connection.close()
+        self.connection = None
 
     def connect(self, location):
         """ connect method
@@ -100,7 +108,7 @@ class SqliteData(BaseData):
         elif collection_name is collections.LAYOUTS:
             return self._get_layout()
         else:
-            return "[]"
+            return []
 
     def get_driver_iteration_data(self, case_id):
         """ get_driver_iteration_data method
@@ -125,11 +133,14 @@ class SqliteData(BaseData):
         Returns:
             True if new data is available, False otherwise
         """
-        self.cursor = self.connection.cursor()
-        self.cursor.execute(
-            "SELECT counter FROM driver_iterations WHERE counter > "
-            + str(count))
-        rows = self.cursor.fetchall()
+        rows = None
+
+        with self.connection:
+            self.cursor = self.connection.cursor()
+            self.cursor.execute(
+                "SELECT counter FROM driver_iterations WHERE counter > " +
+                str(count))
+            rows = self.cursor.fetchall()
 
         if len(rows) > 0:
             return True
@@ -308,6 +319,9 @@ class SqliteData(BaseData):
             self.cursor.execute("SELECT model_viewer_data\
                                  FROM driver_metadata")
             row = self.cursor.fetchone()
+            if row is None:
+                return []
+
             ret = self.blob_to_array(row[0])
 
         return json.dumps([{'model_viewer_data': ret}])
@@ -328,7 +342,7 @@ class SqliteData(BaseData):
             self.cursor.execute("SELECT layout FROM layouts WHERE id=0")
             row = self.cursor.fetchone()
             if row is None:
-                ret = "[]"
+                ret = []
             else:
                 ret = json.dumps([json.loads(row[0])])
 
