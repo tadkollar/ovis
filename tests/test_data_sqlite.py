@@ -74,7 +74,7 @@ class TestSqliteData(unittest.TestCase):
         _data.connect(f_name)
         metadata = _data.generic_get(collections.DRIVER_METADATA)
 
-        self.assertEqual(metadata, [])
+        self.assertEqual(json.loads(metadata), [])
 
     def test_generic_get_empty_layout(self):
         f_name = self._create_new_db()
@@ -88,7 +88,7 @@ class TestSqliteData(unittest.TestCase):
         _data.connect(f_name)
         sys_metadata = _data.generic_get(collections.SYSTEM_METADATA)
 
-        self.assertEqual(sys_metadata, [])
+        self.assertEqual(json.loads(sys_metadata), [])
 
     def test_get_driver_iteration(self):
         self._use_sellar_grouped()
