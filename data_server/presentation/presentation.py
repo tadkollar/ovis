@@ -10,7 +10,7 @@ import tornado.web as web
 import data_server.logic.logic as logic
 import data_server.shared.collection_names as collections
 
-_TOKEN = 'squavy'
+_TOKEN = 'cef48638-0cf2-4e3a-9c57-92df0079583b'
 
 
 class IndexHandler(web.RequestHandler):

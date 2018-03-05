@@ -13,7 +13,7 @@ class BaseData(object):
         """
         Initialize.
         """
-        self._GLOBALLY_ACCEPTED_TOKEN = 'squavy'
+        self._GLOBALLY_ACCEPTED_TOKEN = 'cef48638-0cf2-4e3a-9c57-92df0079583b'
         self.connected = False
 
     def connect(self):
