@@ -108,7 +108,7 @@ class SqliteData(BaseData):
         elif collection_name is collections.LAYOUTS:
             return self._get_layout()
         else:
-            return []
+            return "[]"
 
     def generic_delete(self, collection_name, case_id, token):
         """ generic_delete method
@@ -340,7 +340,7 @@ class SqliteData(BaseData):
                                  FROM driver_metadata")
             row = self.cursor.fetchone()
             if row is None:
-                return []
+                return "[]"
 
             ret = self.blob_to_array(row[0])
 
