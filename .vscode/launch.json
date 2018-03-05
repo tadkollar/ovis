@@ -5,17 +5,31 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug Main Process",
-            "type": "node",
+            "name": "Python",
+            "type": "python",
             "request": "launch",
-            "cwd": "${workspaceRoot}",
-            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
-            "windows": {
-                "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
-            },
-            "args": [
-                "."
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
+            "program": "${file}",
+            "cwd": "${workspaceFolder}",
+            "env": {},
+            "envFile": "${workspaceFolder}/.env",
+            "debugOptions": [
+                "RedirectOutput"
             ]
-        }
+        },
+        // {
+        //     "name": "Debug Main Process",
+        //     "type": "node",
+        //     "request": "launch",
+        //     "cwd": "${workspaceRoot}",
+        //     "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+        //     "windows": {
+        //         "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
+        //     },
+        //     "args": [
+        //         "."
+        //     ]
+        // }
     ]
 }
