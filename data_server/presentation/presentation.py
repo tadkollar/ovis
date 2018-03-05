@@ -9,6 +9,7 @@ import json
 import tornado.web as web
 import data_server.logic.logic as logic
 import data_server.shared.collection_names as collections
+import data_server.shared.data_type as db_type
 
 _TOKEN = 'cef48638-0cf2-4e3a-9c57-92df0079583b'
 
@@ -20,15 +21,7 @@ class IndexHandler(web.RequestHandler):
     """
 
     def get(self):
-        token = str(self.get_secure_cookie("token"))
-        token = token.replace("b'", '')
-        token = token.replace("'", '')
-        if self.get_secure_cookie("token"):
-            cases = logic.get_all_cases(token)
-            self.render("../../public/list_cases.html",
-                        cases=cases, token=token)
-        else:
-            self.render("../../public/login.html")
+        self.render("../../need_load.html")
 
 
 class ConnectHandler(web.RequestHandler):
@@ -66,20 +59,27 @@ class CaseHandler(web.RequestHandler):
     """
 
     def get(self, *params):
-        if len(params) == 0:
-            self.write(logic.get_all_cases(self.request.headers.get('token')))
+        if db_type.is_mongodb():
+            if len(params) == 0:
+                self.write(logic.get_all_cases(
+                    self.request.headers.get('token')))
+            else:
+                self.render("../../public/dashboard.html")
         else:
-            self.render("../../public/dashboard.html")
+            self.send_error(400)
 
     def post(self):
         body = json.loads(self.request.body)
-        ret = logic.create_case(body, self.request.headers.get('token'))
+        c_id = logic.create_case(body, self.request.headers.get('token'))
+        ret = {'case_id': c_id}
+        ret['status'] = 'Success' if c_id != -1 else 'Failed to create ID'
         self.write(ret)
 
     def delete(self, *params):
         ret = _get_ret()
-        if logic.delete_case_with_id(params[0],
-                                     self.request.headers.get('token')):
+        if len(params) > 0 and \
+            logic.delete_case_with_id(params[0],
+                                      self.request.headers.get('token')):
             self.write(ret)
         else:
             ret['status'] = 'Failed'
@@ -88,7 +88,8 @@ class CaseHandler(web.RequestHandler):
     def patch(self, *params):
         ret = _get_ret()
         body = json.loads(self.request.body)
-        if logic.update_case_name(body['name'], params[0]):
+        if 'name' in body and\
+                logic.update_case_name(body['name'], params[0]):
             self.write(ret)
         else:
             ret['status'] = 'Failed'

@@ -20,9 +20,8 @@ define("port", default=18403)
 
 public_root = os.path.join(os.path.dirname(__file__), 'public')
 
-if __name__ == "__main__":
-    tornado.options.parse_command_line()
-    # Set up endpoints
+
+def get_app():
     app = tornado.web.Application(handlers=[
         (r"/", presentation.IndexHandler),
         (r"/connect", presentation.ConnectHandler),
@@ -55,7 +54,13 @@ if __name__ == "__main__":
         (r"/case/(\d+)/variables", presentation.VariablesHandler),
         (r"/case/(\d+)/desvars", presentation.DesvarsHandler),
         (r"/(.*)", web.StaticFileHandler, {'path': public_root})
-    ], cookie_secret="tklskdjfsdv8982fj4kj3ookr0", debug=True)
+    ], cookie_secret="tklskdjfsdv8982fj4kj3ookr0")
+    return app
+
+if __name__ == "__main__":
+    tornado.options.parse_command_line()
+    # Set up endpoints
+    app = get_app()
 
     print("Starting up OpenMDAO server on port: " + str(options.port))
     http_server = tornado.httpserver.HTTPServer(app)

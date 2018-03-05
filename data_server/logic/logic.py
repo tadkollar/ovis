@@ -21,10 +21,9 @@ import data_server.shared.data_type as db_type
 from data_server.data.mongo_data import MongoData
 from data_server.data.sqlite_data import SqliteData
 
-is_sqlite = db_type.DB_TYPE == 'SQLite'
 
 data = None
-if not is_sqlite:
+if db_type.is_mongodb():
     data = MongoData()
     data.connect()
 else:
@@ -40,10 +39,9 @@ def connect(location):
     Returns:
         bool: True if connection established, False otherwise
     """
-    if db_type.DB_TYPE == 'SQLite':
+    if db_type.is_sqlite():
         return data.connect(location)
     else:
-        data = MongoData()
         return data.connect()
 
 
@@ -58,6 +56,8 @@ def get_all_cases(token):
     Returns:
         JSON array of all case documents
     """
+    if db_type.is_sqlite():
+        return []
     cases = json.loads(data.get_all_cases(token))
     for case in cases:
         ind = case['date'].find('.')
@@ -89,6 +89,8 @@ def get_case_with_id(c_id, token):
     Returns:
         JSON document of the case
     """
+    if db_type.is_sqlite():
+        return {}
     return data.get_case_with_id(c_id, token)
 
 
@@ -104,6 +106,8 @@ def delete_case_with_id(c_id, token):
     Returns:
         True if successfull, False otherwise
     """
+    if db_type.is_sqlite():
+        return False
     return data.delete_case_with_id(c_id, token)
 
 
@@ -121,13 +125,10 @@ def create_case(body, token):
     Returns:
         Integer case_id to be used in all other HTTP requests
     """
+    if db_type.is_sqlite():
+        return -1
     c_id = data.create_case(body, token)
-    ret = {}
-    ret['case_id'] = c_id
-    ret['status'] = 'Success'
-    if c_id == -1:
-        ret['status'] = 'Failed to create ID'
-    return ret
+    return c_id
 
 
 def update_case_name(name, case_id):
@@ -141,6 +142,8 @@ def update_case_name(name, case_id):
     Returns:
         True if success, False otherwise
     """
+    if db_type.is_sqlite():
+        return False
     return data.update_case_name(name, case_id)
 
 
@@ -300,6 +303,8 @@ def create_token(name, email):
     Returns:
         token if successful or -1 otherwise
     """
+    if db_type.is_sqlite():
+        return -1
     if data.user_exists(email):
         return -1
 
@@ -316,6 +321,8 @@ def token_exists(token):
     Returns:
         True if exists, False otherwise
     """
+    if db_type.is_sqlite():
+        return False
     return data.token_exists(token)
 
 
@@ -329,7 +336,8 @@ def delete_token(token):
     Returns:
         None
     """
-    data.delete_token(token)
+    if db_type.is_mongodb():
+        data.delete_token(token)
 
 
 def get_system_iteration_data(case_id, variable):
@@ -559,7 +567,8 @@ def activate_account(token):
     Args:
         token(string): the token that needs activating
     """
-    data.activate_account(token)
+    if db_type.is_mongodb():
+        data.activate_account(token)
 
 
 def _send_email(recipient, subject, message):

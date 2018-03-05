@@ -26,6 +26,13 @@ def cleanup():
 
 
 class TestLogic(unittest.TestCase):
+    def logic_create_case(self, body, token):
+        ret = {}
+        c_id = logic.create_case(body, token)
+        ret['status'] = 'Success' if c_id != -1 else 'Failed'
+        ret['case_id'] = c_id
+        return ret
+
     def create_system_iteration(self):
         ret = {}
         ret['iteration_coordinate'] = 'it|1'
@@ -50,12 +57,12 @@ class TestLogic(unittest.TestCase):
 
     def test_create_case(self):
         body = {}
-        case = logic.create_case(body, token)
+        case = self.logic_create_case(body, token)
         self.assertNotEqual(case, -1)
 
     def test_case_exists1(self):
         body = {}
-        case = logic.create_case(body, token)
+        case = self.logic_create_case(body, token)
         case_obj = json.loads(logic.get_case_with_id(case['case_id'], token))
         self.assertEqual(case_obj['users'][0], token)
 
@@ -63,7 +70,7 @@ class TestLogic(unittest.TestCase):
         new_token = logic.create_token('Unit Test Cleanup', 'blah@fake4.com')
         logic.activate_account(new_token)
         try:
-            new_case = logic.create_case({}, new_token)
+            new_case = self.logic_create_case({}, new_token)
             self.assertEqual(logic.token_exists(new_token), True)
             self.assertNotEqual(logic.get_case_with_id(
                 new_case['case_id'], new_token), {})
@@ -75,7 +82,7 @@ class TestLogic(unittest.TestCase):
             logic.delete_token(new_token)
 
     def test_delete_case(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         self.assertNotEqual(logic.get_case_with_id(
             new_case['case_id'], token), {})
         logic.delete_case_with_id(new_case['case_id'], token)
@@ -96,20 +103,20 @@ class TestLogic(unittest.TestCase):
             'test cases not empty', 'TestCasesNotEmpty@fake.com')
         logic.activate_account(new_token)
         try:
-            case1 = logic.create_case({}, new_token)
-            case2 = logic.create_case({}, new_token)
-            case3 = logic.create_case({}, new_token)
+            case1 = self.logic_create_case({}, new_token)
+            case2 = self.logic_create_case({}, new_token)
+            case3 = self.logic_create_case({}, new_token)
             self.assertEqual(len(logic.get_all_cases(new_token)), 3)
         finally:
             logic.delete_token(new_token)
 
     def test_get_case_with_id(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         self.assertEqual(json.loads(logic.get_case_with_id(
             new_case['case_id'], token))['case_id'], new_case['case_id'])
 
     def test_get_case_with_id_no_token(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         self.assertEqual(logic.get_case_with_id(
             new_case['case_id'], 'badToken'), {})
 
@@ -118,18 +125,18 @@ class TestLogic(unittest.TestCase):
             'test get case with bad token', 'TestGetCaseBadToken@fake.com')
         logic.activate_account(new_token)
         try:
-            new_case = logic.create_case({}, token)
+            new_case = self.logic_create_case({}, token)
             self.assertEqual(logic.get_case_with_id(
                 new_case['case_id'], new_token), {})
         finally:
             logic.delete_token(new_token)
 
     def test_delete_case_with_id(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         self.assertTrue(logic.delete_case_with_id(new_case['case_id'], token))
 
     def test_delete_case_no_token(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         self.assertFalse(logic.delete_case_with_id(
             new_case['case_id'], 'bad token'))
 
@@ -138,19 +145,19 @@ class TestLogic(unittest.TestCase):
             'test delete with bad token', 'TestDeleteBadToken@fake.com')
         logic.activate_account(new_token)
         try:
-            new_case = logic.create_case({}, token)
+            new_case = self.logic_create_case({}, token)
             self.assertFalse(logic.delete_case_with_id(
                 new_case['case_id'], new_token))
         finally:
             logic.delete_token(new_token)
 
     def test_generic_create(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         self.assertTrue(logic.generic_create(collections.DRIVER_ITERATIONS, {
                         'test': 1}, new_case['case_id'], token, 'False'))
 
     def test_generic_create2(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         logic.generic_create(collections.DRIVER_ITERATIONS, {
                              'test': 1}, new_case['case_id'], token, 'False')
         driv_iter = json.loads(logic.generic_get(
@@ -158,7 +165,7 @@ class TestLogic(unittest.TestCase):
         self.assertEqual(driv_iter['test'], 1)
 
     def test_update(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         logic.generic_create(collections.DRIVER_ITERATIONS, {
                              'test': 1}, new_case['case_id'], token, 'False')
         logic.generic_create(collections.DRIVER_ITERATIONS, {
@@ -168,14 +175,14 @@ class TestLogic(unittest.TestCase):
         self.assertEqual(driv_iter['test'], 2)
 
     def test_generic_create_bad_token(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         result = logic.generic_create(collections.DRIVER_ITERATIONS, {
                                       'test': 1}, new_case['case_id'],
                                       'bad token', 'False')
         self.assertFalse(result)
 
     def test_generic_get(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         logic.generic_create(collections.DRIVER_ITERATIONS, {
                              'test': True}, new_case['case_id'], token,
                              'False')
@@ -184,7 +191,7 @@ class TestLogic(unittest.TestCase):
         self.assertTrue(driv_iter['test'])
 
     def test_generic_get_bad_token(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         logic.generic_create(collections.DRIVER_ITERATIONS, {'test': 1},
                              new_case['case_id'], 'bad token', 'False')
         driv_iter = json.loads(logic.generic_get(collections.DRIVER_ITERATIONS,
@@ -192,7 +199,7 @@ class TestLogic(unittest.TestCase):
         self.assertEqual(driv_iter, None)
 
     def test_generic_delete(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         logic.generic_create(collections.DRIVER_ITERATIONS, {
                              'test': True}, new_case['case_id'], token,
                              'False')
@@ -200,7 +207,7 @@ class TestLogic(unittest.TestCase):
             collections.DRIVER_ITERATIONS, new_case['case_id'], token))
 
     def test_generic_delete2(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         logic.generic_create(collections.DRIVER_ITERATIONS, {
                              'test': True}, new_case['case_id'], token,
                              'False')
@@ -211,7 +218,7 @@ class TestLogic(unittest.TestCase):
         self.assertEqual(result, '[]')
 
     def test_delete_bad_token(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         logic.generic_create(collections.DRIVER_ITERATIONS, {
                              'test': True}, new_case['case_id'], token,
                              'False')
@@ -225,25 +232,25 @@ class TestLogic(unittest.TestCase):
         self.assertFalse(logic.token_exists('bad token'))
 
     def test_empty_system_iteration_data(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         self.assertEqual(logic.get_system_iteration_data(
             new_case['case_id'], 'test'), '[]')
 
     def test_empty_get_variables(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         self.assertEqual(logic.get_variables(new_case['case_id']), '[]')
 
     def test_empty_get_driver_iteration(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         self.assertEqual(logic.get_driver_iteration_data(
             new_case['case_id'], 'test'), '[]')
 
     def test_empty_get_desvars(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         self.assertEqual(logic.get_desvars(new_case['case_id']), '[]')
 
     def test_get_system_iteration_data(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         logic.generic_create(collections.SYSTEM_ITERATIONS,
                              self.create_system_iteration(),
                              new_case['case_id'], token, False)
@@ -274,7 +281,7 @@ class TestLogic(unittest.TestCase):
         self.assertEqual(sys_data3[0]['name'], 'var3')
 
     def test_get_driver_iteration_data(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         logic.generic_create(collections.DRIVER_ITERATIONS,
                              self.create_driver_iteration(),
                              new_case['case_id'], token, False)
@@ -312,7 +319,7 @@ class TestLogic(unittest.TestCase):
         self.assertEqual(sys_data4[0]['name'], 'var4')
 
     def test_get_variables(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         logic.generic_create(collections.SYSTEM_ITERATIONS,
                              self.create_system_iteration(),
                              new_case['case_id'], token, False)
@@ -328,7 +335,7 @@ class TestLogic(unittest.TestCase):
         self.assertTrue(got_var2)
 
     def test_get_desvars(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         logic.generic_create(collections.DRIVER_ITERATIONS,
                              self.create_driver_iteration(),
                              new_case['case_id'], token, False)
@@ -356,7 +363,7 @@ class TestLogic(unittest.TestCase):
             logic.delete_token(new_token)
 
     def test_get_driver_iteration_based_on_count(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         di1 = self.create_driver_iteration()
         di2 = self.create_driver_iteration()
         di2['counter'] = 2
@@ -368,7 +375,7 @@ class TestLogic(unittest.TestCase):
             new_case['case_id'], 'var1', 2), '[]')
 
     def test_get_driver_iteration_based_on_count2(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         di1 = self.create_driver_iteration()
         di2 = self.create_driver_iteration()
         di2['counter'] = 2
@@ -383,8 +390,8 @@ class TestLogic(unittest.TestCase):
     def test_get_case_without_validation(self):
         new_token = logic.create_token('test token', 'UnitTest123@fake.com')
         try:
-            new_case = logic.create_case({}, new_token)
-            self.assertEqual(new_case['status'], 'Failed to create ID')
+            new_case = self.logic_create_case({}, new_token)
+            self.assertEqual(new_case['status'], 'Failed')
         finally:
             logic.delete_token(new_token)
 
@@ -405,7 +412,7 @@ class TestLogic(unittest.TestCase):
             logic.delete_token(new_token)
 
     def test_update_case_name(self):
-        new_case = logic.create_case({'case_name': 'test'}, token)
+        new_case = self.logic_create_case({'case_name': 'test'}, token)
         new_case_data = json.loads(
             logic.get_case_with_id(new_case['case_id'], token))
         self.assertEqual(new_case_data['case_name'], 'test')
@@ -415,7 +422,7 @@ class TestLogic(unittest.TestCase):
         self.assertEqual(updated_case_data['case_name'], 'test_updated')
 
     def test_update_layout(self):
-        new_case = logic.create_case({'case_name': 'test'}, token)
+        new_case = self.logic_create_case({'case_name': 'test'}, token)
         logic.update_layout({'test': True}, new_case['case_id'])
         layout_data = json.loads(logic.generic_get(
             collections.LAYOUTS, new_case['case_id'],
@@ -423,11 +430,11 @@ class TestLogic(unittest.TestCase):
         self.assertTrue(layout_data['test'])
 
     def test_create_metadata_empty(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         self.assertTrue(logic.metadata_create({}, new_case['case_id'], token))
 
     def test_create_metadata_standard(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
 
         metadata = {
             'abs2prom': {
@@ -452,12 +459,12 @@ class TestLogic(unittest.TestCase):
             metadata, new_case['case_id'], token))
 
     def test_read_metadata_empty(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
         self.assertEqual(logic.metadata_get(
             new_case['case_id'], token), 'null')
 
     def test_read_metadata_standard(self):
-        new_case = logic.create_case({}, token)
+        new_case = self.logic_create_case({}, token)
 
         metadata = {
             'abs2prom': {
