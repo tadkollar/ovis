@@ -409,8 +409,8 @@ def _generic_get(collection_name, request_handler, case_id, token=None):
 
     if token is None:
         token = request_handler.request.headers.get('token')
-    request_handler.write(logic.generic_get(collection_name, case_id,
-                                            token))
+    dat = logic.generic_get(collection_name, case_id, token)
+    request_handler.write(dat)
 
 
 def _generic_post(collection_name, request_handler, case_id):

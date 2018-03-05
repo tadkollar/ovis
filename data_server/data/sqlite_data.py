@@ -110,6 +110,26 @@ class SqliteData(BaseData):
         else:
             return []
 
+    def generic_delete(self, collection_name, case_id, token):
+        """ generic_delete method
+
+        Currently unimplemented, always returns False.
+
+        Returns:
+            False
+        """
+        return False
+
+    def generic_create(self, collection_name, case_id, token, update):
+        """ generic_create method
+
+        Currently unimplemented, always returns False
+
+        Returns:
+            False
+        """
+        return False
+
     def get_driver_iteration_data(self, case_id):
         """ get_driver_iteration_data method
 

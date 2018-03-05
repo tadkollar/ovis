@@ -18,8 +18,11 @@ class TestPresentationLayer(AsyncHTTPTestCase):
         return main.get_app()
 
     def _connect_sellar_grouped(self):
+        file_path = os.path.join(os.path.dirname(__file__),
+                                 'sellar_grouped.db')
+        body = {'location': file_path}
         response = self.fetch('/connect', method='POST',
-                              body='{"location": "sellar_grouped.db"}')
+                              body=json.dumps(body))
         return response
 
     def test_index(self):
@@ -59,6 +62,17 @@ class TestPresentationLayer(AsyncHTTPTestCase):
         body = json.loads(response.body)
         self.assertEqual(response.code, 200)
         self.assertEqual(body['status'], 'Failed')
+
+    def test_get_layout(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/layout')
+        self.assertEqual(response.code, 200)
+        self.assertIsNotNone(response.body)
+
+    def test_driver_iteration_get(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/driver_iterations')
+        self.assertEqual(response.code, 200)
 
 
 def cleanup():
