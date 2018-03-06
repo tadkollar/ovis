@@ -102,7 +102,7 @@ class SqliteData(BaseData):
             JSON array of documents returned from the query
         """
         if collection_name is collections.DRIVER_ITERATIONS:
-            return self._get_driver_iterations()
+            return json.dumps(self._get_driver_iterations())
         elif collection_name is collections.DRIVER_METADATA:
             return self._get_driver_metadata()
         elif collection_name is collections.LAYOUTS:
@@ -120,7 +120,7 @@ class SqliteData(BaseData):
         """
         return False
 
-    def generic_create(self, collection_name, case_id, token, update):
+    def generic_create(self, collection_name, body, case_id, token, update):
         """ generic_create method
 
         Currently unimplemented, always returns False
@@ -232,7 +232,7 @@ class SqliteData(BaseData):
             the list of all driver iterations as JSON
         """
         if self.connection is None:
-            return []
+            return "[]"
 
         ret = []
         with self.connection:

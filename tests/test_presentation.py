@@ -73,6 +73,213 @@ class TestPresentationLayer(AsyncHTTPTestCase):
         self._connect_sellar_grouped()
         response = self.fetch('/case/0/driver_iterations')
         self.assertEqual(response.code, 200)
+        self.assertIsNotNone(response.body)
+
+    def test_driver_iteration_get_var(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/driver_iterations/p1.x')
+        body = json.loads(response.body)
+        self.assertEqual(response.code, 200)
+        self.assertIsNotNone(response.body)
+        self.assertEqual(len(body), 6)
+
+    def test_driver_iteration_post(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/driver_iterations',
+                              method='POST', body='{}')
+        self.assertEqual(response.code, 200)
+        body = json.loads(response.body)
+        self.assertEqual(body['status'], 'Failed')
+
+    def test_driver_iteration_delete(self):
+        self._connect_sellar_grouped()
+        response = self.fetch(
+            '/case/0/driver_iterations', method='DELETE')
+        self.assertEqual(response.code, 200)
+        body = json.loads(response.body)
+        self.assertEqual(body['status'], 'Failed')
+
+    def test_driver_metadata_get(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/driver_metadata')
+        body = json.loads(response.body)
+        self.assertEqual(response.code, 200)
+        self.assertIsNotNone(response.body)
+        self.assertEqual(len(body), 1)
+
+    def test_driver_metadata_post(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/driver_metadata',
+                              method='POST', body='{}')
+        self.assertEqual(response.code, 200)
+        body = json.loads(response.body)
+        self.assertEqual(body['status'], 'Failed')
+
+    def test_driver_metadata_delete(self):
+        self._connect_sellar_grouped()
+        response = self.fetch(
+            '/case/0/driver_metadata', method='DELETE')
+        self.assertEqual(response.code, 200)
+        body = json.loads(response.body)
+        self.assertEqual(body['status'], 'Failed')
+
+    def test_global_iterations_get(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/global_iterations')
+        body = json.loads(response.body)
+        self.assertEqual(response.code, 200)
+        self.assertIsNotNone(response.body)
+
+    def test_global_iterations_post(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/global_iterations',
+                              method='POST', body='{}')
+        self.assertEqual(response.code, 200)
+        body = json.loads(response.body)
+        self.assertEqual(body['status'], 'Failed')
+
+    def test_global_iterations_delete(self):
+        self._connect_sellar_grouped()
+        response = self.fetch(
+            '/case/0/global_iterations', method='DELETE')
+        self.assertEqual(response.code, 200)
+        body = json.loads(response.body)
+        self.assertEqual(body['status'], 'Failed')
+
+    def test_solver_iterations_get(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/solver_iterations')
+        body = json.loads(response.body)
+        self.assertEqual(response.code, 200)
+        self.assertIsNotNone(response.body)
+
+    def test_solver_iterations_post(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/solver_iterations',
+                              method='POST', body='{}')
+        self.assertEqual(response.code, 200)
+        body = json.loads(response.body)
+        self.assertEqual(body['status'], 'Failed')
+
+    def test_solver_iterations_delete(self):
+        self._connect_sellar_grouped()
+        response = self.fetch(
+            '/case/0/solver_iterations', method='DELETE')
+        self.assertEqual(response.code, 200)
+        body = json.loads(response.body)
+        self.assertEqual(body['status'], 'Failed')
+
+    def test_solver_metadata_get(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/solver_metadata')
+        body = json.loads(response.body)
+        self.assertEqual(response.code, 200)
+        self.assertIsNotNone(response.body)
+
+    def test_solver_metadata_post(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/solver_metadata',
+                              method='POST', body='{}')
+        self.assertEqual(response.code, 200)
+        body = json.loads(response.body)
+        self.assertEqual(body['status'], 'Failed')
+
+    def test_solver_metadata_delete(self):
+        self._connect_sellar_grouped()
+        response = self.fetch(
+            '/case/0/solver_metadata', method='DELETE')
+        self.assertEqual(response.code, 200)
+        body = json.loads(response.body)
+        self.assertEqual(body['status'], 'Failed')
+
+    def test_system_iteration_get(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/system_iterations')
+        body = json.loads(response.body)
+        self.assertEqual(response.code, 200)
+        self.assertIsNotNone(response.body)
+
+    def test_system_iteration_post(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/system_iterations',
+                              method='POST', body='{}')
+        self.assertEqual(response.code, 200)
+        body = json.loads(response.body)
+        self.assertEqual(body['status'], 'Failed')
+
+    def test_system_iteration_delete(self):
+        self._connect_sellar_grouped()
+        response = self.fetch(
+            '/case/0/system_iterations', method='DELETE')
+        self.assertEqual(response.code, 200)
+        body = json.loads(response.body)
+        self.assertEqual(body['status'], 'Failed')
+
+    def test_system_metadata_get(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/system_metadata')
+        body = json.loads(response.body)
+        self.assertEqual(response.code, 200)
+        self.assertIsNotNone(response.body)
+
+    def test_system_metadata_post(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/system_metadata',
+                              method='POST', body='{}')
+        self.assertEqual(response.code, 200)
+        body = json.loads(response.body)
+        self.assertEqual(body['status'], 'Failed')
+
+    def test_system_metadata_delete(self):
+        self._connect_sellar_grouped()
+        response = self.fetch(
+            '/case/0/system_metadata', method='DELETE')
+        self.assertEqual(response.code, 200)
+        body = json.loads(response.body)
+        self.assertEqual(body['status'], 'Failed')
+
+    def test_metadata_get(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/metadata')
+        body = json.loads(response.body)
+        self.assertEqual(response.code, 200)
+        self.assertIsNotNone(response.body)
+
+    def test_metadata_post(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/metadata',
+                              method='POST', body='{}')
+        self.assertEqual(response.code, 200)
+        body = json.loads(response.body)
+        self.assertEqual(body['status'], 'Failed')
+
+    def test_metadata_delete(self):
+        self._connect_sellar_grouped()
+        response = self.fetch(
+            '/case/0/metadata', method='DELETE')
+        self.assertEqual(response.code, 200)
+        body = json.loads(response.body)
+        self.assertEqual(body['status'], 'Failed')
+
+    def test_create_token(self):
+        response = self.fetch('/token', method='POST',
+                              body='{"name": "test", "email": "test@testcom"}')
+        body = json.loads(response.body)
+        self.assertEqual(body['status'], 'Failed')
+        self.assertEqual(response.code, 200)
+
+    def test_login(self):
+        response = self.fetch('/login', method='POST', body='{"token":"123"}')
+        body = json.loads(response.body)
+        self.assertEqual(response.code, 200)
+        self.assertEqual(body['status'], 'Failed')
+
+    def test_get_desvars(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/case/0/desvars')
+        body = json.loads(response.body)
+        self.assertEqual(response.code, 200)
+        self.assertIsNotNone(body)
 
 
 def cleanup():

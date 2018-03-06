@@ -67,7 +67,7 @@ class TestSqliteData(unittest.TestCase):
         _data.connect(f_name)
         iteration = _data.generic_get(collections.DRIVER_ITERATIONS)
 
-        self.assertEqual(iteration, [])
+        self.assertEqual(iteration, "[]")
 
     def test_generic_get_empty_driver_metadata(self):
         f_name = self._create_new_db()
@@ -92,7 +92,8 @@ class TestSqliteData(unittest.TestCase):
 
     def test_get_driver_iteration(self):
         self._use_sellar_grouped()
-        iterations = _data.generic_get(collections.DRIVER_ITERATIONS)
+        iterations = json.loads(_data.generic_get(
+            collections.DRIVER_ITERATIONS))
 
         self.assertEqual(len(iterations), 6)
         t_iter = iterations[0]
@@ -173,7 +174,7 @@ class TestSqliteData(unittest.TestCase):
 
     def test_get_driver_iteration_without_connection(self):
         _data.disconnect()
-        self.assertEqual(_data.get_driver_iteration_data(''), [])
+        self.assertEqual(_data.get_driver_iteration_data(''), "[]")
 
     def test_is_no_new_data(self):
         f_name = self._create_new_db()
