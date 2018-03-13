@@ -1,3 +1,16 @@
+//NOTE: the N^2 and associated scripts were originally written
+//  to work directly in OpenMDAO as one file. Despite lots of
+//  refactoring, there's still a lot of work to be done to make
+//  this more maintainable. Associated scripts are:
+//
+//  * constants.js
+//  * modal.js
+//  * svg.js
+//  * search.js
+//  * legend.js
+//  * draw.js
+//  * ptN2.js
+
 function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
     var parentDiv = paramParentDiv;
     var root = paramRootJson;
@@ -1598,6 +1611,7 @@ ptn2.resize = function () {
     var app = PtN2Diagram(lastLeftClickedElement, treeData['tree'], treeData['connections_list']);
 };
 
+// Set ptN2's initializeTree method
 ptn2.initializeTree = function (container) {
     ptn2.container = container;
     ptn2.container.on('resize', ptn2.resize)

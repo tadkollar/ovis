@@ -59,31 +59,35 @@ app.on('will-quit', function () {
 
 function findFile() {
   dialog.showOpenDialog((fileNames) => {
-    if (fileNames === undefined) {
-      logger.info("No file selected");
-      return;
-    }
-
-    logger.info("Sending 'connect' with: " + fileNames[0])
-
-    request.post('http://127.0.0.1:18403/connect',
-      { json: { 'location': fileNames[0] } },
-      function (error, response, body) {
-        if (error) {
-          logger.error("ERROR: " + error.toString())
-          return;
-        }
-        logger.info("Connected to DB");
-      });
-
-    filename = fileNames[0]
-    mainWindow.webContents.send('connect', fileNames)
-    mainWindow.loadURL(url.format({
-      pathname: path.join(__dirname, 'index.html'),
-      protocol: 'file:',
-      slashes: true
-    }))
+    openFile(fileNames);
   })
+}
+
+function openFile(fileNames) {
+  if (fileNames === undefined) {
+    logger.info("No file selected");
+    return;
+  }
+
+  logger.info("Sending 'connect' with: " + fileNames[0])
+
+  request.post('http://127.0.0.1:18403/connect',
+    { json: { 'location': fileNames[0] } },
+    function (error, response, body) {
+      if (error) {
+        logger.error("ERROR: " + error.toString())
+        return;
+      }
+      logger.info("Connected to DB");
+    });
+
+  filename = fileNames[0]
+  mainWindow.webContents.send('connect', fileNames)
+  mainWindow.loadURL(url.format({
+    pathname: path.join(__dirname, 'index.html'),
+    protocol: 'file:',
+    slashes: true
+  }))
 }
 
 ipcMain.on('openFile', (event, arg) => {
@@ -151,90 +155,6 @@ const template = [
     ]
   }
 ]
-// const template = [
-//   {
-//     label: 'Edit',
-//     submenu: [
-//       {role: 'undo'},
-//       {role: 'redo'},
-//       {type: 'separator'},
-//       {role: 'cut'},
-//       {role: 'copy'},
-//       {role: 'paste'},
-//       {role: 'pasteandmatchstyle'},
-//       {role: 'delete'},
-//       {role: 'selectall'}
-//     ]
-//   },
-//   {
-//     label: 'View',
-//     submenu: [
-//       {role: 'reload'},
-//       {role: 'forcereload'},
-//       {role: 'toggledevtools'},
-//       {type: 'separator'},
-//       {role: 'resetzoom'},
-//       {role: 'zoomin'},
-//       {role: 'zoomout'},
-//       {type: 'separator'},
-//       {role: 'togglefullscreen'}
-//     ]
-//   },
-//   {
-//     role: 'window',
-//     submenu: [
-//       {role: 'minimize'},
-//       {role: 'close'}
-//     ]
-//   },
-//   {
-//     role: 'help',
-//     submenu: [
-//       {
-//         label: 'Learn More',
-//         click () { require('electron').shell.openExternal('https://electronjs.org') }
-//       }
-//     ]
-//   }
-// ]
-
-// if (process.platform === 'darwin') {
-//   template.unshift({
-//     label: app.getName(),
-//     submenu: [
-//       {role: 'about'},
-//       {type: 'separator'},
-//       {role: 'services', submenu: []},
-//       {type: 'separator'},
-//       {role: 'hide'},
-//       {role: 'hideothers'},
-//       {role: 'unhide'},
-//       {type: 'separator'},
-//       {role: 'quit'}
-//     ]
-//   })
-
-//   // Edit menu
-//   template[1].submenu.push(
-//     {type: 'separator'},
-//     {
-//       label: 'Speech',
-//       submenu: [
-//         {role: 'startspeaking'},
-//         {role: 'stopspeaking'}
-//       ]
-//     }
-//   )
-
-//   // Window menu
-//   template[3].submenu = [
-//     {role: 'close'},
-//     {role: 'minimize'},
-//     {role: 'zoom'},
-//     {type: 'separator'},
-//     {role: 'front'}
-//   ]
-// }
 
 const onAppReady = () => {
   let menu = Menu.buildFromTemplate(template);

@@ -260,6 +260,3 @@ getFilename(function(filename) {
     document.getElementById('sidebarHeaderContent').innerHTML = filename;
     console.log(filename);
 });
-
-// $('#sidebar').resizable();
-// $('#goldenLayout').resizable();

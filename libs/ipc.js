@@ -16,6 +16,11 @@ ipcRenderer.on('connect', (event, message) => {
     connect(message[0])
 });
 
+/**
+ * Sends the CONNECT signal to the server via a POST request.
+ * 
+ * @param {String} url 
+ */
 function connect(url) {
     console.log("Received connect");
 
@@ -26,11 +31,11 @@ function connect(url) {
         }
         else {
             console.log("Failed to open file");
-            //Report to user
         }
     });
 }
 
+//Call the filename callback, if it exists
 ipcRenderer.on('filenameReply', (event, arg) => {
     if(filenameCallback != null) {
         filenameCallback(arg);
@@ -39,6 +44,11 @@ ipcRenderer.on('filenameReply', (event, arg) => {
     filenameCallback = null;
 })
 
+/**
+ * Sets the filename callback and sends 'getFilename' to the renderer
+ * 
+ * @param {Method} callback 
+ */
 function getFilename(callback) {
     filenameCallback = callback;
     ipcRenderer.send('getFilename');
