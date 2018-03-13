@@ -2,7 +2,7 @@ var Application = require('spectron').Application
 var assert = require('assert')
 
 var app = new Application({
-  path: './dist/linux-unpacked/ovis'
+  path: '../dist/linux-unpacked/ovis'
 })
 
 app.start().then(function () {
@@ -16,7 +16,7 @@ app.start().then(function () {
   return app.client.getTitle()
 }).then(function (title) {
   // Verify the window's title
-  assert.equal(title, 'My App')
+  assert.equal(title, 'OpenMDAO Visualization')
 }).then(function () {
   // Stop the application
   return app.stop()
