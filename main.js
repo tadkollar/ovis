@@ -58,9 +58,14 @@ app.on('will-quit', function () {
 })
 
 function findFile() {
-  dialog.showOpenDialog((fileNames) => {
-    openFile(fileNames);
-  })
+  if (!process.env.RUNNING_IN_SPECTRON) {
+    dialog.showOpenDialog((fileNames) => {
+      openFile(fileNames);
+    })
+  }
+  else {
+    openFile(["../server-tests/sellar_grouped.db"])
+  }
 }
 
 function openFile(fileNames) {
