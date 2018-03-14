@@ -32,6 +32,9 @@ const mainWindowUrl = url.format({
   slashes: true
 });
 
+logger.transports.console.level = "info";
+logger.transports.file.level = "info";
+
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
   // On OS X it is common for applications and their menu bar
@@ -63,7 +66,8 @@ function findFile() {
       openFile(fileNames);
     })
   }
-  else {
+    else {
+	logger.info("Opening sellar grouped in Spectron environment");
     openFile(["../server-tests/sellar_grouped.db"])
   }
 }
@@ -87,7 +91,8 @@ function openFile(fileNames) {
     });
 
   filename = fileNames[0]
-  mainWindow.webContents.send('connect', fileNames)
+    mainWindow.webContents.send('connect', fileNames)
+    logger.info("Opening file: " + path.join(__dirname, 'index.html'))
   mainWindow.loadURL(url.format({
     pathname: path.join(__dirname, 'index.html'),
     protocol: 'file:',
