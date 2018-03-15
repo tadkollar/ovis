@@ -2,7 +2,7 @@ var Application = require('spectron').Application
 var assert = require('assert')
 
 var app = new Application({
-    env: {RUNNING_IN_SPECTRON: '1'},
+  env: { RUNNING_IN_SPECTRON: '1' },
   path: '../dist/linux-unpacked/ovis'
 })
 
@@ -16,23 +16,23 @@ app.start().then(function () {
   return app.browserWindow.isVisible()
 }).then(function (isVisible) {
   // Verify the window is visible
-    //assert.equal(isVisible, true)
-    //app.client.element('.btn-large').click();
+  //assert.equal(isVisible, true)
+  //app.client.element('.btn-large').click();
 }).then(function () {
   // Get the window's title
   return app.client.getTitle()
 }).then(function (title) {
   // Verify the window's title
   assert.equal(title, 'OpenMDAO Visualization')
-}).then(function() {
-    let openButton = app.client.element('.btn-large');
-    assert.notEqual(openButton, null);
-}).then(function() {
-    //app.client.element('.btn-large').click();
-    //assert.equal(true, true, "button was not clicked");
 }).then(function () {
-    // Stop the application
-    console.log("Closing application...");
+  let openButton = app.client.element('.btn-large');
+  assert.notEqual(openButton, null);
+}).then(function () {
+  //app.client.element('.btn-large').click();
+  //assert.equal(true, true, "button was not clicked");
+}).then(function () {
+  // Stop the application
+  console.log("Closing application...");
   return app.stop()
 }).catch(function (error) {
   // Log any failures
