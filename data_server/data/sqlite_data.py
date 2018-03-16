@@ -243,6 +243,9 @@ class SqliteData(BaseData):
                  FROM driver_iterations")
             rows = self.cursor.fetchall()
 
+            # NOTE: responses is None right now because blob_to_array isn't working for responses
+            #   that are made in python3 when you're running the server in python2. However,
+            #   they're irrelevant for visualization.
             for row in rows:
                 n_row = {}
                 n_row['iteration_coordinate'] = row[0]
@@ -250,7 +253,7 @@ class SqliteData(BaseData):
                 n_row['success'] = row[2]
                 n_row['msg'] = row[3]
                 n_row['desvars'] = self.blob_to_array(row[4])
-                n_row['responses'] = self.blob_to_array(row[5])
+                n_row['responses'] = None # self.blob_to_array(row[5])
                 n_row['objectives'] = self.blob_to_array(row[6])
                 n_row['constraints'] = self.blob_to_array(row[7])
                 n_row['sysincludes'] = self.blob_to_array(row[8])
@@ -362,7 +365,7 @@ class SqliteData(BaseData):
             self.cursor.execute("SELECT layout FROM layouts WHERE id=0")
             row = self.cursor.fetchone()
             if row is None:
-                ret = []
+                ret = "[]"
             else:
                 ret = json.dumps([json.loads(row[0])])
 
