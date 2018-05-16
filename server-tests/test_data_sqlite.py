@@ -160,6 +160,10 @@ class TestSqliteData(unittest.TestCase):
         self.assertIsNotNone(layout['labels'])
         self.assertIsNotNone(layout['content'])
 
+    def test_metadata(self):
+        # test abs2meta
+        pass
+
     def test_update_layout(self):
         f_name = self._create_new_db()
         _data.connect(f_name)

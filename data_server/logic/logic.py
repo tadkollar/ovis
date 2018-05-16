@@ -422,22 +422,19 @@ def get_driver_iteration_data(case_id, variable):
     for i in dat:
         for v in i['desvars']:
             if v['name'] == variable:
-                v['iteration'] = _extract_iteration_coordinate(
-                    i['iteration_coordinate'])
+                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
                 v['counter'] = i['counter']
                 v['type'] = 'desvar'
                 ret.append(v)
         for v in i['objectives']:
             if v['name'] == variable:
-                v['iteration'] = _extract_iteration_coordinate(
-                    i['iteration_coordinate'])
+                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
                 v['counter'] = i['counter']
                 v['type'] = 'objective'
                 ret.append(v)
         for v in i['constraints']:
             if v['name'] == variable:
-                v['iteration'] = _extract_iteration_coordinate(
-                    i['iteration_coordinate'])
+                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
                 v['counter'] = i['counter']
                 v['type'] = 'constraint'
                 ret.append(v)
@@ -445,11 +442,17 @@ def get_driver_iteration_data(case_id, variable):
         if 'sysincludes' in i:
             for v in i['sysincludes']:
                 if v['name'] == variable:
-                    v['iteration'] = _extract_iteration_coordinate(
-                        i['iteration_coordinate'])
+                    v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
                     v['counter'] = i['counter']
                     v['type'] = 'sysinclude'
                     ret.append(v)
+
+        for v in i['inputs']:
+            if v['name'] == variable:
+                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
+                v['counter'] = i['counter']
+                v['type'] = 'constraint'
+                ret.append(v)
 
     return json.dumps(ret)
 
@@ -498,6 +501,14 @@ def get_desvars(case_id):
                         'type': 'sysinclude'
                     })
                     cache.append(v['name'])
+
+        for v in i['inputs']:
+            if v['name'] not in cache:
+                ret.append({
+                    'name': v['name'],
+                    'type': 'constraint'
+                })
+                cache.append(v['name'])
 
     return json.dumps(ret)
 

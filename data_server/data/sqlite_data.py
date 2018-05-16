@@ -64,6 +64,12 @@ class SqliteData(BaseData):
             self.cursor.execute("create table if not exists layouts\
                                  (id integer PRIMARY KEY, layout text)")
 
+            self.cursor.execute("SELECT * FROM metadata")
+            row = self.cursor.fetchone()
+            self.abs2prom = self.blob_to_array(row[0])
+            self.prom2abs = self.blob_to_array(row[1])
+            self.abs2meta = self.blob_to_array(row[2])
+
         return True
 
     def update_layout(self, body, case_id):
@@ -238,9 +244,8 @@ class SqliteData(BaseData):
         with self.connection:
             self.cursor = self.connection.cursor()
             self.cursor.execute(
-                "SELECT iteration_coordinate, timestamp, success, msg, desvars,\
-                 responses, objectives, constraints, sysincludes, counter\
-                 FROM driver_iterations")
+                "SELECT iteration_coordinate, timestamp, success, msg, \
+                 inputs, outputs, counter FROM driver_iterations")
             rows = self.cursor.fetchall()
 
             # NOTE: responses is None right now because blob_to_array isn't working for responses
@@ -252,12 +257,9 @@ class SqliteData(BaseData):
                 n_row['timestamp'] = row[1]
                 n_row['success'] = row[2]
                 n_row['msg'] = row[3]
-                n_row['desvars'] = self.blob_to_array(row[4])
-                n_row['responses'] = None # self.blob_to_array(row[5])
-                n_row['objectives'] = self.blob_to_array(row[6])
-                n_row['constraints'] = self.blob_to_array(row[7])
-                n_row['sysincludes'] = self.blob_to_array(row[8])
-                n_row['counter'] = row[9]
+                n_row['inputs'] = self.blob_to_array(row[4])
+                n_row['outputs'] = self.blob_to_array(row[5])
+                n_row['counter'] = row[6]
 
                 ret.append(n_row)
 
@@ -268,43 +270,41 @@ class SqliteData(BaseData):
             objectives_array = []
             constraints_array = []
             sysincludes_array = []
-            if data['desvars']:
-                for name in data['desvars'].dtype.names:
-                    desvars_array.append({
-                        'name': name,
-                        'values': self.convert_to_list(data['desvars'][name])
-                    })
+            inputs_array = []
+            for name in data['outputs'].dtype.names:
+                types = self.abs2meta[name]['type']
 
-            if data['responses']:
-                for name in data['responses'].dtype.names:
+                if 'response' in types:
                     responses_array.append({
                         'name': name,
-                        'values': self.convert_to_list(data['responses'][name])
+                        'values': self.convert_to_list(data['outputs'][name])
                     })
-
-            if data['objectives']:
-                for name in data['objectives'].dtype.names:
+                if 'desvar' in types:
+                    desvars_array.append({
+                        'name': name,
+                        'values': self.convert_to_list(data['outputs'][name])
+                    })
+                elif 'objective' in types:
                     objectives_array.append({
                         'name': name,
-                        'values': self.convert_to_list(
-                            data['objectives'][name])
+                        'values': self.convert_to_list(data['outputs'][name])
                     })
-
-            if data['constraints']:
-                for name in data['constraints'].dtype.names:
+                elif 'constraint' in types:
                     constraints_array.append({
                         'name': name,
-                        'values': self.convert_to_list(
-                            data['constraints'][name])
+                        'values': self.convert_to_list(data['outputs'][name])
                     })
-
-            if data['sysincludes']:
-                for name in data['sysincludes'].dtype.names:
+                else:
                     sysincludes_array.append({
                         'name': name,
-                        'values': self.convert_to_list(
-                            data['sysincludes'][name])
+                        'values': self.convert_to_list(data['outputs'][name])
                     })
+
+            for name in data['inputs'].dtype.names:
+                inputs_array.append({
+                    'name': name,
+                    'values': pmpiself.convert_to_list(data['inputs'][name])
+                })
 
             final_ret.append({
                 'iteration_coordinate': data['iteration_coordinate'],
@@ -321,7 +321,8 @@ class SqliteData(BaseData):
                 "constraints": [] if len(constraints_array) is 0
                 else constraints_array,
                 "sysincludes": [] if len(sysincludes_array) is 0
-                else sysincludes_array
+                else sysincludes_array,
+                "inputs": [] if len(inputs_array) is 0 else inputs_array
             })
 
         return final_ret
