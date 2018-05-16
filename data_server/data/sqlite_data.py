@@ -66,9 +66,9 @@ class SqliteData(BaseData):
 
             self.cursor.execute("SELECT * FROM metadata")
             row = self.cursor.fetchone()
-            self.abs2prom = self.blob_to_array(row[0])
-            self.prom2abs = self.blob_to_array(row[1])
-            self.abs2meta = self.blob_to_array(row[2])
+            self.abs2prom = pickle.loads(row[0])
+            self.prom2abs = pickle.loads(row[1])
+            self.abs2meta = pickle.loads(row[2])
 
         return True
 
