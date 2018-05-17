@@ -64,11 +64,17 @@ class SqliteData(BaseData):
             self.cursor.execute("create table if not exists layouts\
                                  (id integer PRIMARY KEY, layout text)")
 
-            self.cursor.execute("SELECT * FROM metadata")
+            self.cursor.execute("SELECT abs2prom, prom2abs, abs2meta FROM metadata")
             row = self.cursor.fetchone()
-            self.abs2prom = pickle.loads(row[0])
-            self.prom2abs = pickle.loads(row[1])
-            self.abs2meta = pickle.loads(row[2])
+
+            if PY2:
+                self.abs2prom = pickle.loads(str(row[0])) if row[0] is not None else None
+                self.prom2abs = pickle.loads(str(row[1])) if row[1] is not None else None
+                self.abs2meta = pickle.loads(str(row[2])) if row[2] is not None else None
+            if PY3:
+                self.abs2prom = pickle.loads(str.encode(row[0])) if row[0] is not None else None
+                self.prom2abs = pickle.loads(str.encode(row[1])) if row[1] is not None else None
+                self.abs2meta = pickle.loads(str.encode(row[2])) if row[2] is not None else None
 
         return True
 
@@ -272,6 +278,7 @@ class SqliteData(BaseData):
             sysincludes_array = []
             inputs_array = []
             for name in data['outputs'].dtype.names:
+                print(self.abs2meta[name])
                 types = self.abs2meta[name]['type']
 
                 if 'response' in types:
@@ -303,7 +310,7 @@ class SqliteData(BaseData):
             for name in data['inputs'].dtype.names:
                 inputs_array.append({
                     'name': name,
-                    'values': pmpiself.convert_to_list(data['inputs'][name])
+                    'values': self.convert_to_list(data['inputs'][name])
                 })
 
             final_ret.append({
