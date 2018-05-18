@@ -81,7 +81,7 @@ class TestSqliteData(unittest.TestCase):
         _data.connect(f_name)
         layout = _data.generic_get(collections.LAYOUTS)
 
-        self.assertEqual(layout, [])
+        self.assertEqual(layout, "[]")
 
     def test_generic_get_unsupported_collection(self):
         f_name = self._create_new_db()
@@ -95,51 +95,93 @@ class TestSqliteData(unittest.TestCase):
         iterations = json.loads(_data.generic_get(
             collections.DRIVER_ITERATIONS))
 
-        self.assertEqual(len(iterations), 6)
+        self.assertEqual(len(iterations), 7)
         t_iter = iterations[0]
         desvars = [
-            {'name': 'p1.x', 'values': [[50.0]]},
-            {'name': 'p2.y', 'values': [[50.0]]}
+            {'name': 'pz.z', 'values': [[5.0, 2.0]]},
+            {'name': 'px.x', 'values': [[1.0]]}
         ]
         objectives = [
-            {'name': 'comp.f_xy', 'values': [[7622.0]]}
+            {'name': 'obj_cmp.obj', 'values': [[28.5883081]]}
         ]
         sysincludes = [
-            {'name': 'p3.z', 'values': [[50.0]]}
+            {'name': 'mda.d2.y2', 'values': [[12.05848815]]},
+            {'name': 'mda.d1.y1', 'values': [[25.58830237]]}
+        ]
+        constraints = [
+            {'name': 'con_cmp1.con1', 'values': [[-22.42830237]]},
+            {'name': 'con_cmp2.con2', 'values': [[-11.94151184]]}
+        ]
+        inputs = [
+            {'name': 'mda.d2.y1', 'values': [[25.58830237]]},
+            {'name': 'con_cmp2.y2', 'values': [[12.05848815]]},
+            {'name': 'mda.d1.x', 'values': [[1.0]]},
+            {'name': 'mda.d1.z', 'values': [[5.0, 2.0]]},
+            {'name': 'obj_cmp.x', 'values': [[1.0]]},
+            {'name': 'obj_cmp.z', 'values': [[5.0, 2.0]]},
+            {'name': 'obj_cmp.y1', 'values': [[25.58830237]]},
+            {'name': 'obj_cmp.y2', 'values': [[12.05848815062]]},
+            {'name': 'mda.d2.z', 'values': [[5.0, 2.0]]},
+            {'name': 'con_cmp1.y1', 'values': [[25.58830237]]},
+            {'name': 'mda.d1.y2', 'values': [[12.058488150]]},
         ]
 
-        self.assertEqual(t_iter['constraints'], [])
+        for c in constraints:
+            self._assert_array_close(c, t_iter['constraints'])
         for d in desvars:
             self._assert_array_close(d, t_iter['desvars'])
         for o in objectives:
             self._assert_array_close(o, t_iter['objectives'])
         for s in sysincludes:
             self._assert_array_close(s, t_iter['sysincludes'])
+        for i in inputs:
+            self._assert_array_close(i, t_iter['inputs'])
 
     def test_get_driver_iteration2(self):
         self._use_sellar_grouped()
         iterations = _data.get_driver_iteration_data('')
 
-        self.assertEqual(len(iterations), 6)
+        self.assertEqual(len(iterations), 7)
         t_iter = iterations[0]
         desvars = [
-            {'name': 'p1.x', 'values': [[50.0]]},
-            {'name': 'p2.y', 'values': [[50.0]]}
+            {'name': 'pz.z', 'values': [[5.0, 2.0]]},
+            {'name': 'px.x', 'values': [[1.0]]}
         ]
         objectives = [
-            {'name': 'comp.f_xy', 'values': [[7622.0]]}
+            {'name': 'obj_cmp.obj', 'values': [[28.5883081]]}
         ]
         sysincludes = [
-            {'name': 'p3.z', 'values': [[50.0]]}
+            {'name': 'mda.d2.y2', 'values': [[12.05848815]]},
+            {'name': 'mda.d1.y1', 'values': [[25.58830237]]}
+        ]
+        constraints = [
+            {'name': 'con_cmp1.con1', 'values': [[-22.42830237]]},
+            {'name': 'con_cmp2.con2', 'values': [[-11.94151184]]}
+        ]
+        inputs = [
+            {'name': 'mda.d2.y1', 'values': [[25.58830237]]},
+            {'name': 'con_cmp2.y2', 'values': [[12.05848815]]},
+            {'name': 'mda.d1.x', 'values': [[1.0]]},
+            {'name': 'mda.d1.z', 'values': [[5.0, 2.0]]},
+            {'name': 'obj_cmp.x', 'values': [[1.0]]},
+            {'name': 'obj_cmp.z', 'values': [[5.0, 2.0]]},
+            {'name': 'obj_cmp.y1', 'values': [[25.58830237]]},
+            {'name': 'obj_cmp.y2', 'values': [[12.05848815062]]},
+            {'name': 'mda.d2.z', 'values': [[5.0, 2.0]]},
+            {'name': 'con_cmp1.y1', 'values': [[25.58830237]]},
+            {'name': 'mda.d1.y2', 'values': [[12.058488150]]},
         ]
 
-        self.assertEqual(t_iter['constraints'], [])
+        for c in constraints:
+            self._assert_array_close(c, t_iter['constraints'])
         for d in desvars:
             self._assert_array_close(d, t_iter['desvars'])
         for o in objectives:
             self._assert_array_close(o, t_iter['objectives'])
         for s in sysincludes:
             self._assert_array_close(s, t_iter['sysincludes'])
+        for i in inputs:
+            self._assert_array_close(i, t_iter['inputs'])
 
     def test_get_driver_metadata(self):
         self._use_sellar_grouped()
@@ -149,7 +191,7 @@ class TestSqliteData(unittest.TestCase):
         self.assertIsNotNone(metadata['model_viewer_data']['tree'])
         self.assertIsNotNone(metadata['model_viewer_data']['connections_list'])
         self.assertEqual(
-            len(metadata['model_viewer_data']['connections_list']), 4)
+            len(metadata['model_viewer_data']['connections_list']), 11)
 
     def test_get_layout(self):
         self._use_sellar_grouped()
@@ -168,7 +210,7 @@ class TestSqliteData(unittest.TestCase):
         f_name = self._create_new_db()
         _data.connect(f_name)
         layout_s = _data.generic_get(collections.LAYOUTS)
-        self.assertEqual(layout_s, [])
+        self.assertEqual(layout_s, '[]')
 
         new_layout = {'test': True}
         _data.update_layout(new_layout, '')
@@ -200,11 +242,9 @@ class TestSqliteData(unittest.TestCase):
             self.cursor = con.cursor()
             self.cursor.execute("INSERT INTO driver_iterations(counter, "
                                 "iteration_coordinate, timestamp, success,"
-                                " msg, desvars , responses , objectives , "
-                                "constraints, sysincludes ) "
-                                "VALUES(?,?,?,?,?,?,?,?,?,?)",
-                                (1, '', 0, 1, '', None, None, None,
-                                 None, None))
+                                " msg, inputs, outputs) "
+                                "VALUES(?,?,?,?,?,?,?)",
+                                (1, '', 0, 1, '', None, None))
 
         con.close()
         _data.connect(f_name)
@@ -212,8 +252,8 @@ class TestSqliteData(unittest.TestCase):
 
     def test_is_new_data2(self):
         self._use_sellar_grouped()
-        self.assertFalse(_data.is_new_data('', 42))
-        self.assertTrue(_data.is_new_data('', 41))
+        self.assertFalse(_data.is_new_data('', 59))
+        self.assertTrue(_data.is_new_data('', 57))
 
     # Helper methods
 
@@ -231,7 +271,7 @@ class TestSqliteData(unittest.TestCase):
         values_arr = [t for t in comp_set if t['name'] == test_val['name']]
         if len(values_arr) != 1:
             self.assertTrue(False, 'Expected to find a value with a unique name in the comp_set,\
-             but found 0 or more than 1 instead')
+             but found 0 or more than 1 instead for name: ' + test_val['name'])
             return
         np.testing.assert_almost_equal(test_val['values'],
                                        values_arr[0]['values'],
@@ -263,40 +303,34 @@ class TestSqliteData(unittest.TestCase):
         with con:
             self.cursor = con.cursor()
             self.cursor.execute("CREATE TABLE metadata( format_version INT, "
-                                "abs2prom BLOB, prom2abs BLOB)")
-            self.cursor.execute("INSERT INTO metadata(format_version, "
-                                "abs2prom, prom2abs) VALUES(?,?,?)",
-                                (1, None, None))
+                                "abs2prom BLOB, prom2abs BLOB, abs2meta BLOB)")
+            self.cursor.execute("INSERT INTO metadata(format_version, abs2prom, "
+                                "prom2abs) VALUES(?,?,?)",
+                                (1.0, None, None))
 
             # used to keep track of the order of the case records across all
             # three tables
-            self.cursor.execute("CREATE TABLE global_iterations(id INTEGER "
-                                "PRIMARY KEY, record_type TEXT, rowid INT)")
-            self.cursor.execute("CREATE TABLE driver_iterations(id INTEGER "
-                                "PRIMARY KEY, counter INT,"
-                                "iteration_coordinate TEXT, timestamp REAL, "
-                                "success INT, msg TEXT, desvars BLOB, "
-                                "responses BLOB, objectives BLOB, constraints "
-                                "BLOB, sysincludes BLOB)")
-            self.cursor.execute("CREATE TABLE system_iterations(id INTEGER "
-                                "PRIMARY KEY, counter INT, "
-                                "iteration_coordinate TEXT,  timestamp REAL, "
-                                "success INT, msg TEXT, inputs BLOB, "
-                                "outputs BLOB, residuals BLOB)")
-            self.cursor.execute("CREATE TABLE solver_iterations(id INTEGER "
-                                "PRIMARY KEY, counter INT, "
-                                "iteration_coordinate TEXT, timestamp REAL, "
-                                "success INT, msg TEXT, abs_err REAL, "
-                                "rel_err REAL, solver_output BLOB, "
+            self.cursor.execute("CREATE TABLE global_iterations(id INTEGER PRIMARY KEY, "
+                                "record_type TEXT, rowid INT)")
+            self.cursor.execute("CREATE TABLE driver_iterations(id INTEGER PRIMARY KEY, "
+                                "counter INT,iteration_coordinate TEXT, timestamp REAL, "
+                                "success INT, msg TEXT, inputs BLOB, outputs BLOB)")
+            self.cursor.execute("CREATE TABLE system_iterations(id INTEGER PRIMARY KEY, "
+                                "counter INT, iteration_coordinate TEXT,  timestamp REAL, "
+                                "success INT, msg TEXT, inputs BLOB, outputs BLOB, "
+                                "residuals BLOB)")
+            self.cursor.execute("CREATE TABLE solver_iterations(id INTEGER PRIMARY KEY, "
+                                "counter INT, iteration_coordinate TEXT, timestamp REAL, "
+                                "success INT, msg TEXT, abs_err REAL, rel_err REAL, "
+                                "solver_inputs BLOB, solver_output BLOB, "
                                 "solver_residuals BLOB)")
 
-            self.cursor.execute("CREATE TABLE driver_metadata(id TEXT "
-                                "PRIMARY KEY, model_viewer_data BLOB)")
-            self.cursor.execute("CREATE TABLE system_metadata(id TEXT "
-                                "PRIMARY KEY, scaling_factors BLOB)")
-            self.cursor.execute("CREATE TABLE solver_metadata(id TEXT "
-                                "PRIMARY KEY, solver_options BLOB, "
-                                "solver_class TEXT)")
+            self.cursor.execute("CREATE TABLE driver_metadata(id TEXT PRIMARY KEY, "
+                                "model_viewer_data BLOB)")
+            self.cursor.execute("CREATE TABLE system_metadata(id TEXT PRIMARY KEY, "
+                                "scaling_factors BLOB, component_metadata BLOB)")
+            self.cursor.execute("CREATE TABLE solver_metadata(id TEXT PRIMARY KEY, "
+                                "solver_options BLOB, solver_class TEXT)")
         con.close()
         return f_name
 

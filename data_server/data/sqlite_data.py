@@ -64,17 +64,24 @@ class SqliteData(BaseData):
             self.cursor.execute("create table if not exists layouts\
                                  (id integer PRIMARY KEY, layout text)")
 
-            self.cursor.execute("SELECT abs2prom, prom2abs, abs2meta FROM metadata")
+            self.cursor.execute(
+                "SELECT abs2prom, prom2abs, abs2meta FROM metadata")
             row = self.cursor.fetchone()
 
             if PY2:
-                self.abs2prom = pickle.loads(str(row[0])) if row[0] is not None else None
-                self.prom2abs = pickle.loads(str(row[1])) if row[1] is not None else None
-                self.abs2meta = pickle.loads(str(row[2])) if row[2] is not None else None
+                self.abs2prom = pickle.loads(
+                    str(row[0])) if row[0] is not None else None
+                self.prom2abs = pickle.loads(
+                    str(row[1])) if row[1] is not None else None
+                self.abs2meta = pickle.loads(
+                    str(row[2])) if row[2] is not None else None
             if PY3:
-                self.abs2prom = pickle.loads(str.encode(row[0])) if row[0] is not None else None
-                self.prom2abs = pickle.loads(str.encode(row[1])) if row[1] is not None else None
-                self.abs2meta = pickle.loads(str.encode(row[2])) if row[2] is not None else None
+                self.abs2prom = pickle.loads(str.encode(
+                    row[0])) if row[0] is not None else None
+                self.prom2abs = pickle.loads(str.encode(
+                    row[1])) if row[1] is not None else None
+                self.abs2meta = pickle.loads(str.encode(
+                    row[2])) if row[2] is not None else None
 
         return True
 
@@ -278,7 +285,6 @@ class SqliteData(BaseData):
             sysincludes_array = []
             inputs_array = []
             for name in data['outputs'].dtype.names:
-                print(self.abs2meta[name])
                 types = self.abs2meta[name]['type']
 
                 if 'response' in types:
@@ -367,7 +373,7 @@ class SqliteData(BaseData):
         JSON :
             the layout for this case if one exists, [] otherwise
         """
-        ret = []
+        ret = None
         with self.connection:
             self.cursor = self.connection.cursor()
             self.cursor.execute("SELECT layout FROM layouts WHERE id=0")
