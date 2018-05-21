@@ -11,6 +11,7 @@ import os
 import json
 import time
 import smtplib
+import warnings
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dateutil import tz
@@ -447,12 +448,13 @@ def get_driver_iteration_data(case_id, variable):
                     v['type'] = 'sysinclude'
                     ret.append(v)
 
-        for v in i['inputs']:
-            if v['name'] == variable:
-                v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
-                v['counter'] = i['counter']
-                v['type'] = 'constraint'
-                ret.append(v)
+        if 'inputs' in i:
+            for v in i['inputs']:
+                if v['name'] == variable:
+                    v['iteration'] = _extract_iteration_coordinate(i['iteration_coordinate'])
+                    v['counter'] = i['counter']
+                    v['type'] = 'constraint'
+                    ret.append(v)
 
     return json.dumps(ret)
 
@@ -502,13 +504,14 @@ def get_desvars(case_id):
                     })
                     cache.append(v['name'])
 
-        for v in i['inputs']:
-            if v['name'] not in cache:
-                ret.append({
-                    'name': v['name'],
-                    'type': 'constraint'
-                })
-                cache.append(v['name'])
+        if 'inputs' in i:
+            for v in i['inputs']:
+                if v['name'] not in cache:
+                    ret.append({
+                        'name': v['name'],
+                        'type': 'constraint'
+                    })
+                    cache.append(v['name'])
 
     return json.dumps(ret)
 
@@ -563,7 +566,11 @@ def send_activation_email(token, name, email):
         name (string): the person's name
         email (string): the person's email
     """
-    recipient = os.environ['OPENMDAO_EMAIL']
+    if 'OPENMDAO_EMAIL' in os.environ:
+        recipient = os.environ['OPENMDAO_EMAIL']
+    else:
+        recipient = 'test_email@fake.com'
+        warnings.warn("OPENMDAO_EMAIL enivronment variable not set")
     message = 'Activate new user: ' + name + ' with the email: ' + \
         email + '\r\nhttp://openmdao.org/visualization/activate/' + token
     subject = 'Activate OpenMDAO Visualization User'
@@ -592,8 +599,16 @@ def _send_email(recipient, subject, message):
         subject (string): the email subject
         message (string): the email body
     """
-    gmail_user = os.environ['VISUALIZATION_EMAIL']
-    gmail_password = os.environ['VISUALIZATION_EMAIL_PASSWORD']
+    if 'VISUALIZATION_EMAIL' in os.environ:
+        gmail_user = os.environ['VISUALIZATION_EMAIL']
+    else:
+        gmail_user = 'vis_email@fake.com'
+        warnings.warn("VISUALIZATION_EMAIL enivronment variable not set")
+    if 'VISUALIZATION_EMAIL_PASSWORD' in os.environ:
+        gmail_password = os.environ['VISUALIZATION_EMAIL_PASSWORD']
+    else:
+        gmail_password = ''
+        warnings.warn("VISUALIZATION_EMAIL_PASSWORD environment variable not set")
 
     msg = MIMEMultipart()
     msg['From'] = gmail_user

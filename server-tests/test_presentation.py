@@ -77,11 +77,11 @@ class TestPresentationLayer(AsyncHTTPTestCase):
 
     def test_driver_iteration_get_var(self):
         self._connect_sellar_grouped()
-        response = self.fetch('/case/0/driver_iterations/p1.x')
+        response = self.fetch('/case/0/driver_iterations/pz.z')
         body = json.loads(response.body)
         self.assertEqual(response.code, 200)
         self.assertIsNotNone(response.body)
-        self.assertEqual(len(body), 6)
+        self.assertEqual(len(body), 7)
 
     def test_driver_iteration_post(self):
         self._connect_sellar_grouped()
