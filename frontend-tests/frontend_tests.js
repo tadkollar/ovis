@@ -1,40 +1,62 @@
-var Application = require('spectron').Application
-var assert = require('assert')
+var Application = require('spectron').Application;
+var assert = require('assert');
+
+// Determine which app to use
+var path = '../dist/';
+switch (process.platform) {
+    case 'darwin':
+        path += 'mac/OVis.app';
+        break;
+    case 'win32':
+        path += 'win-unpacked/OVis.exe';
+        break;
+    case 'linux':
+        path += 'linux-unpacked/ovis';
+        break;
+}
 
 var app = new Application({
-  env: { RUNNING_IN_SPECTRON: '1' },
-  path: '../dist/linux-unpacked/ovis'
-})
+    env: { RUNNING_IN_SPECTRON: '1' },
+    path: path
+});
 
-const chaiAsPromised = require("chai-as-promised")
-const chai = require("chai")
-chai.should()
-chai.use(chaiAsPromised)
+const chaiAsPromised = require('chai-as-promised');
+const chai = require('chai');
+chai.should();
+chai.use(chaiAsPromised);
 
-app.start().then(function () {
-  // Check if the window is visible
-  return app.browserWindow.isVisible()
-}).then(function (isVisible) {
-  // Verify the window is visible
-  assert.equal(isVisible, true)
-}).then(function () {
-  // Get the window's title
-  return app.client.getTitle()
-}).then(function (title) {
-  // Verify the window's title
-  assert.equal(title, 'OpenMDAO Visualization')
-}).then(function () {
-  // Verify our open button is rendered to page
-  let openButton = app.client.element('#openButton');
-  assert.notEqual(openButton, null);
-}).then(function () {
-  // Stop the application
-  console.log("Closing application...");
-  return app.stop()
-}).catch(function (error) {
-  // Log any failures
-  console.error('Test failed', error.message)
-})
+app
+    .start()
+    .then(function() {
+        // Check if the window is visible
+        return app.browserWindow.isVisible();
+    })
+    .then(function(isVisible) {
+        // Verify the window is visible
+        assert.equal(isVisible, true);
+    })
+    .then(function() {
+        // Get the window's title
+        return app.client.getTitle();
+    })
+    .then(function(title) {
+        // Verify the window's title
+        assert.equal(title, 'OpenMDAO Visualization');
+    })
+    .then(function() {
+        // Verify our open button is rendered to page
+        let openButton = app.client.element('#openButton');
+        assert.notEqual(openButton, null);
+    })
+    .then(function() {
+        // Stop the application
+        console.log('Closing application...');
+        return app.stop();
+    })
+    .catch(function(error) {
+        // Log any failures
+        console.error('Test failed', error.message);
+    });
 
 // app.start().then(function() {
 //   app.client.element('#openButton').click();

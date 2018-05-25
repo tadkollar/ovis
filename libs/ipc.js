@@ -1,21 +1,21 @@
-'use strict'
+'use strict';
 
-var { ipcRenderer, remote } = require('electron')
+var { ipcRenderer, remote } = require('electron');
 let filenameCallback = null;
 
 /**
-* function openFile - Sends an IPC message to the main process to
-*   open the file epxlorer
-*/
+ * function openFile - Sends an IPC message to the main process to
+ *   open the file epxlorer
+ */
 function openFile() {
     ipcRenderer.sendSync('openFile');
-    console.log("Sent openFile IPC message");
+    console.log('Sent openFile IPC message');
 }
 
 /**
  * Sets the filename callback and sends 'getFilename' to the renderer
- * 
- * @param {Method} callback 
+ *
+ * @param {function} callback
  */
 function getFilename(callback) {
     filenameCallback = callback;
@@ -29,4 +29,4 @@ ipcRenderer.on('filenameReply', (event, arg) => {
     }
 
     filenameCallback = null;
-})
+});

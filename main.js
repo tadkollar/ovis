@@ -5,6 +5,7 @@ const querystring = require('querystring');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
+const is = require('electron-is');
 const { spawn } = require('child_process');
 const {
     app,
@@ -43,6 +44,9 @@ function findFile() {
     if (!process.env.RUNNING_IN_SPECTRON) {
         logger.info('Opening file dialog');
         dialog.showOpenDialog(mainWindow, null, fileNames => {
+            if (fileNames == null || fileNames.length === 0) {
+                return;
+            }
             openFile(fileNames[0]);
         });
     } else {
@@ -85,8 +89,7 @@ function openFile(fName) {
  * Open the visualization HTML file
  */
 function loadVisPage() {
-    let visInd = path.join(__dirname, 'components');
-    visInd = path.join(visInd, 'vis_index.html');
+    let visInd = path.join(__dirname, 'vis_index.html');
 
     logger.info('Loading file: ' + visInd);
     mainWindow.loadURL(
@@ -103,7 +106,15 @@ function loadVisPage() {
  */
 function startServer() {
     // Start up the server
-    let server_loc = path.join(__dirname, 'main.py');
+    let server_loc = path.join(__dirname, '../main.py');
+
+    // Use a different path if we're running in Electron
+    if (is.dev()) {
+        logger.info('Running in Electron');
+        server_loc = path.join(__dirname, 'main.py');
+    } else {
+        logger.info('Running outside of Electron');
+    }
     server = spawn('python', [server_loc]);
 
     // Redirect stdout
@@ -126,6 +137,9 @@ function startApp() {
 
     mainWindow = new BrowserWindow({});
     mainWindow.loadURL(mainWindowUrl);
+
+    // Start the server
+    startServer();
 }
 
 // Quit when all windows are closed.
@@ -162,9 +176,6 @@ ipcMain.on('getFilename', (event, arg) => {
 });
 
 app.on('ready', startApp);
-
-// Start the server
-startServer();
 
 // Toolbar template
 const template = [

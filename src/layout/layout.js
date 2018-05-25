@@ -1,5 +1,6 @@
-var fs = require('fs');
-var path = require('path');
+const fs = require('fs');
+const path = require('path');
+const is = require('electron-is');
 
 // The list of callbacks to get configs from plots
 // so that we can update their componentState on the server.
@@ -9,8 +10,15 @@ var configCallbacks = [];
 var lastLayout = null;
 
 // Grab the ptn2 and plot HTML data
-let ptn2_loc = path.join(__dirname, '../components/partition_tree_n2.html');
-let plot_loc = path.join(__dirname, '../components/plot.html');
+let ptn2_loc = path.join(
+    process.resourcesPath,
+    'components/partition_tree_n2.html'
+);
+let plot_loc = path.join(process.resourcesPath, 'components/plot.html');
+if (is.dev()) {
+    ptn2_loc = path.join(__dirname, 'components/partition_tree_n2.html');
+    plot_loc = path.join(__dirname, 'components/plot.html');
+}
 let ptn2_file = fs.readFileSync(ptn2_loc);
 let plot_file = fs.readFileSync(plot_loc);
 
