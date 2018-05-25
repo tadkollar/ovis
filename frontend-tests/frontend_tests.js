@@ -16,8 +16,7 @@ app.start().then(function () {
   return app.browserWindow.isVisible()
 }).then(function (isVisible) {
   // Verify the window is visible
-  //assert.equal(isVisible, true)
-  //app.client.element('.btn-large').click();
+  assert.equal(isVisible, true)
 }).then(function () {
   // Get the window's title
   return app.client.getTitle()
@@ -25,11 +24,9 @@ app.start().then(function () {
   // Verify the window's title
   assert.equal(title, 'OpenMDAO Visualization')
 }).then(function () {
-  let openButton = app.client.element('.btn-large');
+  // Verify our open button is rendered to page
+  let openButton = app.client.element('#openButton');
   assert.notEqual(openButton, null);
-}).then(function () {
-  //app.client.element('.btn-large').click();
-  //assert.equal(true, true, "button was not clicked");
 }).then(function () {
   // Stop the application
   console.log("Closing application...");
@@ -38,3 +35,10 @@ app.start().then(function () {
   // Log any failures
   console.error('Test failed', error.message)
 })
+
+// app.start().then(function() {
+//   app.client.element('#openButton').click();
+//   // assert.equal(true, true, "button was not clicked");
+// }).then(function() {
+//   return app.stop();
+// })

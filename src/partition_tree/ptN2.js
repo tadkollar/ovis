@@ -16,8 +16,8 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
     var root = paramRootJson;
     var conns = paramConnsJson;
     var FONT_SIZE_PX = 11;
-    var svgStyleElement = document.createElement("style");
-    var outputNamingType = "Absolute";
+    var svgStyleElement = document.createElement('style');
+    var outputNamingType = 'Absolute';
     var showPath = false; //default off
 
     var DEFAULT_TRANSITION_START_DELAY = 100;
@@ -27,11 +27,12 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
     var RIGHT_TEXT_MARGIN_PX = 8; // How much space in px (left and) right of text in partition tree
 
     //N^2 vars
-    var backButtonHistory = [], forwardButtonHistory = [];
+    var backButtonHistory = [],
+        forwardButtonHistory = [];
     var chosenCollapseDepth = -1;
     var updateRecomputesAutoComplete = true; //default
-    var katexInputDivElement = document.getElementById("katexInputDiv");
-    var katexInputElement = document.getElementById("katexInput");
+    var katexInputDivElement = document.getElementById('katexInputDiv');
+    var katexInputElement = document.getElementById('katexInput');
 
     mouseOverOnDiagN2 = MouseoverOnDiagN2;
     mouseOverOffDiagN2 = MouseoverOffDiagN2;
@@ -43,39 +44,42 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
 
     setD3ContentDiv();
 
-    $("#svgId")[0].appendChild(svgStyleElement);
+    $('#svgId')[0].appendChild(svgStyleElement);
     UpdateSvgCss(svgStyleElement, FONT_SIZE_PX);
 
-    arrowMarker = svg.append("svg:defs").append("svg:marker");
+    arrowMarker = svg.append('svg:defs').append('svg:marker');
 
     arrowMarker
-        .attr("id", "arrow")
-        .attr("viewBox", "0 -5 10 10")
-        .attr("refX", 5)
-        .attr("refY", 0)
-        .attr("markerWidth", 1)
-        .attr("markerHeight", 1)
-        .attr("orient", "auto")
-        .append("path")
-        .attr("d", "M0,-5L10,0L0,5")
-        .attr("class", "arrowHead");
+        .attr('id', 'arrow')
+        .attr('viewBox', '0 -5 10 10')
+        .attr('refX', 5)
+        .attr('refY', 0)
+        .attr('markerWidth', 1)
+        .attr('markerHeight', 1)
+        .attr('orient', 'auto')
+        .append('path')
+        .attr('d', 'M0,-5L10,0L0,5')
+        .attr('class', 'arrowHead');
 
     setN2Group();
-    var pTreeGroup = svg.append("g");
+    var pTreeGroup = svg.append('g');
 
     function updateRootTypes() {
         if (!search.showParams) return;
 
-        var stack = []
+        var stack = [];
         for (var i = 0; i < root.children.length; ++i) {
             stack.push(root.children[i]);
         }
 
         while (stack.length > 0) {
             var cur_ele = stack.pop();
-            if (cur_ele.type === "param") {
-                if (!hasInputConnection(cur_ele.absPathName) && !hasOutputConnection(cur_ele.absPathName)) {
-                    cur_ele.type = "unconnected_param";
+            if (cur_ele.type === 'param') {
+                if (
+                    !hasInputConnection(cur_ele.absPathName) &&
+                    !hasOutputConnection(cur_ele.absPathName)
+                ) {
+                    cur_ele.type = 'unconnected_param';
                 }
             }
 
@@ -106,122 +110,214 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
     }
     hasInputConn = hasInputConnection;
 
-    var n2BackgroundRectR0 = -1, n2BackgroundRectC0 = -1;
+    var n2BackgroundRectR0 = -1,
+        n2BackgroundRectC0 = -1;
     var newConnsDict = {};
     function PrintConnects() {
-        var text = "Connections:";
+        var text = 'Connections:';
         for (var key in newConnsDict) {
             var d = newConnsDict[key];
             var param = d3RightTextNodesArrayZoomed[d.c],
                 unknown = d3RightTextNodesArrayZoomed[d.r];
-            var paramName = (zoomedElement.promotions && zoomedElement.promotions[param.absPathName] !== undefined) ?
-                "<b>" + zoomedElement.promotions[param.absPathName] + "</b>" :
-                ((zoomedElement === root) ? param.absPathName : param.absPathName.slice(zoomedElement.absPathName.length + 1));
-            var unknownName = (zoomedElement.promotions && zoomedElement.promotions[unknown.absPathName] !== undefined) ?
-                "<b>" + zoomedElement.promotions[unknown.absPathName] + "</b>" :
-                ((zoomedElement === root) ? unknown.absPathName : unknown.absPathName.slice(zoomedElement.absPathName.length + 1));
+            var paramName =
+                zoomedElement.promotions &&
+                zoomedElement.promotions[param.absPathName] !== undefined
+                    ? '<b>' +
+                      zoomedElement.promotions[param.absPathName] +
+                      '</b>'
+                    : zoomedElement === root
+                        ? param.absPathName
+                        : param.absPathName.slice(
+                              zoomedElement.absPathName.length + 1
+                          );
+            var unknownName =
+                zoomedElement.promotions &&
+                zoomedElement.promotions[unknown.absPathName] !== undefined
+                    ? '<b>' +
+                      zoomedElement.promotions[unknown.absPathName] +
+                      '</b>'
+                    : zoomedElement === root
+                        ? unknown.absPathName
+                        : unknown.absPathName.slice(
+                              zoomedElement.absPathName.length + 1
+                          );
 
-            text += "<br />self.connect(\"" + unknownName + "\", \"" + paramName + "\")";
+            text +=
+                '<br />self.connect("' +
+                unknownName +
+                '", "' +
+                paramName +
+                '")';
         }
-        $("#connectionId")[0].innerHTML = text;
+        $('#connectionId')[0].innerHTML = text;
     }
-    var n2BackgroundRect = n2Group.append("rect")
-        .attr("class", "background")
-        .attr("width", ptn2.WIDTH_N2_PX)
-        .attr("height", ptn2.HEIGHT_PX)
-        .on("click", function () {
+    var n2BackgroundRect = n2Group
+        .append('rect')
+        .attr('class', 'background')
+        .attr('width', ptn2.WIDTH_N2_PX)
+        .attr('height', ptn2.HEIGHT_PX)
+        .on('click', function() {
             if (!search.showParams) return;
             var coords = d3.mouse(this);
-            var c = Math.floor(coords[0] * d3RightTextNodesArrayZoomed.length / ptn2.WIDTH_N2_PX);
-            var r = Math.floor(coords[1] * d3RightTextNodesArrayZoomed.length / ptn2.HEIGHT_PX);
-            if (r == c || r < 0 || c < 0 || r >= d3RightTextNodesArrayZoomed.length || c >= d3RightTextNodesArrayZoomed.length) return;
-            if (matrix[r + "_" + c] !== undefined) return;
+            var c = Math.floor(
+                coords[0] *
+                    d3RightTextNodesArrayZoomed.length /
+                    ptn2.WIDTH_N2_PX
+            );
+            var r = Math.floor(
+                coords[1] * d3RightTextNodesArrayZoomed.length / ptn2.HEIGHT_PX
+            );
+            if (
+                r == c ||
+                r < 0 ||
+                c < 0 ||
+                r >= d3RightTextNodesArrayZoomed.length ||
+                c >= d3RightTextNodesArrayZoomed.length
+            )
+                return;
+            if (matrix[r + '_' + c] !== undefined) return;
 
             var param = d3RightTextNodesArrayZoomed[c],
                 unknown = d3RightTextNodesArrayZoomed[r];
-            if (param.type !== "param" && unknown.type !== "unknown") return;
+            if (param.type !== 'param' && unknown.type !== 'unknown') return;
 
-            var newClassName = "n2_hover_elements_" + r + "_" + c;
-            var selection = n2Group.selectAll("." + newClassName);
+            var newClassName = 'n2_hover_elements_' + r + '_' + c;
+            var selection = n2Group.selectAll('.' + newClassName);
             if (selection.size() > 0) {
-                delete newConnsDict[r + "_" + c];
+                delete newConnsDict[r + '_' + c];
                 selection.remove();
-            }
-            else {
-                newConnsDict[r + "_" + c] = { "r": r, "c": c };
-                n2Group.selectAll("path.n2_hover_elements, circle.n2_hover_elements")
-                    .attr("class", newClassName);
+            } else {
+                newConnsDict[r + '_' + c] = { r: r, c: c };
+                n2Group
+                    .selectAll(
+                        'path.n2_hover_elements, circle.n2_hover_elements'
+                    )
+                    .attr('class', newClassName);
             }
             PrintConnects();
         })
-        .on("mouseover", function () {
+        .on('mouseover', function() {
             n2BackgroundRectR0 = -1;
             n2BackgroundRectC0 = -1;
-            n2Group.selectAll(".n2_hover_elements").remove();
+            n2Group.selectAll('.n2_hover_elements').remove();
             PrintConnects();
         })
-        .on("mouseleave", function () {
+        .on('mouseleave', function() {
             n2BackgroundRectR0 = -1;
             n2BackgroundRectC0 = -1;
-            n2Group.selectAll(".n2_hover_elements").remove();
+            n2Group.selectAll('.n2_hover_elements').remove();
             PrintConnects();
         })
-        .on("mousemove", function () {
+        .on('mousemove', function() {
             if (!search.showParams) return;
             var coords = d3.mouse(this);
-            var c = Math.floor(coords[0] * d3RightTextNodesArrayZoomed.length / ptn2.WIDTH_N2_PX);
-            var r = Math.floor(coords[1] * d3RightTextNodesArrayZoomed.length / ptn2.HEIGHT_PX);
-            if (r == c || r < 0 || c < 0 || r >= d3RightTextNodesArrayZoomed.length || c >= d3RightTextNodesArrayZoomed.length) return;
-            if (matrix[r + "_" + c] !== undefined) return;
+            var c = Math.floor(
+                coords[0] *
+                    d3RightTextNodesArrayZoomed.length /
+                    ptn2.WIDTH_N2_PX
+            );
+            var r = Math.floor(
+                coords[1] * d3RightTextNodesArrayZoomed.length / ptn2.HEIGHT_PX
+            );
+            if (
+                r == c ||
+                r < 0 ||
+                c < 0 ||
+                r >= d3RightTextNodesArrayZoomed.length ||
+                c >= d3RightTextNodesArrayZoomed.length
+            )
+                return;
+            if (matrix[r + '_' + c] !== undefined) return;
             if (n2BackgroundRectR0 == r && n2BackgroundRectC0 == c) return;
             //n2Group.selectAll(".n2_hover_elements_" + n2BackgroundRectR0 + "_" + n2BackgroundRectC0).remove();
-            n2Group.selectAll(".n2_hover_elements").remove();
+            n2Group.selectAll('.n2_hover_elements').remove();
             n2BackgroundRectR0 = r;
             n2BackgroundRectC0 = c;
 
-            var lineWidth = Math.min(5, n2Dx * .5, n2Dy * .5);
-            arrowMarker.attr("markerWidth", lineWidth * .4)
-                .attr("markerHeight", lineWidth * .4);
+            var lineWidth = Math.min(5, n2Dx * 0.5, n2Dy * 0.5);
+            arrowMarker
+                .attr('markerWidth', lineWidth * 0.4)
+                .attr('markerHeight', lineWidth * 0.4);
 
             var param = d3RightTextNodesArrayZoomed[c],
                 unknown = d3RightTextNodesArrayZoomed[r];
-            if (param.type !== "param" && unknown.type !== "unknown") return;
-            if (r > c) { //bottom left
+            if (param.type !== 'param' && unknown.type !== 'unknown') return;
+            if (r > c) {
+                //bottom left
                 DrawPathTwoLines(
                     n2Dx * r, //x1
-                    n2Dy * r + n2Dy * .5, //y1
-                    n2Dx * c + n2Dx * .5, //left x2
-                    n2Dy * r + n2Dy * .5, //left y2
-                    n2Dx * c + n2Dx * .5, //up x3
+                    n2Dy * r + n2Dy * 0.5, //y1
+                    n2Dx * c + n2Dx * 0.5, //left x2
+                    n2Dy * r + n2Dy * 0.5, //left y2
+                    n2Dx * c + n2Dx * 0.5, //up x3
                     n2Dy * c + n2Dy - 1e-2, //up y3
-                    "blue", lineWidth, true);
-            }
-            else if (r < c) { //top right
+                    'blue',
+                    lineWidth,
+                    true
+                );
+            } else if (r < c) {
+                //top right
                 DrawPathTwoLines(
                     n2Dx * r + n2Dx, //x1
-                    n2Dy * r + n2Dy * .5, //y1
-                    n2Dx * c + n2Dx * .5, //right x2
-                    n2Dy * r + n2Dy * .5, //right y2
-                    n2Dx * c + n2Dx * .5, //down x3
+                    n2Dy * r + n2Dy * 0.5, //y1
+                    n2Dx * c + n2Dx * 0.5, //right x2
+                    n2Dy * r + n2Dy * 0.5, //right y2
+                    n2Dx * c + n2Dx * 0.5, //down x3
                     n2Dy * c + 1e-2, //down y3
-                    "blue", lineWidth, true);
+                    'blue',
+                    lineWidth,
+                    true
+                );
             }
             var leftTextWidthR = d3RightTextNodesArrayZoomed[r].nameWidthPx,
                 leftTextWidthC = d3RightTextNodesArrayZoomed[c].nameWidthPx;
-            DrawRect(-leftTextWidthR - PTREE_N2_GAP_PX, n2Dy * r, leftTextWidthR, n2Dy, "blue"); //highlight var name
-            DrawRect(-leftTextWidthC - PTREE_N2_GAP_PX, n2Dy * c, leftTextWidthC, n2Dy, "blue"); //highlight var name
+            DrawRect(
+                -leftTextWidthR - PTREE_N2_GAP_PX,
+                n2Dy * r,
+                leftTextWidthR,
+                n2Dy,
+                'blue'
+            ); //highlight var name
+            DrawRect(
+                -leftTextWidthC - PTREE_N2_GAP_PX,
+                n2Dy * c,
+                leftTextWidthC,
+                n2Dy,
+                'blue'
+            ); //highlight var name
 
             PrintConnects();
 
-            if (newConnsDict[r + "_" + c] === undefined) {
-                var paramName = (zoomedElement.promotions && zoomedElement.promotions[param.absPathName] !== undefined) ?
-                    "<b>" + zoomedElement.promotions[param.absPathName] + "</b>" :
-                    ((zoomedElement === root) ? param.absPathName : param.absPathName.slice(zoomedElement.absPathName.length + 1));
-                var unknownName = (zoomedElement.promotions && zoomedElement.promotions[unknown.absPathName] !== undefined) ?
-                    "<b>" + zoomedElement.promotions[unknown.absPathName] + "</b>" :
-                    ((zoomedElement === root) ? unknown.absPathName : unknown.absPathName.slice(zoomedElement.absPathName.length + 1));
+            if (newConnsDict[r + '_' + c] === undefined) {
+                var paramName =
+                    zoomedElement.promotions &&
+                    zoomedElement.promotions[param.absPathName] !== undefined
+                        ? '<b>' +
+                          zoomedElement.promotions[param.absPathName] +
+                          '</b>'
+                        : zoomedElement === root
+                            ? param.absPathName
+                            : param.absPathName.slice(
+                                  zoomedElement.absPathName.length + 1
+                              );
+                var unknownName =
+                    zoomedElement.promotions &&
+                    zoomedElement.promotions[unknown.absPathName] !== undefined
+                        ? '<b>' +
+                          zoomedElement.promotions[unknown.absPathName] +
+                          '</b>'
+                        : zoomedElement === root
+                            ? unknown.absPathName
+                            : unknown.absPathName.slice(
+                                  zoomedElement.absPathName.length + 1
+                              );
 
-                $("#connectionId")[0].innerHTML += "<br /><i style=\"color:red;\">self.connect(\"" + unknownName + "\", \"" + paramName + "\")</i>";
+                $('#connectionId')[0].innerHTML +=
+                    '<br /><i style="color:red;">self.connect("' +
+                    unknownName +
+                    '", "' +
+                    paramName +
+                    '")</i>';
             }
         });
 
@@ -237,20 +333,20 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
     ComputeConnections();
     ComputeMatrixN2();
 
-    var collapseDepthElement = $("#idCollapseDepthDiv")[0];
-    while(collapseDepthElement.children.length > 0) {
+    var collapseDepthElement = $('#idCollapseDepthDiv')[0];
+    while (collapseDepthElement.children.length > 0) {
         collapseDepthElement.removeChild(collapseDepthElement.children[0]);
     }
     for (var i = 2; i <= maxDepth; ++i) {
-        var option = document.createElement("span");
-        option.className = "fakeLink";
-        option.id = "idCollapseDepthOption" + i + "";
-        option.innerHTML = "" + i + "";
-        var f = function (idx) {
-            return function () {
+        var option = document.createElement('span');
+        option.className = 'fakeLink';
+        option.id = 'idCollapseDepthOption' + i + '';
+        option.innerHTML = '' + i + '';
+        var f = (function(idx) {
+            return function() {
                 CollapseToDepthSelectChange(idx);
             };
-        }(i);
+        })(i);
         option.onclick = f;
         collapseDepthElement.appendChild(option);
     }
@@ -259,156 +355,283 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
     SetupLegend(d3, d3ContentDiv);
 
     function Update() {
-        $("#currentPathId")[0].innerHTML = "PATH: root" + ((zoomedElement.parent) ? "." : "") + zoomedElement.absPathName;
+        $('#currentPathId')[0].innerHTML =
+            'PATH: root' +
+            (zoomedElement.parent ? '.' : '') +
+            zoomedElement.absPathName;
 
-        $("#backButtonId")[0].disabled = (backButtonHistory.length == 0) ? "disabled" : false;
-        $("#forwardButtonId")[0].disabled = (forwardButtonHistory.length == 0) ? "disabled" : false;
-        $("#upOneLevelButtonId")[0].disabled = (zoomedElement === root) ? "disabled" : false;
-        $("#returnToRootButtonId")[0].disabled = (zoomedElement === root) ? "disabled" : false;
+        $('#backButtonId')[0].disabled =
+            backButtonHistory.length == 0 ? 'disabled' : false;
+        $('#forwardButtonId')[0].disabled =
+            forwardButtonHistory.length == 0 ? 'disabled' : false;
+        $('#upOneLevelButtonId')[0].disabled =
+            zoomedElement === root ? 'disabled' : false;
+        $('#returnToRootButtonId')[0].disabled =
+            zoomedElement === root ? 'disabled' : false;
 
         // Compute the new tree layout.
         ComputeLayout(); //updates d3NodesArray
         ComputeMatrixN2();
 
         for (var i = 2; i <= maxDepth; ++i) {
-            $("#idCollapseDepthOption" + i + "")[0].style.display = (i <= zoomedElement.depth) ? "none" : "block";
+            $('#idCollapseDepthOption' + i + '')[0].style.display =
+                i <= zoomedElement.depth ? 'none' : 'block';
         }
 
-        if (ptn2.xScalerPTree0 != null) {//not first run.. store previous
+        if (ptn2.xScalerPTree0 != null) {
+            //not first run.. store previous
             ptn2.kx0 = ptn2.kx;
             ptn2.ky0 = ptn2.ky;
             ptn2.xScalerPTree0 = ptn2.xScalerPTree.copy();
             ptn2.yScalerPTree0 = ptn2.yScalerPTree.copy();
         }
 
-        ptn2.kx = (zoomedElement.x ? ptn2.widthPTreePx - ptn2.PARENT_NODE_WIDTH_PX : ptn2.widthPTreePx) / (1 - zoomedElement.x);
+        ptn2.kx =
+            (zoomedElement.x
+                ? ptn2.widthPTreePx - ptn2.PARENT_NODE_WIDTH_PX
+                : ptn2.widthPTreePx) /
+            (1 - zoomedElement.x);
         ptn2.ky = ptn2.HEIGHT_PX / zoomedElement.height;
-        ptn2.xScalerPTree.domain([zoomedElement.x, 1]).range([zoomedElement.x ? ptn2.PARENT_NODE_WIDTH_PX : 0, ptn2.widthPTreePx]);
-        ptn2.yScalerPTree.domain([zoomedElement.y, zoomedElement.y + zoomedElement.height]).range([0, ptn2.HEIGHT_PX]);
+        ptn2.xScalerPTree
+            .domain([zoomedElement.x, 1])
+            .range([
+                zoomedElement.x ? ptn2.PARENT_NODE_WIDTH_PX : 0,
+                ptn2.widthPTreePx
+            ]);
+        ptn2.yScalerPTree
+            .domain([zoomedElement.y, zoomedElement.y + zoomedElement.height])
+            .range([0, ptn2.HEIGHT_PX]);
 
-        if (ptn2.xScalerPTree0 == null) { //first run.. duplicate
+        if (ptn2.xScalerPTree0 == null) {
+            //first run.. duplicate
             ptn2.kx0 = ptn2.kx;
             ptn2.ky0 = ptn2.ky;
             ptn2.xScalerPTree0 = ptn2.xScalerPTree.copy();
             ptn2.yScalerPTree0 = ptn2.yScalerPTree.copy();
 
             //Update svg dimensions before ComputeLayout() changes ptn2.widthPTreePx
-            svgDiv.style("width", (ptn2.widthPTreePx + PTREE_N2_GAP_PX + ptn2.WIDTH_N2_PX + 2 * ptn2.SVG_MARGIN) + "px")
-                .style("height", (ptn2.HEIGHT_PX + 2 * ptn2.SVG_MARGIN) + "px");
-            svg.attr("width", ptn2.widthPTreePx + PTREE_N2_GAP_PX + ptn2.WIDTH_N2_PX + 2 * ptn2.SVG_MARGIN)
-                .attr("height", ptn2.HEIGHT_PX + 2 * ptn2.SVG_MARGIN);
-            n2Group.attr("transform", "translate(" + (ptn2.widthPTreePx + PTREE_N2_GAP_PX + ptn2.SVG_MARGIN) + "," + ptn2.SVG_MARGIN + ")");
-            pTreeGroup.attr("transform", "translate(" + ptn2.SVG_MARGIN + "," + ptn2.SVG_MARGIN + ")");
+            svgDiv
+                .style(
+                    'width',
+                    ptn2.widthPTreePx +
+                        PTREE_N2_GAP_PX +
+                        ptn2.WIDTH_N2_PX +
+                        2 * ptn2.SVG_MARGIN +
+                        'px'
+                )
+                .style('height', ptn2.HEIGHT_PX + 2 * ptn2.SVG_MARGIN + 'px');
+            svg
+                .attr(
+                    'width',
+                    ptn2.widthPTreePx +
+                        PTREE_N2_GAP_PX +
+                        ptn2.WIDTH_N2_PX +
+                        2 * ptn2.SVG_MARGIN
+                )
+                .attr('height', ptn2.HEIGHT_PX + 2 * ptn2.SVG_MARGIN);
+            n2Group.attr(
+                'transform',
+                'translate(' +
+                    (ptn2.widthPTreePx + PTREE_N2_GAP_PX + ptn2.SVG_MARGIN) +
+                    ',' +
+                    ptn2.SVG_MARGIN +
+                    ')'
+            );
+            pTreeGroup.attr(
+                'transform',
+                'translate(' + ptn2.SVG_MARGIN + ',' + ptn2.SVG_MARGIN + ')'
+            );
         }
 
-        sharedTransition = d3.transition().duration(ptn2.TRANSITION_DURATION).delay(transitionStartDelay); //do this after intense computation
+        sharedTransition = d3
+            .transition()
+            .duration(ptn2.TRANSITION_DURATION)
+            .delay(transitionStartDelay); //do this after intense computation
         transitionStartDelay = DEFAULT_TRANSITION_START_DELAY;
 
         //Update svg dimensions with transition after ComputeLayout() changes ptn2.widthPTreePx
-        svgDiv.transition(sharedTransition).style("width", (ptn2.widthPTreePx + PTREE_N2_GAP_PX + ptn2.WIDTH_N2_PX + 2 * ptn2.SVG_MARGIN) + "px")
-            .style("height", (ptn2.HEIGHT_PX + 2 * ptn2.SVG_MARGIN) + "px");
-        svg.transition(sharedTransition).attr("width", ptn2.widthPTreePx + PTREE_N2_GAP_PX + ptn2.WIDTH_N2_PX + 2 * ptn2.SVG_MARGIN)
-            .attr("height", ptn2.HEIGHT_PX + 2 * ptn2.SVG_MARGIN);
-        n2Group.transition(sharedTransition).attr("transform", "translate(" + (ptn2.widthPTreePx + PTREE_N2_GAP_PX + ptn2.SVG_MARGIN) + "," + ptn2.SVG_MARGIN + ")");
-        pTreeGroup.transition(sharedTransition).attr("transform", "translate(" + ptn2.SVG_MARGIN + "," + ptn2.SVG_MARGIN + ")");
-        n2BackgroundRect.transition(sharedTransition).attr("width", ptn2.WIDTH_N2_PX).attr("height", ptn2.HEIGHT_PX);
+        svgDiv
+            .transition(sharedTransition)
+            .style(
+                'width',
+                ptn2.widthPTreePx +
+                    PTREE_N2_GAP_PX +
+                    ptn2.WIDTH_N2_PX +
+                    2 * ptn2.SVG_MARGIN +
+                    'px'
+            )
+            .style('height', ptn2.HEIGHT_PX + 2 * ptn2.SVG_MARGIN + 'px');
+        svg
+            .transition(sharedTransition)
+            .attr(
+                'width',
+                ptn2.widthPTreePx +
+                    PTREE_N2_GAP_PX +
+                    ptn2.WIDTH_N2_PX +
+                    2 * ptn2.SVG_MARGIN
+            )
+            .attr('height', ptn2.HEIGHT_PX + 2 * ptn2.SVG_MARGIN);
+        n2Group
+            .transition(sharedTransition)
+            .attr(
+                'transform',
+                'translate(' +
+                    (ptn2.widthPTreePx + PTREE_N2_GAP_PX + ptn2.SVG_MARGIN) +
+                    ',' +
+                    ptn2.SVG_MARGIN +
+                    ')'
+            );
+        pTreeGroup
+            .transition(sharedTransition)
+            .attr(
+                'transform',
+                'translate(' + ptn2.SVG_MARGIN + ',' + ptn2.SVG_MARGIN + ')'
+            );
+        n2BackgroundRect
+            .transition(sharedTransition)
+            .attr('width', ptn2.WIDTH_N2_PX)
+            .attr('height', ptn2.HEIGHT_PX);
 
-        var sel = pTreeGroup.selectAll(".partition_group")
-            .data(d3NodesArray, function (d) {
+        var sel = pTreeGroup
+            .selectAll('.partition_group')
+            .data(d3NodesArray, function(d) {
                 return d.id;
             });
 
-        var nodeEnter = sel.enter().append("svg:g")
-            .attr("class", function (d) {
-                return "partition_group " + GetClass(d);
+        var nodeEnter = sel
+            .enter()
+            .append('svg:g')
+            .attr('class', function(d) {
+                return 'partition_group ' + GetClass(d);
             })
-            .attr("transform", function (d) {
-                return "translate(" + ptn2.xScalerPTree0(d.x0) + "," + ptn2.yScalerPTree0(d.y0) + ")";
+            .attr('transform', function(d) {
+                return (
+                    'translate(' +
+                    ptn2.xScalerPTree0(d.x0) +
+                    ',' +
+                    ptn2.yScalerPTree0(d.y0) +
+                    ')'
+                );
             })
-            .on("click", function (d) { LeftClick(d, this); })
-            .on("contextmenu", function (d) { RightClick(d, this); });
+            .on('click', function(d) {
+                LeftClick(d, this);
+            })
+            .on('contextmenu', function(d) {
+                RightClick(d, this);
+            });
 
-        nodeEnter.append("svg:rect")
-            .attr("width", function (d) {
-                return d.width0 * ptn2.kx0;//0;//
+        nodeEnter
+            .append('svg:rect')
+            .attr('width', function(d) {
+                return d.width0 * ptn2.kx0; //0;//
             })
-            .attr("height", function (d) {
+            .attr('height', function(d) {
                 return d.height0 * ptn2.ky0;
             });
 
-        nodeEnter.append("svg:text")
-            .attr("dy", ".35em")
+        nodeEnter
+            .append('svg:text')
+            .attr('dy', '.35em')
             //.attr("text-anchor", "end")
-            .attr("transform", function (d) {
+            .attr('transform', function(d) {
                 var anchorX = d.width0 * ptn2.kx0 - RIGHT_TEXT_MARGIN_PX;
                 //var anchorX = -RIGHT_TEXT_MARGIN_PX;
-                return "translate(" + anchorX + "," + d.height0 * ptn2.ky0 / 2 + ")";
+                return (
+                    'translate(' +
+                    anchorX +
+                    ',' +
+                    d.height0 * ptn2.ky0 / 2 +
+                    ')'
+                );
             })
-            .style("opacity", function (d) {
+            .style('opacity', function(d) {
                 if (d.depth < zoomedElement.depth) return 0;
                 return d.textOpacity0;
             })
             .text(GetText);
 
-        var nodeUpdate = nodeEnter.merge(sel).transition(sharedTransition)
-            .attr("class", function (d) {
-                return "partition_group " + GetClass(d);
+        var nodeUpdate = nodeEnter
+            .merge(sel)
+            .transition(sharedTransition)
+            .attr('class', function(d) {
+                return 'partition_group ' + GetClass(d);
             })
-            .attr("transform", function (d) {
-                return "translate(" + ptn2.xScalerPTree(d.x) + "," + ptn2.yScalerPTree(d.y) + ")";
+            .attr('transform', function(d) {
+                return (
+                    'translate(' +
+                    ptn2.xScalerPTree(d.x) +
+                    ',' +
+                    ptn2.yScalerPTree(d.y) +
+                    ')'
+                );
             });
 
-        nodeUpdate.select("rect")
-            .attr("width", function (d) {
+        nodeUpdate
+            .select('rect')
+            .attr('width', function(d) {
                 return d.width * ptn2.kx;
             })
-            .attr("height", function (d) {
+            .attr('height', function(d) {
                 return d.height * ptn2.ky;
             });
 
-        nodeUpdate.select("text")
-            .attr("transform", function (d) {
+        nodeUpdate
+            .select('text')
+            .attr('transform', function(d) {
                 var anchorX = d.width * ptn2.kx - RIGHT_TEXT_MARGIN_PX;
-                return "translate(" + anchorX + "," + d.height * ptn2.ky / 2 + ")";
+                return (
+                    'translate(' + anchorX + ',' + d.height * ptn2.ky / 2 + ')'
+                );
             })
-            .style("opacity", function (d) {
+            .style('opacity', function(d) {
                 if (d.depth < zoomedElement.depth) return 0;
                 return d.textOpacity;
             })
             .text(GetText);
 
-
         // Transition exiting nodes to the parent's new position.
-        var nodeExit = sel.exit().transition(sharedTransition)
-            .attr("transform", function (d) {
-                return "translate(" + ptn2.xScalerPTree(d.x) + "," + ptn2.yScalerPTree(d.y) + ")";
+        var nodeExit = sel
+            .exit()
+            .transition(sharedTransition)
+            .attr('transform', function(d) {
+                return (
+                    'translate(' +
+                    ptn2.xScalerPTree(d.x) +
+                    ',' +
+                    ptn2.yScalerPTree(d.y) +
+                    ')'
+                );
             })
             .remove();
 
-        nodeExit.select("rect")
-            .attr("width", function (d) {
-                return d.width * ptn2.kx;//0;//
+        nodeExit
+            .select('rect')
+            .attr('width', function(d) {
+                return d.width * ptn2.kx; //0;//
             })
-            .attr("height", function (d) {
+            .attr('height', function(d) {
                 return d.height * ptn2.ky;
             });
 
-        nodeExit.select("text")
-            .attr("transform", function (d) {
+        nodeExit
+            .select('text')
+            .attr('transform', function(d) {
                 var anchorX = d.width * ptn2.kx - RIGHT_TEXT_MARGIN_PX;
-                return "translate(" + anchorX + "," + d.height * ptn2.ky / 2 + ")";
+                return (
+                    'translate(' + anchorX + ',' + d.height * ptn2.ky / 2 + ')'
+                );
                 //return "translate(8," + d.height * ptn2.ky / 2 + ")";
             })
-            .style("opacity", 0);
+            .style('opacity', 0);
 
-        ClearArrowsAndConnects()
+        ClearArrowsAndConnects();
         DrawMatrix();
     }
 
     updateFunc = Update;
 
     function ClearArrows() {
-        n2Group.selectAll("[class^=n2_hover_elements]").remove();
+        n2Group.selectAll('[class^=n2_hover_elements]').remove();
     }
 
     function ClearArrowsAndConnects() {
@@ -425,42 +648,65 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             return -1;
         }
 
-        function addChildren(originalParent, parent, arrayOfNames, arrayOfNamesIndex, type) {
+        function addChildren(
+            originalParent,
+            parent,
+            arrayOfNames,
+            arrayOfNamesIndex,
+            type
+        ) {
             if (arrayOfNames.length == arrayOfNamesIndex) return;
 
             var name = arrayOfNames[arrayOfNamesIndex];
 
-            if (!parent.hasOwnProperty("children")) {
+            if (!parent.hasOwnProperty('children')) {
                 parent.children = [];
             }
 
             var parentI = findNameInIndex(parent.children, name);
-            if (parentI == -1) { //new name not found in parent, create new
+            if (parentI == -1) {
+                //new name not found in parent, create new
                 var newObj = {
-                    "name": name,
-                    "type": type,
-                    "splitByColon": true,
-                    "originalParent": originalParent
+                    name: name,
+                    type: type,
+                    splitByColon: true,
+                    originalParent: originalParent
                 };
-                if (type === "param" && type === "unconnected_param") {
+                if (type === 'param' && type === 'unconnected_param') {
                     parent.children.splice(0, 0, newObj);
-                }
-                else {
+                } else {
                     parent.children.push(newObj);
                 }
-                addChildren(originalParent, newObj, arrayOfNames, arrayOfNamesIndex + 1, type);
-            } else { //new name already found in parent, keep traversing
-                addChildren(originalParent, parent.children[parentI], arrayOfNames, arrayOfNamesIndex + 1, type);
+                addChildren(
+                    originalParent,
+                    newObj,
+                    arrayOfNames,
+                    arrayOfNamesIndex + 1,
+                    type
+                );
+            } else {
+                //new name already found in parent, keep traversing
+                addChildren(
+                    originalParent,
+                    parent.children[parentI],
+                    arrayOfNames,
+                    arrayOfNamesIndex + 1,
+                    type
+                );
             }
         }
 
         if (!d.children) return;
         for (var i = 0; i < d.children.length; ++i) {
-
-            var splitArray = d.children[i].name.split(":");
+            var splitArray = d.children[i].name.split(':');
             if (splitArray.length > 1) {
-                if (!d.hasOwnProperty("subsystem_type") || d.subsystem_type !== "component") {
-                    alert("error: there is a colon named object whose parent is not a component");
+                if (
+                    !d.hasOwnProperty('subsystem_type') ||
+                    d.subsystem_type !== 'component'
+                ) {
+                    alert(
+                        'error: there is a colon named object whose parent is not a component'
+                    );
                     return;
                 }
                 var type = d.children[i].type;
@@ -475,11 +721,19 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
 
     function FlattenColonGroups(d) {
         if (!d.children) return;
-        while (d.splitByColon && d.children && d.children.length == 1 && d.children[0].splitByColon) {
+        while (
+            d.splitByColon &&
+            d.children &&
+            d.children.length == 1 &&
+            d.children[0].splitByColon
+        ) {
             //alert("combine " + d.name + " " + d.children[0].name);
             var child = d.children[0];
-            d.name += ":" + child.name;
-            d.children = (child.hasOwnProperty("children") && child.children.length >= 1) ? child.children : null; //absorb childs children
+            d.name += ':' + child.name;
+            d.children =
+                child.hasOwnProperty('children') && child.children.length >= 1
+                    ? child.children
+                    : null; //absorb childs children
             if (d.children == null) delete d.children;
         }
         if (!d.children) return;
@@ -490,10 +744,18 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
 
     function GetText(d) {
         var retVal = d.name;
-        if (outputNamingType === "Promoted" && (d.type === "unknown" || d.type === "param" || d.type === "unconnected_param") && zoomedElement.promotions && zoomedElement.promotions[d.absPathName] !== undefined) {
+        if (
+            outputNamingType === 'Promoted' &&
+            (d.type === 'unknown' ||
+                d.type === 'param' ||
+                d.type === 'unconnected_param') &&
+            zoomedElement.promotions &&
+            zoomedElement.promotions[d.absPathName] !== undefined
+        ) {
             retVal = zoomedElement.promotions[d.absPathName];
         }
-        if (d.splitByColon && d.children && d.children.length > 0) retVal += ":";
+        if (d.splitByColon && d.children && d.children.length > 0)
+            retVal += ':';
         return retVal;
     }
 
@@ -503,27 +765,38 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
         d.depth = depth;
         d.parent = parent;
         d.id = ++idCounter; //id starts at 1 for if comparision
-        d.absPathName = "";
-        if (d.parent) { //not root node? d.parent.absPathName : "";
-            if (d.parent.absPathName !== "") {
+        d.absPathName = '';
+        if (d.parent) {
+            //not root node? d.parent.absPathName : "";
+            if (d.parent.absPathName !== '') {
                 d.absPathName += d.parent.absPathName;
-                d.absPathName += (d.parent.splitByColon) ? ":" : ".";
+                d.absPathName += d.parent.splitByColon ? ':' : '.';
             }
             d.absPathName += d.name;
         }
-        if (d.type === "unknown" || d.type === "param" || d.type === "unconnected_param") {
-            var parentComponent = (d.originalParent) ? d.originalParent : d.parent;
-            if (parentComponent.type === "subsystem" && parentComponent.subsystem_type === "component") {
+        if (
+            d.type === 'unknown' ||
+            d.type === 'param' ||
+            d.type === 'unconnected_param'
+        ) {
+            var parentComponent = d.originalParent
+                ? d.originalParent
+                : d.parent;
+            if (
+                parentComponent.type === 'subsystem' &&
+                parentComponent.subsystem_type === 'component'
+            ) {
                 d.parentComponent = parentComponent;
-            }
-            else {
-                alert("error: there is a param or unknown without a parent component!");
+            } else {
+                alert(
+                    'error: there is a param or unknown without a parent component!'
+                );
             }
         }
         if (d.splitByColon) {
             d.colonName = d.name;
             for (var obj = d.parent; obj.splitByColon; obj = obj.parent) {
-                d.colonName = obj.name + ":" + d.colonName;
+                d.colonName = obj.name + ':' + d.colonName;
             }
         }
         maxDepth = Math.max(depth, maxDepth);
@@ -535,46 +808,66 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                 }
             }
         }
-        return (d.implicit) ? true : false;
+        return d.implicit ? true : false;
     }
 
-
     function ComputeLayout() {
-        var columnWidthsPx = new Array(maxDepth + 1).fill(0.0),// since depth is one based
+        var columnWidthsPx = new Array(maxDepth + 1).fill(0.0), // since depth is one based
             columnLocationsPx = new Array(maxDepth + 1).fill(0.0);
 
-        var textWidthGroup = svg.append("svg:g").attr("class", "partition_group");
-        var textWidthText = textWidthGroup.append("svg:text")
-            .text("")
-            .attr("x", -50); // Put text off screen
+        var textWidthGroup = svg
+            .append('svg:g')
+            .attr('class', 'partition_group');
+        var textWidthText = textWidthGroup
+            .append('svg:text')
+            .text('')
+            .attr('x', -50); // Put text off screen
         var textWidthTextNode = textWidthText.node();
 
-        var autoCompleteSetNames = {}, autoCompleteSetPathNames = {};
+        var autoCompleteSetNames = {},
+            autoCompleteSetPathNames = {};
 
         function PopulateAutoCompleteList(d) {
-            if (d.children && !d.isMinimized) { //depth first, dont go into minimized children
+            if (d.children && !d.isMinimized) {
+                //depth first, dont go into minimized children
                 for (var i = 0; i < d.children.length; ++i) {
                     PopulateAutoCompleteList(d.children[i]);
                 }
             }
             if (d === zoomedElement) return;
-            if (!search.showParams && (d.type === "param" || d.type === "unconnected_param")) return;
+            if (
+                !search.showParams &&
+                (d.type === 'param' || d.type === 'unconnected_param')
+            )
+                return;
 
             var n = d.name;
-            if (d.splitByColon && d.children && d.children.length > 0) n += ":";
-            if ((d.type !== "param" && d.type !== "unconnected_param") && d.type !== "unknown") n += ".";
+            if (d.splitByColon && d.children && d.children.length > 0) n += ':';
+            if (
+                d.type !== 'param' &&
+                d.type !== 'unconnected_param' &&
+                d.type !== 'unknown'
+            )
+                n += '.';
             var namesToAdd = [n];
 
-            if (d.splitByColon) namesToAdd.push(d.colonName + ((d.children && d.children.length > 0) ? ":" : ""));
+            if (d.splitByColon)
+                namesToAdd.push(
+                    d.colonName +
+                        (d.children && d.children.length > 0 ? ':' : '')
+                );
 
-            namesToAdd.forEach(function (name) {
+            namesToAdd.forEach(function(name) {
                 if (!autoCompleteSetNames.hasOwnProperty(name)) {
                     autoCompleteSetNames[name] = true;
                     search.autoCompleteListNames.push(name);
                 }
             });
 
-            var localPathName = (zoomedElement === root) ? d.absPathName : d.absPathName.slice(zoomedElement.absPathName.length + 1);
+            var localPathName =
+                zoomedElement === root
+                    ? d.absPathName
+                    : d.absPathName.slice(zoomedElement.absPathName.length + 1);
             if (!autoCompleteSetPathNames.hasOwnProperty(localPathName)) {
                 autoCompleteSetPathNames[localPathName] = true;
                 search.autoCompleteListPathNames.push(localPathName);
@@ -587,7 +880,12 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
         }
 
         function UpdateTextWidths(d) {
-            if ((!search.showParams && (d.type === "param" || d.type === "unconnected_param")) || d.varIsHidden) return;
+            if (
+                (!search.showParams &&
+                    (d.type === 'param' || d.type === 'unconnected_param')) ||
+                d.varIsHidden
+            )
+                return;
             d.nameWidthPx = GetTextWidth(GetText(d)) + 2 * RIGHT_TEXT_MARGIN_PX;
             if (d.children) {
                 for (var i = 0; i < d.children.length; ++i) {
@@ -601,47 +899,68 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             var leafWidthsPx = new Array(maxDepth + 1).fill(0.0);
 
             function DoComputeColumnWidths(d) {
-                if ((!search.showParams && (d.type === "param" || d.type === "unconnected_param")) || d.varIsHidden) return;
+                if (
+                    (!search.showParams &&
+                        (d.type === 'param' ||
+                            d.type === 'unconnected_param')) ||
+                    d.varIsHidden
+                )
+                    return;
 
-                var heightPx = ptn2.HEIGHT_PX * d.numLeaves / zoomedElement.numLeaves;
-                d.textOpacity0 = d.hasOwnProperty('textOpacity') ? d.textOpacity : 0;
-                d.textOpacity = (heightPx > FONT_SIZE_PX) ? 1 : 0;
-                var hasVisibleDetail = (heightPx >= 2.0);
+                var heightPx =
+                    ptn2.HEIGHT_PX * d.numLeaves / zoomedElement.numLeaves;
+                d.textOpacity0 = d.hasOwnProperty('textOpacity')
+                    ? d.textOpacity
+                    : 0;
+                d.textOpacity = heightPx > FONT_SIZE_PX ? 1 : 0;
+                var hasVisibleDetail = heightPx >= 2.0;
                 var widthPx = 1e-3;
                 if (hasVisibleDetail) widthPx = ptn2.MIN_COLUMN_WIDTH_PX;
                 if (d.textOpacity > 0.5) widthPx = d.nameWidthPx;
 
                 greatestDepth = Math.max(greatestDepth, d.depth);
 
-                if (d.children && !d.isMinimized) { //not leaf
-                    columnWidthsPx[d.depth] = Math.max(columnWidthsPx[d.depth], widthPx);
+                if (d.children && !d.isMinimized) {
+                    //not leaf
+                    columnWidthsPx[d.depth] = Math.max(
+                        columnWidthsPx[d.depth],
+                        widthPx
+                    );
                     for (var i = 0; i < d.children.length; ++i) {
                         DoComputeColumnWidths(d.children[i]);
                     }
-                }
-                else { //leaf
-                    leafWidthsPx[d.depth] = Math.max(leafWidthsPx[d.depth], widthPx);
+                } else {
+                    //leaf
+                    leafWidthsPx[d.depth] = Math.max(
+                        leafWidthsPx[d.depth],
+                        widthPx
+                    );
                 }
             }
 
             DoComputeColumnWidths(d);
 
-
             var sum = 0;
             var lastColumnWidth = 0;
-            for (var i = leafWidthsPx.length - 1; i >= zoomedElement.depth; --i) {
+            for (
+                var i = leafWidthsPx.length - 1;
+                i >= zoomedElement.depth;
+                --i
+            ) {
                 sum += columnWidthsPx[i];
                 var lastWidthNeeded = leafWidthsPx[i] - sum;
                 lastColumnWidth = Math.max(lastWidthNeeded, lastColumnWidth);
             }
             columnWidthsPx[zoomedElement.depth - 1] = ptn2.PARENT_NODE_WIDTH_PX;
             columnWidthsPx[greatestDepth] = lastColumnWidth;
-
         }
 
-
         function ComputeLeaves(d) {
-            if ((!search.showParams && (d.type === "param" || d.type === "unconnected_params")) || d.varIsHidden) {
+            if (
+                (!search.showParams &&
+                    (d.type === 'param' || d.type === 'unconnected_params')) ||
+                d.varIsHidden
+            ) {
                 d.numLeaves = 0;
                 return;
             }
@@ -655,17 +974,37 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             }
         }
 
-        function ComputeNormalizedPositions(d, leafCounter, isChildOfZoomed, earliestMinimizedParent) {
-            isChildOfZoomed = (isChildOfZoomed) ? true : (d === zoomedElement);
+        function ComputeNormalizedPositions(
+            d,
+            leafCounter,
+            isChildOfZoomed,
+            earliestMinimizedParent
+        ) {
+            isChildOfZoomed = isChildOfZoomed ? true : d === zoomedElement;
             if (earliestMinimizedParent == null && isChildOfZoomed) {
-                if ((search.showParams || (d.type !== "param" && d.type !== "unconnected_param")) && !d.varIsHidden) d3NodesArray.push(d);
-                if (!d.children || d.isMinimized) { //at a "leaf" node
-                    if ((search.showParams || (d.type !== "param" && d.type !== "unconnected_param")) && !d.varIsHidden) d3RightTextNodesArrayZoomed.push(d);
+                if (
+                    (search.showParams ||
+                        (d.type !== 'param' &&
+                            d.type !== 'unconnected_param')) &&
+                    !d.varIsHidden
+                )
+                    d3NodesArray.push(d);
+                if (!d.children || d.isMinimized) {
+                    //at a "leaf" node
+                    if (
+                        (search.showParams ||
+                            (d.type !== 'param' &&
+                                d.type !== 'unconnected_param')) &&
+                        !d.varIsHidden
+                    )
+                        d3RightTextNodesArrayZoomed.push(d);
                     earliestMinimizedParent = d;
                 }
             }
-            var node = (earliestMinimizedParent) ? earliestMinimizedParent : d;
-            d.rootIndex0 = d.hasOwnProperty('rootIndex') ? d.rootIndex : leafCounter;
+            var node = earliestMinimizedParent ? earliestMinimizedParent : d;
+            d.rootIndex0 = d.hasOwnProperty('rootIndex')
+                ? d.rootIndex
+                : leafCounter;
             d.rootIndex = leafCounter;
             d.x0 = d.hasOwnProperty('x') ? d.x : 1e-6;
             d.y0 = d.hasOwnProperty('y') ? d.y : 1e-6;
@@ -673,10 +1012,20 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             d.height0 = d.hasOwnProperty('height') ? d.height : 1e-6;
             d.x = columnLocationsPx[node.depth] / ptn2.widthPTreePx;
             d.y = leafCounter / root.numLeaves;
-            d.width = (d.children && !d.isMinimized) ? (columnWidthsPx[node.depth] / ptn2.widthPTreePx) : 1 - node.x;//1-d.x;
+            d.width =
+                d.children && !d.isMinimized
+                    ? columnWidthsPx[node.depth] / ptn2.widthPTreePx
+                    : 1 - node.x; //1-d.x;
             d.height = node.numLeaves / root.numLeaves;
-            if ((!search.showParams && (d.type === "param" || d.type === "unconnected_param")) || d.varIsHidden) { //param or hidden leaf leaving
-                d.x = columnLocationsPx[d.parentComponent.depth + 1] / ptn2.widthPTreePx;
+            if (
+                (!search.showParams &&
+                    (d.type === 'param' || d.type === 'unconnected_param')) ||
+                d.varIsHidden
+            ) {
+                //param or hidden leaf leaving
+                d.x =
+                    columnLocationsPx[d.parentComponent.depth + 1] /
+                    ptn2.widthPTreePx;
                 d.y = d.parentComponent.y;
                 d.width = 1e-6;
                 d.height = 1e-6;
@@ -684,15 +1033,19 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
 
             if (d.children) {
                 for (var i = 0; i < d.children.length; ++i) {
-                    ComputeNormalizedPositions(d.children[i], leafCounter, isChildOfZoomed, earliestMinimizedParent);
-                    if (earliestMinimizedParent == null) { //numleaves is only valid passed nonminimized nodes
+                    ComputeNormalizedPositions(
+                        d.children[i],
+                        leafCounter,
+                        isChildOfZoomed,
+                        earliestMinimizedParent
+                    );
+                    if (earliestMinimizedParent == null) {
+                        //numleaves is only valid passed nonminimized nodes
                         leafCounter += d.children[i].numLeaves;
                     }
                 }
             }
         }
-
-
 
         UpdateTextWidths(zoomedElement);
         ComputeLeaves(root);
@@ -722,12 +1075,14 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
         updateRecomputesAutoComplete = true; //default
 
         enterIndex = exitIndex = 0;
-        if (lastClickWasLeft) { //left click
+        if (lastClickWasLeft) {
+            //left click
             if (leftClickIsForward) {
-                exitIndex = lastLeftClickedElement.rootIndex - zoomedElement0.rootIndex;
-            }
-            else {
-                enterIndex = zoomedElement0.rootIndex - lastLeftClickedElement.rootIndex;
+                exitIndex =
+                    lastLeftClickedElement.rootIndex - zoomedElement0.rootIndex;
+            } else {
+                enterIndex =
+                    zoomedElement0.rootIndex - lastLeftClickedElement.rootIndex;
             }
         }
 
@@ -750,12 +1105,13 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
 
     var menu = document.querySelector('#context-menu');
     var menuState = 0;
-    var contextMenuActive = "context-menu--active";
+    var contextMenuActive = 'context-menu--active';
 
     function collapse() {
         var d = lastLeftClickedEle;
         if (!d.children) return;
-        if (d.depth > zoomedElement.depth) { //dont allow minimizing on root node
+        if (d.depth > zoomedElement.depth) {
+            //dont allow minimizing on root node
             lastRightClickedElement = d;
             FindRootOfChangeFunction = FindRootOfChangeForRightClick;
             ptn2.TRANSITION_DURATION = ptn2.TRANSITION_DURATION_FAST;
@@ -770,8 +1126,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
         lastClickWasLeft = true;
         if (lastLeftClickedElement.depth > zoomedElement.depth) {
             leftClickIsForward = true; //forward
-        }
-        else if (lastLeftClickedElement.depth < zoomedElement.depth) {
+        } else if (lastLeftClickedElement.depth < zoomedElement.depth) {
             leftClickIsForward = false; //backwards
         }
         zoomedElement0 = zoomedElement;
@@ -783,7 +1138,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
     function LeftClick(d, ele) {
         if (!d.children) return;
         if (d3.event.button != 0) return;
-        backButtonHistory.push({ "el": zoomedElement });
+        backButtonHistory.push({ el: zoomedElement });
         forwardButtonHistory = [];
         SetupLeftClick(d);
         Update();
@@ -794,11 +1149,13 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
     function BackButtonPressed() {
         if (backButtonHistory.length == 0) return;
         var d = backButtonHistory.pop().el;
-        $("#backButtonId")[0].disabled = (backButtonHistory.length == 0) ? "disabled" : false;
-        for (var obj = d; obj != null; obj = obj.parent) { //make sure history item is not minimized
+        $('#backButtonId')[0].disabled =
+            backButtonHistory.length == 0 ? 'disabled' : false;
+        for (var obj = d; obj != null; obj = obj.parent) {
+            //make sure history item is not minimized
             if (obj.isMinimized) return;
         }
-        forwardButtonHistory.push({ "el": zoomedElement });
+        forwardButtonHistory.push({ el: zoomedElement });
         SetupLeftClick(d);
         Update();
     }
@@ -806,44 +1163,43 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
     function ForwardButtonPressed() {
         if (forwardButtonHistory.length == 0) return;
         var d = forwardButtonHistory.pop().el;
-        $("#forwardButtonId")[0].disabled = (forwardButtonHistory.length == 0) ? "disabled" : false;
-        for (var obj = d; obj != null; obj = obj.parent) { //make sure history item is not minimized
+        $('#forwardButtonId')[0].disabled =
+            forwardButtonHistory.length == 0 ? 'disabled' : false;
+        for (var obj = d; obj != null; obj = obj.parent) {
+            //make sure history item is not minimized
             if (obj.isMinimized) return;
         }
-        backButtonHistory.push({ "el": zoomedElement });
+        backButtonHistory.push({ el: zoomedElement });
         SetupLeftClick(d);
         Update();
     }
 
     function GetClass(d) {
-        if (d.isMinimized) return "minimized";
-        if (d.type === "param") {
-            if (d.children && d.children.length > 0) return "param_group";
-            return "param";
+        if (d.isMinimized) return 'minimized';
+        if (d.type === 'param') {
+            if (d.children && d.children.length > 0) return 'param_group';
+            return 'param';
         }
-        if (d.type === "unconnected_param") {
-            if (d.children && d.children.length > 0) return "param_group";
-            return "unconnected_param"
+        if (d.type === 'unconnected_param') {
+            if (d.children && d.children.length > 0) return 'param_group';
+            return 'unconnected_param';
         }
-        if (d.type === "unknown") {
-            if (d.children && d.children.length > 0) return "unknown_group";
-            if (d.implicit) return "unknown_implicit";
-            return "unknown";
+        if (d.type === 'unknown') {
+            if (d.children && d.children.length > 0) return 'unknown_group';
+            if (d.implicit) return 'unknown_implicit';
+            return 'unknown';
         }
-        if (d.type === "root") return "subsystem";
-        if (d.type === "subsystem") {
-            if (d.subsystem_type === "component") return "component";
-            return "subsystem";
+        if (d.type === 'root') return 'subsystem';
+        if (d.type === 'subsystem') {
+            if (d.subsystem_type === 'component') return 'component';
+            return 'subsystem';
         }
-        alert("class not found");
+        alert('class not found');
     }
 
     function Toggle(d) {
-
-        if (d.isMinimized)
-            d.isMinimized = false;
-        else
-            d.isMinimized = true;
+        if (d.isMinimized) d.isMinimized = false;
+        else d.isMinimized = true;
     }
 
     function ComputeConnections() {
@@ -857,17 +1213,27 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
 
             for (var i = 0; i < d.children.length; ++i) {
                 if (d.children[i].name === nameArray[nameIndex]) {
-                    return GetObjectInTree(d.children[i], nameArray, nameIndex + 1);
-                }
-                else {
-                    var numNames = d.children[i].name.split(":").length;
-                    if (numNames >= 2 && nameIndex + numNames <= nameArray.length) {
+                    return GetObjectInTree(
+                        d.children[i],
+                        nameArray,
+                        nameIndex + 1
+                    );
+                } else {
+                    var numNames = d.children[i].name.split(':').length;
+                    if (
+                        numNames >= 2 &&
+                        nameIndex + numNames <= nameArray.length
+                    ) {
                         var mergedName = nameArray[nameIndex];
                         for (var j = 1; j < numNames; ++j) {
-                            mergedName += ":" + nameArray[nameIndex + j];
+                            mergedName += ':' + nameArray[nameIndex + j];
                         }
                         if (d.children[i].name === mergedName) {
-                            return GetObjectInTree(d.children[i], nameArray, nameIndex + numNames);
+                            return GetObjectInTree(
+                                d.children[i],
+                                nameArray,
+                                nameIndex + numNames
+                            );
                         }
                     }
                 }
@@ -875,7 +1241,8 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             return null;
         }
 
-        function RemoveDuplicates(d) { //remove redundant elements in every objects' sources and targets arrays
+        function RemoveDuplicates(d) {
+            //remove redundant elements in every objects' sources and targets arrays
             if (d.children) {
                 for (var i = 0; i < d.children.length; ++i) {
                     RemoveDuplicates(d.children[i]);
@@ -901,7 +1268,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
         }
 
         function AddLeaves(d, objArray) {
-            if (d.type !== "param" && d.type !== "unconnected_param") {
+            if (d.type !== 'param' && d.type !== 'unconnected_param') {
                 objArray.push(d);
             }
             if (d.children) {
@@ -927,16 +1294,18 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             var srcSplitArray = conns[i].src.split(/\.|:/);
             var srcObj = GetObjectInTree(root, srcSplitArray, 0);
             if (srcObj == null) {
-                alert("error: cannot find connection source " + conns[i].src);
+                alert('error: cannot find connection source ' + conns[i].src);
                 return;
             }
             var srcObjArray = [srcObj];
-            if (srcObj.type !== "unknown") { //source obj must be unknown
-                alert("error: there is a source that is not an unknown.");
+            if (srcObj.type !== 'unknown') {
+                //source obj must be unknown
+                alert('error: there is a source that is not an unknown.');
                 return;
             }
-            if (srcObj.children) { //source obj must be unknown
-                alert("error: there is a source that has children.");
+            if (srcObj.children) {
+                //source obj must be unknown
+                alert('error: there is a source that has children.');
                 return;
             }
             for (var obj = srcObj.parent; obj != null; obj = obj.parent) {
@@ -946,17 +1315,21 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             var tgtSplitArray = conns[i].tgt.split(/\.|:/);
             var tgtObj = GetObjectInTree(root, tgtSplitArray, 0);
             if (tgtObj == null) {
-                alert("error: cannot find connection target " + conns[i].tgt);
+                alert('error: cannot find connection target ' + conns[i].tgt);
                 return;
             }
             var tgtObjArrayParamView = [tgtObj];
             var tgtObjArrayHideParams = [tgtObj];
-            if (tgtObj.type !== "param" && tgtObj.type !== "unconnected_param") { //target obj must be a param
-                alert("error: there is a target that is NOT a param.");
+            if (
+                tgtObj.type !== 'param' &&
+                tgtObj.type !== 'unconnected_param'
+            ) {
+                //target obj must be a param
+                alert('error: there is a target that is NOT a param.');
                 return;
             }
             if (tgtObj.children) {
-                alert("error: there is a target that has children.");
+                alert('error: there is a target that has children.');
                 return;
             }
             AddLeaves(tgtObj.parentComponent, tgtObjArrayHideParams); //contaminate
@@ -965,70 +1338,117 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                 tgtObjArrayHideParams.push(obj);
             }
 
-
             for (var j = 0; j < srcObjArray.length; ++j) {
-                if (!srcObjArray[j].hasOwnProperty('targetsParamView')) srcObjArray[j].targetsParamView = [];
-                if (!srcObjArray[j].hasOwnProperty('targetsHideParams')) srcObjArray[j].targetsHideParams = [];
-                srcObjArray[j].targetsParamView = srcObjArray[j].targetsParamView.concat(tgtObjArrayParamView);
-                srcObjArray[j].targetsHideParams = srcObjArray[j].targetsHideParams.concat(tgtObjArrayHideParams);
+                if (!srcObjArray[j].hasOwnProperty('targetsParamView'))
+                    srcObjArray[j].targetsParamView = [];
+                if (!srcObjArray[j].hasOwnProperty('targetsHideParams'))
+                    srcObjArray[j].targetsHideParams = [];
+                srcObjArray[j].targetsParamView = srcObjArray[
+                    j
+                ].targetsParamView.concat(tgtObjArrayParamView);
+                srcObjArray[j].targetsHideParams = srcObjArray[
+                    j
+                ].targetsHideParams.concat(tgtObjArrayHideParams);
             }
 
             var cycleArrowsArray = [];
             if (conns[i].cycle_arrows && conns[i].cycle_arrows.length > 0) {
                 var cycleArrows = conns[i].cycle_arrows;
                 for (var j = 0; j < cycleArrows.length; ++j) {
-                    var cycleArrowsSplitArray = cycleArrows[j].split(" ");
+                    var cycleArrowsSplitArray = cycleArrows[j].split(' ');
                     if (cycleArrowsSplitArray.length != 2) {
-                        alert("error: cycleArrowsSplitArray length not 2: got " + cycleArrowsSplitArray.length);
+                        alert(
+                            'error: cycleArrowsSplitArray length not 2: got ' +
+                                cycleArrowsSplitArray.length
+                        );
                         return;
                     }
                     var splitArray = cycleArrowsSplitArray[0].split(/\.|:/);
                     var arrowBeginObj = GetObjectInTree(root, splitArray, 0);
                     if (arrowBeginObj == null) {
-                        alert("error: cannot find cycle arrows begin object " + cycleArrowsSplitArray[0]);
+                        alert(
+                            'error: cannot find cycle arrows begin object ' +
+                                cycleArrowsSplitArray[0]
+                        );
                         return;
                     }
                     splitArray = cycleArrowsSplitArray[1].split(/\.|:/);
                     var arrowEndObj = GetObjectInTree(root, splitArray, 0);
                     if (arrowEndObj == null) {
-                        alert("error: cannot find cycle arrows end object " + cycleArrowsSplitArray[1]);
+                        alert(
+                            'error: cannot find cycle arrows end object ' +
+                                cycleArrowsSplitArray[1]
+                        );
                         return;
                     }
-                    cycleArrowsArray.push({ "begin": arrowBeginObj, "end": arrowEndObj });
+                    cycleArrowsArray.push({
+                        begin: arrowBeginObj,
+                        end: arrowEndObj
+                    });
                 }
             }
             if (cycleArrowsArray.length > 0) {
-                if (!tgtObj.parent.hasOwnProperty("cycleArrows")) {
+                if (!tgtObj.parent.hasOwnProperty('cycleArrows')) {
                     tgtObj.parent.cycleArrows = [];
                 }
-                tgtObj.parent.cycleArrows.push({ "src": srcObj, "arrows": cycleArrowsArray });
+                tgtObj.parent.cycleArrows.push({
+                    src: srcObj,
+                    arrows: cycleArrowsArray
+                });
             }
-
         }
         RemoveDuplicates(root);
     }
 
     function ComputeMatrixN2() {
         matrix = {};
-        if (d3RightTextNodesArrayZoomed.length < ptn2.LEVEL_OF_DETAIL_THRESHOLD) {
+        if (
+            d3RightTextNodesArrayZoomed.length < ptn2.LEVEL_OF_DETAIL_THRESHOLD
+        ) {
             for (var si = 0; si < d3RightTextNodesArrayZoomed.length; ++si) {
                 var srcObj = d3RightTextNodesArrayZoomed[si];
-                matrix[si + "_" + si] = { "r": si, "c": si, "obj": srcObj, "id": srcObj.id + "_" + srcObj.id };
-                var targets = (search.showParams) ? srcObj.targetsParamView : srcObj.targetsHideParams;
+                matrix[si + '_' + si] = {
+                    r: si,
+                    c: si,
+                    obj: srcObj,
+                    id: srcObj.id + '_' + srcObj.id
+                };
+                var targets = search.showParams
+                    ? srcObj.targetsParamView
+                    : srcObj.targetsHideParams;
                 for (var j = 0; j < targets.length; ++j) {
                     var tgtObj = targets[j];
                     var ti = d3RightTextNodesArrayZoomed.indexOf(tgtObj);
                     if (ti != -1) {
-                        matrix[si + "_" + ti] = { "r": si, "c": ti, "obj": srcObj, "id": srcObj.id + "_" + tgtObj.id }; //matrix[si][ti].z = 1;
+                        matrix[si + '_' + ti] = {
+                            r: si,
+                            c: ti,
+                            obj: srcObj,
+                            id: srcObj.id + '_' + tgtObj.id
+                        }; //matrix[si][ti].z = 1;
                     }
                 }
-                if (search.showParams && (srcObj.type === "param" || srcObj.type === "unconnected_param")) {
-                    for (var j = si + 1; j < d3RightTextNodesArrayZoomed.length; ++j) {
+                if (
+                    search.showParams &&
+                    (srcObj.type === 'param' ||
+                        srcObj.type === 'unconnected_param')
+                ) {
+                    for (
+                        var j = si + 1;
+                        j < d3RightTextNodesArrayZoomed.length;
+                        ++j
+                    ) {
                         var tgtObj = d3RightTextNodesArrayZoomed[j];
-                        if (srcObj.parentComponent !== tgtObj.parentComponent) break;
-                        if (tgtObj.type === "unknown") {
+                        if (srcObj.parentComponent !== tgtObj.parentComponent)
+                            break;
+                        if (tgtObj.type === 'unknown') {
                             var ti = j;
-                            matrix[si + "_" + ti] = { "r": si, "c": ti, "obj": srcObj, "id": srcObj.id + "_" + tgtObj.id };
+                            matrix[si + '_' + ti] = {
+                                r: si,
+                                c: ti,
+                                obj: srcObj,
+                                id: srcObj.id + '_' + tgtObj.id
+                            };
                         }
                     }
                 }
@@ -1055,87 +1475,123 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
 
         for (var key in matrix) {
             var d = matrix[key];
-            var tgtObj = d3RightTextNodesArrayZoomed[d.c], srcObj = d3RightTextNodesArrayZoomed[d.r];
+            var tgtObj = d3RightTextNodesArrayZoomed[d.c],
+                srcObj = d3RightTextNodesArrayZoomed[d.r];
             //alert(tgtObj.name + " " + srcObj.name);
-            if (d.c == d.r) { //on diagonal
-                if (srcObj.type === "subsystem") { //group
+            if (d.c == d.r) {
+                //on diagonal
+                if (srcObj.type === 'subsystem') {
+                    //group
                     symbols_group.push(d);
-                } else if (srcObj.type === "unknown" || (search.showParams && (srcObj.type === "param" || srcObj.type === "unconnected_param"))) {
-                    if (srcObj.dtype === "ndarray") { //vector
+                } else if (
+                    srcObj.type === 'unknown' ||
+                    (search.showParams &&
+                        (srcObj.type === 'param' ||
+                            srcObj.type === 'unconnected_param'))
+                ) {
+                    if (srcObj.dtype === 'ndarray') {
+                        //vector
                         symbols_vector.push(d);
-                    } else { //scalar
+                    } else {
+                        //scalar
                         symbols_scalar.push(d);
                     }
                 }
-
-            }
-            else if (srcObj.type === "subsystem") {
-                if (tgtObj.type === "subsystem") { //groupGroup
+            } else if (srcObj.type === 'subsystem') {
+                if (tgtObj.type === 'subsystem') {
+                    //groupGroup
                     symbols_groupGroup.push(d);
-                }
-                else if (tgtObj.type === "unknown" || (search.showParams && (tgtObj.type === "param" || tgtObj.type === "unconnected_param"))) {
-                    if (tgtObj.dtype === "ndarray") {//groupVector
+                } else if (
+                    tgtObj.type === 'unknown' ||
+                    (search.showParams &&
+                        (tgtObj.type === 'param' ||
+                            tgtObj.type === 'unconnected_param'))
+                ) {
+                    if (tgtObj.dtype === 'ndarray') {
+                        //groupVector
                         symbols_groupVector.push(d);
-                    }
-                    else {//groupScalar
+                    } else {
+                        //groupScalar
                         symbols_groupScalar.push(d);
                     }
                 }
-            }
-            else if (srcObj.type === "unknown" || (search.showParams && (srcObj.type === "param" || srcObj.type === "unconnected_param"))) {
-                if (srcObj.dtype === "ndarray") {
-                    if (tgtObj.type === "unknown" || (search.showParams && (tgtObj.type === "param" || tgtObj.type === "unconnected_param"))) {
-                        if (tgtObj.dtype === "ndarray" || (search.showParams && (tgtObj.type === "param" || tgtObj.type === "unconnected_param"))) {//vectorVector
+            } else if (
+                srcObj.type === 'unknown' ||
+                (search.showParams &&
+                    (srcObj.type === 'param' ||
+                        srcObj.type === 'unconnected_param'))
+            ) {
+                if (srcObj.dtype === 'ndarray') {
+                    if (
+                        tgtObj.type === 'unknown' ||
+                        (search.showParams &&
+                            (tgtObj.type === 'param' ||
+                                tgtObj.type === 'unconnected_param'))
+                    ) {
+                        if (
+                            tgtObj.dtype === 'ndarray' ||
+                            (search.showParams &&
+                                (tgtObj.type === 'param' ||
+                                    tgtObj.type === 'unconnected_param'))
+                        ) {
+                            //vectorVector
                             symbols_vectorVector.push(d);
-                        }
-                        else {//vectorScalar
+                        } else {
+                            //vectorScalar
                             symbols_vectorScalar.push(d);
                         }
-
-                    }
-                    else if (tgtObj.type === "subsystem") { //vectorGroup
+                    } else if (tgtObj.type === 'subsystem') {
+                        //vectorGroup
                         symbols_vectorGroup.push(d);
                     }
-                }
-                else { //if (srcObj.dtype !== "ndarray"){
-                    if (tgtObj.type === "unknown" || (search.showParams && (tgtObj.type === "param" || tgtObj.type === "unconnected_param"))) {
-                        if (tgtObj.dtype === "ndarray") {//scalarVector
+                } else {
+                    //if (srcObj.dtype !== "ndarray"){
+                    if (
+                        tgtObj.type === 'unknown' ||
+                        (search.showParams &&
+                            (tgtObj.type === 'param' ||
+                                tgtObj.type === 'unconnected_param'))
+                    ) {
+                        if (tgtObj.dtype === 'ndarray') {
+                            //scalarVector
                             symbols_scalarVector.push(d);
-                        }
-                        else {//scalarScalar
+                        } else {
+                            //scalarScalar
                             symbols_scalarScalar.push(d);
                         }
-
-                    }
-                    else if (tgtObj.type === "subsystem") { //scalarGroup
+                    } else if (tgtObj.type === 'subsystem') {
+                        //scalarGroup
                         symbols_scalarGroup.push(d);
                     }
                 }
-
             }
         }
 
-        var currentBox = { "startI": 0, "stopI": 0 };
+        var currentBox = { startI: 0, stopI: 0 };
         d3RightTextNodesArrayZoomedBoxInfo = [currentBox];
         for (var ri = 1; ri < d3RightTextNodesArrayZoomed.length; ++ri) {
             //boxes
             var el = d3RightTextNodesArrayZoomed[ri];
             var startINode = d3RightTextNodesArrayZoomed[currentBox.startI];
-            if (startINode.parentComponent && el.parentComponent && startINode.parentComponent === el.parentComponent) {
+            if (
+                startINode.parentComponent &&
+                el.parentComponent &&
+                startINode.parentComponent === el.parentComponent
+            ) {
                 ++currentBox.stopI;
-            }
-            else {
-                currentBox = { "startI": ri, "stopI": ri };
+            } else {
+                currentBox = { startI: ri, stopI: ri };
             }
             d3RightTextNodesArrayZoomedBoxInfo.push(currentBox);
         }
 
         drawableN2ComponentBoxes = [];
-        for (var i = 0; i < d3RightTextNodesArrayZoomedBoxInfo.length; ++i) { //draw grid lines last so that they will always be visible
+        for (var i = 0; i < d3RightTextNodesArrayZoomedBoxInfo.length; ++i) {
+            //draw grid lines last so that they will always be visible
             var box = d3RightTextNodesArrayZoomedBoxInfo[i];
             if (box.startI == box.stopI) continue;
             var el = d3RightTextNodesArrayZoomed[box.startI];
-            if (!el.parentComponent) alert("parent component not found in box"); //continue;
+            if (!el.parentComponent) alert('parent component not found in box'); //continue;
             box.obj = el.parentComponent;
             i = box.stopI;
             drawableN2ComponentBoxes.push(box);
@@ -1143,18 +1599,19 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
 
         //do this so you save old index for the exit()
         gridLines = [];
-        if (d3RightTextNodesArrayZoomed.length < ptn2.LEVEL_OF_DETAIL_THRESHOLD){
+        if (
+            d3RightTextNodesArrayZoomed.length < ptn2.LEVEL_OF_DETAIL_THRESHOLD
+        ) {
             for (var i = 0; i < d3RightTextNodesArrayZoomed.length; ++i) {
                 var obj = d3RightTextNodesArrayZoomed[i];
-                var gl = { "i": i, "obj": obj };
+                var gl = { i: i, obj: obj };
                 gridLines.push(gl);
             }
         }
     }
 
-
     function FindRootOfChangeForShowParams(d) {
-        return (d.hasOwnProperty("parentComponent")) ? d.parentComponent : d;
+        return d.hasOwnProperty('parentComponent') ? d.parentComponent : d;
     }
 
     function FindRootOfChangeForRightClick(d) {
@@ -1162,14 +1619,15 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
     }
 
     function FindRootOfChangeForCollapseDepth(d) {
-        for (var obj = d; obj != null; obj = obj.parent) { //make sure history item is not minimized
+        for (var obj = d; obj != null; obj = obj.parent) {
+            //make sure history item is not minimized
             if (obj.depth == chosenCollapseDepth) return obj;
         }
         return d;
     }
 
     function FindRootOfChangeForCollapseUncollapseOutputs(d) {
-        return (d.hasOwnProperty("parentComponent")) ? d.parentComponent : d;
+        return d.hasOwnProperty('parentComponent') ? d.parentComponent : d;
     }
 
     function MouseoverOffDiagN2(d) {
@@ -1184,7 +1642,8 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             }
         }
         function GetObjectsWithCycleArrows(d, arr) {
-            for (var obj = d.parent; obj != null; obj = obj.parent) { //start with parent.. the children will get the current object to avoid duplicates
+            for (var obj = d.parent; obj != null; obj = obj.parent) {
+                //start with parent.. the children will get the current object to avoid duplicates
                 if (obj.cycleArrows) {
                     arr.push(obj);
                 }
@@ -1214,21 +1673,28 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             return HasObjectInChildren(d, toMatchObj);
         }
 
-        var lineWidth = Math.min(5, n2Dx * .5, n2Dy * .5);
-        arrowMarker.attr("markerWidth", lineWidth * .4)
-            .attr("markerHeight", lineWidth * .4);
+        var lineWidth = Math.min(5, n2Dx * 0.5, n2Dy * 0.5);
+        arrowMarker
+            .attr('markerWidth', lineWidth * 0.4)
+            .attr('markerHeight', lineWidth * 0.4);
         var src = d3RightTextNodesArrayZoomed[d.r];
         var tgt = d3RightTextNodesArrayZoomed[d.c];
         var boxEnd = d3RightTextNodesArrayZoomedBoxInfo[d.c];
-        if (d.r > d.c) { //bottom left
+        if (d.r > d.c) {
+            //bottom left
             DrawPathTwoLines(
                 n2Dx * d.r, //x1
-                n2Dy * d.r + n2Dy * .5, //y1
-                n2Dx * d.c + n2Dx * .5, //left x2
-                n2Dy * d.r + n2Dy * .5, //left y2
-                n2Dx * d.c + n2Dx * .5, //up x3
-                (search.showParams) ? n2Dy * d.c + n2Dy - 1e-2 : n2Dy * (boxEnd.stopI) + n2Dy - 1e-2, //up y3
-                ptn2.RED_ARROW_COLOR, lineWidth, true);
+                n2Dy * d.r + n2Dy * 0.5, //y1
+                n2Dx * d.c + n2Dx * 0.5, //left x2
+                n2Dy * d.r + n2Dy * 0.5, //left y2
+                n2Dx * d.c + n2Dx * 0.5, //up x3
+                search.showParams
+                    ? n2Dy * d.c + n2Dy - 1e-2
+                    : n2Dy * boxEnd.stopI + n2Dy - 1e-2, //up y3
+                ptn2.RED_ARROW_COLOR,
+                lineWidth,
+                true
+            );
 
             var targetsWithCycleArrows = [];
             GetObjectsWithCycleArrows(tgt, targetsWithCycleArrows);
@@ -1237,14 +1703,23 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                 for (var ai = 0; ai < arrows.length; ++ai) {
                     if (HasObject(src, arrows[ai].src)) {
                         var correspondingSrcArrows = arrows[ai].arrows;
-                        for (var si = 0; si < correspondingSrcArrows.length; ++si) {
+                        for (
+                            var si = 0;
+                            si < correspondingSrcArrows.length;
+                            ++si
+                        ) {
                             var beginObj = correspondingSrcArrows[si].begin;
                             var endObj = correspondingSrcArrows[si].end;
                             //alert(beginObj.name + "->" + endObj.name);
-                            var firstBeginIndex = -1, firstEndIndex = -1;
+                            var firstBeginIndex = -1,
+                                firstEndIndex = -1;
 
                             //find first begin index
-                            for (var mi = 0; mi < d3RightTextNodesArrayZoomed.length; ++mi) {
+                            for (
+                                var mi = 0;
+                                mi < d3RightTextNodesArrayZoomed.length;
+                                ++mi
+                            ) {
                                 var rtNode = d3RightTextNodesArrayZoomed[mi];
                                 if (HasObject(rtNode, beginObj)) {
                                     firstBeginIndex = mi;
@@ -1252,12 +1727,16 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                                 }
                             }
                             if (firstBeginIndex == -1) {
-                                alert("error: first begin index not found");
+                                alert('error: first begin index not found');
                                 return;
                             }
 
                             //find first end index
-                            for (var mi = 0; mi < d3RightTextNodesArrayZoomed.length; ++mi) {
+                            for (
+                                var mi = 0;
+                                mi < d3RightTextNodesArrayZoomed.length;
+                                ++mi
+                            ) {
                                 var rtNode = d3RightTextNodesArrayZoomed[mi];
                                 if (HasObject(rtNode, endObj)) {
                                     firstEndIndex = mi;
@@ -1265,15 +1744,17 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                                 }
                             }
                             if (firstEndIndex == -1) {
-                                alert("error: first end index not found");
+                                alert('error: first end index not found');
                                 return;
                             }
 
                             if (firstBeginIndex != firstEndIndex) {
                                 if (search.showParams) {
-                                    DrawArrowsParamView(firstBeginIndex, firstEndIndex);
-                                }
-                                else {
+                                    DrawArrowsParamView(
+                                        firstBeginIndex,
+                                        firstEndIndex
+                                    );
+                                } else {
                                     DrawArrows(firstBeginIndex, firstEndIndex);
                                 }
                             }
@@ -1281,129 +1762,208 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                     }
                 }
             }
-        }
-        else if (d.r < d.c) { //top right
+        } else if (d.r < d.c) {
+            //top right
             DrawPathTwoLines(
                 n2Dx * d.r + n2Dx, //x1
-                n2Dy * d.r + n2Dy * .5, //y1
-                n2Dx * d.c + n2Dx * .5, //right x2
-                n2Dy * d.r + n2Dy * .5, //right y2
-                n2Dx * d.c + n2Dx * .5, //down x3
-                (search.showParams) ? n2Dy * d.c + 1e-2 : n2Dy * boxEnd.startI + 1e-2, //down y3
-                ptn2.RED_ARROW_COLOR, lineWidth, true);
+                n2Dy * d.r + n2Dy * 0.5, //y1
+                n2Dx * d.c + n2Dx * 0.5, //right x2
+                n2Dy * d.r + n2Dy * 0.5, //right y2
+                n2Dx * d.c + n2Dx * 0.5, //down x3
+                search.showParams
+                    ? n2Dy * d.c + 1e-2
+                    : n2Dy * boxEnd.startI + 1e-2, //down y3
+                ptn2.RED_ARROW_COLOR,
+                lineWidth,
+                true
+            );
         }
         var leftTextWidthR = d3RightTextNodesArrayZoomed[d.r].nameWidthPx,
             leftTextWidthC = d3RightTextNodesArrayZoomed[d.c].nameWidthPx;
-        DrawRect(-leftTextWidthR - PTREE_N2_GAP_PX, n2Dy * d.r, leftTextWidthR, n2Dy, ptn2.RED_ARROW_COLOR); //highlight var name
-        DrawRect(-leftTextWidthC - PTREE_N2_GAP_PX, n2Dy * d.c, leftTextWidthC, n2Dy, ptn2.GREEN_ARROW_COLOR); //highlight var name
+        DrawRect(
+            -leftTextWidthR - PTREE_N2_GAP_PX,
+            n2Dy * d.r,
+            leftTextWidthR,
+            n2Dy,
+            ptn2.RED_ARROW_COLOR
+        ); //highlight var name
+        DrawRect(
+            -leftTextWidthC - PTREE_N2_GAP_PX,
+            n2Dy * d.c,
+            leftTextWidthC,
+            n2Dy,
+            ptn2.GREEN_ARROW_COLOR
+        ); //highlight var name
     }
 
     function MouseoverOnDiagN2(d) {
         //d=hovered element
         var hoveredIndexRC = d.c; //d.x == d.y == row == col
-        var leftTextWidthHovered = d3RightTextNodesArrayZoomed[hoveredIndexRC].nameWidthPx;
+        var leftTextWidthHovered =
+            d3RightTextNodesArrayZoomed[hoveredIndexRC].nameWidthPx;
 
         // Loop over all elements in the matrix looking for other cells in the same column as
-        var lineWidth = Math.min(5, n2Dx * .5, n2Dy * .5);
-        arrowMarker.attr("markerWidth", lineWidth * .4)
-            .attr("markerHeight", lineWidth * .4);
-        DrawRect(-leftTextWidthHovered - PTREE_N2_GAP_PX, n2Dy * hoveredIndexRC, leftTextWidthHovered, n2Dy, ptn2.HIGHLIGHT_HOVERED_COLOR); //highlight hovered
+        var lineWidth = Math.min(5, n2Dx * 0.5, n2Dy * 0.5);
+        arrowMarker
+            .attr('markerWidth', lineWidth * 0.4)
+            .attr('markerHeight', lineWidth * 0.4);
+        DrawRect(
+            -leftTextWidthHovered - PTREE_N2_GAP_PX,
+            n2Dy * hoveredIndexRC,
+            leftTextWidthHovered,
+            n2Dy,
+            ptn2.HIGHLIGHT_HOVERED_COLOR
+        ); //highlight hovered
         for (var i = 0; i < d3RightTextNodesArrayZoomed.length; ++i) {
-            var leftTextWidthDependency = d3RightTextNodesArrayZoomed[i].nameWidthPx;
+            var leftTextWidthDependency =
+                d3RightTextNodesArrayZoomed[i].nameWidthPx;
             var box = d3RightTextNodesArrayZoomedBoxInfo[i];
-            if (matrix[hoveredIndexRC + "_" + i] !== undefined) { //if (matrix[hoveredIndexRC][i].z > 0) { //i is column here
-                if (i < hoveredIndexRC) { //column less than hovered
+            if (matrix[hoveredIndexRC + '_' + i] !== undefined) {
+                //if (matrix[hoveredIndexRC][i].z > 0) { //i is column here
+                if (i < hoveredIndexRC) {
+                    //column less than hovered
                     if (search.showParams) {
                         DrawPathTwoLines(
                             n2Dx * hoveredIndexRC, //x1
-                            n2Dy * (hoveredIndexRC + .5), //y1
-                            (i + .5) * n2Dx, //left x2
-                            n2Dy * (hoveredIndexRC + .5), //left y2
-                            (i + .5) * n2Dx, //up x3
+                            n2Dy * (hoveredIndexRC + 0.5), //y1
+                            (i + 0.5) * n2Dx, //left x2
+                            n2Dy * (hoveredIndexRC + 0.5), //left y2
+                            (i + 0.5) * n2Dx, //up x3
                             (i + 1) * n2Dy, //up y3
-                            ptn2.GREEN_ARROW_COLOR, lineWidth, true);
-                    }
-                    else if (i == box.startI) {
+                            ptn2.GREEN_ARROW_COLOR,
+                            lineWidth,
+                            true
+                        );
+                    } else if (i == box.startI) {
                         DrawPathTwoLines(
                             n2Dx * hoveredIndexRC, //x1
-                            n2Dy * hoveredIndexRC + n2Dy * .5, //y1
-                            (box.startI + (box.stopI - box.startI) * .5) * n2Dx + n2Dx * .5, //left x2
-                            n2Dy * hoveredIndexRC + n2Dy * .5, //left y2
-                            (box.startI + (box.stopI - box.startI) * .5) * n2Dx + n2Dx * .5, //up x3
+                            n2Dy * hoveredIndexRC + n2Dy * 0.5, //y1
+                            (box.startI + (box.stopI - box.startI) * 0.5) *
+                                n2Dx +
+                                n2Dx * 0.5, //left x2
+                            n2Dy * hoveredIndexRC + n2Dy * 0.5, //left y2
+                            (box.startI + (box.stopI - box.startI) * 0.5) *
+                                n2Dx +
+                                n2Dx * 0.5, //up x3
                             n2Dy * box.stopI + n2Dy, //up y3
-                            ptn2.GREEN_ARROW_COLOR, lineWidth, true);
+                            ptn2.GREEN_ARROW_COLOR,
+                            lineWidth,
+                            true
+                        );
                     }
-                    DrawRect(-leftTextWidthDependency - PTREE_N2_GAP_PX, n2Dy * i, leftTextWidthDependency, n2Dy, ptn2.GREEN_ARROW_COLOR); //highlight var name
-
-                } else if (i > hoveredIndexRC) { //column greater than hovered
+                    DrawRect(
+                        -leftTextWidthDependency - PTREE_N2_GAP_PX,
+                        n2Dy * i,
+                        leftTextWidthDependency,
+                        n2Dy,
+                        ptn2.GREEN_ARROW_COLOR
+                    ); //highlight var name
+                } else if (i > hoveredIndexRC) {
+                    //column greater than hovered
                     if (search.showParams) {
                         DrawPathTwoLines(
                             n2Dx * hoveredIndexRC + n2Dx, //x1
-                            n2Dy * (hoveredIndexRC + .5), //y1
-                            (i + .5) * n2Dx, //right x2
-                            n2Dy * (hoveredIndexRC + .5), //right y2
-                            (i + .5) * n2Dx, //down x3
+                            n2Dy * (hoveredIndexRC + 0.5), //y1
+                            (i + 0.5) * n2Dx, //right x2
+                            n2Dy * (hoveredIndexRC + 0.5), //right y2
+                            (i + 0.5) * n2Dx, //down x3
                             n2Dy * i, //down y3
-                            ptn2.GREEN_ARROW_COLOR, lineWidth, true); //vertical down
-                    }
-                    else if (i == box.startI) {
+                            ptn2.GREEN_ARROW_COLOR,
+                            lineWidth,
+                            true
+                        ); //v  ertical down
+                    } else if (i == box.startI) {
                         DrawPathTwoLines(
                             n2Dx * hoveredIndexRC + n2Dx, //x1
-                            n2Dy * hoveredIndexRC + n2Dy * .5, //y1
-                            (box.startI + (box.stopI - box.startI) * .5) * n2Dx + n2Dx * .5, //right x2
-                            n2Dy * hoveredIndexRC + n2Dy * .5, //right y2
-                            (box.startI + (box.stopI - box.startI) * .5) * n2Dx + n2Dx * .5, //down x3
+                            n2Dy * hoveredIndexRC + n2Dy * 0.5, //y1
+                            (box.startI + (box.stopI - box.startI) * 0.5) *
+                                n2Dx +
+                                n2Dx * 0.5, //right x2
+                            n2Dy * hoveredIndexRC + n2Dy * 0.5, //right y2
+                            (box.startI + (box.stopI - box.startI) * 0.5) *
+                                n2Dx +
+                                n2Dx * 0.5, //down x3
                             n2Dy * box.startI, //down y3
-                            ptn2.GREEN_ARROW_COLOR, lineWidth, true); //vertical down
+                            ptn2.GREEN_ARROW_COLOR,
+                            lineWidth,
+                            true
+                        ); //vertical down
                     }
-                    DrawRect(-leftTextWidthDependency - PTREE_N2_GAP_PX, n2Dy * i, leftTextWidthDependency, n2Dy, ptn2.GREEN_ARROW_COLOR); //highlight var name
+                    DrawRect(
+                        -leftTextWidthDependency - PTREE_N2_GAP_PX,
+                        n2Dy * i,
+                        leftTextWidthDependency,
+                        n2Dy,
+                        ptn2.GREEN_ARROW_COLOR
+                    ); //highlight var name
                 }
             }
 
-            if (matrix[i + "_" + hoveredIndexRC] !== undefined) { //if (matrix[i][hoveredIndexRC].z > 0) { //i is row here
-                if (i < hoveredIndexRC) { //row less than hovered
+            if (matrix[i + '_' + hoveredIndexRC] !== undefined) {
+                //if (matrix[i][hoveredIndexRC].z > 0) { //i is row here
+                if (i < hoveredIndexRC) {
+                    //row less than hovered
                     DrawPathTwoLines(
                         n2Dx * i + n2Dx, //x1
-                        n2Dy * i + n2Dy * .5, //y1
-                        n2Dx * hoveredIndexRC + n2Dx * .5, //right x2
-                        n2Dy * i + n2Dy * .5, //right y2
-                        n2Dx * hoveredIndexRC + n2Dx * .5, //down x3
+                        n2Dy * i + n2Dy * 0.5, //y1
+                        n2Dx * hoveredIndexRC + n2Dx * 0.5, //right x2
+                        n2Dy * i + n2Dy * 0.5, //right y2
+                        n2Dx * hoveredIndexRC + n2Dx * 0.5, //down x3
                         n2Dy * hoveredIndexRC, //down y3
-                        ptn2.RED_ARROW_COLOR, lineWidth, true); //vertical down
-                    DrawRect(-leftTextWidthDependency - PTREE_N2_GAP_PX, n2Dy * i, leftTextWidthDependency, n2Dy, ptn2.RED_ARROW_COLOR); //highlight var name
-                } else if (i > hoveredIndexRC) { //row greater than hovered
+                        ptn2.RED_ARROW_COLOR,
+                        lineWidth,
+                        true
+                    ); //vertical down
+                    DrawRect(
+                        -leftTextWidthDependency - PTREE_N2_GAP_PX,
+                        n2Dy * i,
+                        leftTextWidthDependency,
+                        n2Dy,
+                        ptn2.RED_ARROW_COLOR
+                    ); //highlight var name
+                } else if (i > hoveredIndexRC) {
+                    //row greater than hovered
                     DrawPathTwoLines(
                         n2Dx * i, //x1
-                        n2Dy * i + n2Dy * .5, //y1
-                        n2Dx * hoveredIndexRC + n2Dx * .5, //left x2
-                        n2Dy * i + n2Dy * .5, //left y2
-                        n2Dx * hoveredIndexRC + n2Dx * .5, //up x3
+                        n2Dy * i + n2Dy * 0.5, //y1
+                        n2Dx * hoveredIndexRC + n2Dx * 0.5, //left x2
+                        n2Dy * i + n2Dy * 0.5, //left y2
+                        n2Dx * hoveredIndexRC + n2Dx * 0.5, //up x3
                         n2Dy * hoveredIndexRC + n2Dy, //up y3
-                        ptn2.RED_ARROW_COLOR, lineWidth, true);
-                    DrawRect(-leftTextWidthDependency - PTREE_N2_GAP_PX, n2Dy * i, leftTextWidthDependency, n2Dy, ptn2.RED_ARROW_COLOR); //highlight var name
+                        ptn2.RED_ARROW_COLOR,
+                        lineWidth,
+                        true
+                    );
+                    DrawRect(
+                        -leftTextWidthDependency - PTREE_N2_GAP_PX,
+                        n2Dy * i,
+                        leftTextWidthDependency,
+                        n2Dy,
+                        ptn2.RED_ARROW_COLOR
+                    ); //highlight var name
                 }
             }
         }
     }
 
     function MouseoutN2() {
-        n2Group.selectAll(".n2_hover_elements").remove();
+        n2Group.selectAll('.n2_hover_elements').remove();
     }
 
     function MouseClickN2(d) {
-        var newClassName = "n2_hover_elements_" + d.r + "_" + d.c;
-        var selection = n2Group.selectAll("." + newClassName);
+        var newClassName = 'n2_hover_elements_' + d.r + '_' + d.c;
+        var selection = n2Group.selectAll('.' + newClassName);
         if (selection.size() > 0) {
             selection.remove();
-        }
-        else {
-            n2Group.selectAll("path.n2_hover_elements, circle.n2_hover_elements")
-                .attr("class", newClassName);
+        } else {
+            n2Group
+                .selectAll('path.n2_hover_elements, circle.n2_hover_elements')
+                .attr('class', newClassName);
         }
     }
 
     function ReturnToRootButtonClick() {
-        backButtonHistory.push({ "el": zoomedElement });
+        backButtonHistory.push({ el: zoomedElement });
         forwardButtonHistory = [];
         SetupLeftClick(root);
         Update();
@@ -1411,7 +1971,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
 
     function UpOneLevelButtonClick() {
         if (zoomedElement === root) return;
-        backButtonHistory.push({ "el": zoomedElement });
+        backButtonHistory.push({ el: zoomedElement });
         forwardButtonHistory = [];
         SetupLeftClick(zoomedElement.parent);
         Update();
@@ -1419,7 +1979,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
 
     function CollapseOutputsButtonClick(startNode) {
         function CollapseOutputs(d) {
-            if (d.subsystem_type && d.subsystem_type === "component") {
+            if (d.subsystem_type && d.subsystem_type === 'component') {
                 d.isMinimized = true;
             }
             if (d.children) {
@@ -1437,7 +1997,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
 
     function UncollapseButtonClick(startNode) {
         function Uncollapse(d) {
-            if (d.type !== "param" && d.type !== "unconnected_param") {
+            if (d.type !== 'param' && d.type !== 'unconnected_param') {
                 d.isMinimized = false;
             }
             if (d.children) {
@@ -1455,13 +2015,16 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
 
     function CollapseToDepthSelectChange(newChosenCollapseDepth) {
         function CollapseToDepth(d, depth) {
-            if (d.type === "param" || d.type === "unknown" || d.type === "unconnected_param") {
+            if (
+                d.type === 'param' ||
+                d.type === 'unknown' ||
+                d.type === 'unconnected_param'
+            ) {
                 return;
             }
             if (d.depth < depth) {
                 d.isMinimized = false;
-            }
-            else {
+            } else {
                 d.isMinimized = true;
             }
             if (d.children) {
@@ -1483,8 +2046,8 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
 
     function FontSizeSelectChange(fontSize) {
         for (var i = 8; i <= 14; ++i) {
-            var newText = (i == fontSize) ? ("<b>" + i + "px</b>") : (i + "px");
-            $("#idFontSize" + i + "px")[0].innerHTML = newText;
+            var newText = i == fontSize ? '<b>' + i + 'px</b>' : i + 'px';
+            $('#idFontSize' + i + 'px')[0].innerHTML = newText;
         }
         FONT_SIZE_PX = fontSize;
         ptn2.TRANSITION_DURATION = ptn2.TRANSITION_DURATION_FAST;
@@ -1494,8 +2057,8 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
 
     function VerticalResize(height) {
         for (var i = 600; i <= 1000; i += 50) {
-            var newText = (i == height) ? ("<b>" + i + "px</b>") : (i + "px");
-            $("#idVerticalResize" + i + "px")[0].innerHTML = newText;
+            var newText = i == height ? '<b>' + i + 'px</b>' : i + 'px';
+            $('#idVerticalResize' + i + 'px')[0].innerHTML = newText;
         }
         ClearArrowsAndConnects();
         ptn2.HEIGHT_PX = height;
@@ -1507,9 +2070,15 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
     }
 
     function ShowParamsCheckboxChange() {
-        if (zoomedElement.type === "param" || zoomedElement.type === "unconnected_param") return;
+        if (
+            zoomedElement.type === 'param' ||
+            zoomedElement.type === 'unconnected_param'
+        )
+            return;
         search.showParams = !search.showParams;
-        $("#showParamsButtonId")[0].className = search.showParams ? "myButton myButtonToggledOn" : "myButton";
+        $('#showParamsButtonId')[0].className = search.showParams
+            ? 'myButton myButtonToggledOn'
+            : 'myButton';
 
         FindRootOfChangeFunction = FindRootOfChangeForShowParams;
         lastClickWasLeft = false;
@@ -1519,60 +2088,86 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
         Update();
     }
 
-
     function ShowPathCheckboxChange() {
         showPath = !showPath;
-        $("#currentPathId")[0].style.display = showPath ? "block" : "none";
-        $("#showCurrentPathButtonId")[0].className = showPath ? "myButton myButtonToggledOn" : "myButton";
+        $('#currentPathId')[0].style.display = showPath ? 'block' : 'none';
+        $('#showCurrentPathButtonId')[0].className = showPath
+            ? 'myButton myButtonToggledOn'
+            : 'myButton';
     }
 
     function ToggleLegend() {
         showLegend = !showLegend;
-        $("#showLegendButtonId")[0].className = showLegend ? "myButton myButtonToggledOn" : "myButton";
+        $('#showLegendButtonId')[0].className = showLegend
+            ? 'myButton myButtonToggledOn'
+            : 'myButton';
         SetupLegend(d3, d3ContentDiv);
     }
 
     function CreateDomLayout() {
-        document.getElementById("searchButtonId").onclick = search.SearchButtonClicked;
+        document.getElementById('searchButtonId').onclick =
+            search.SearchButtonClicked;
     }
 
     function CreateToolbar() {
-        var div = document.getElementById("toolbarDiv")
-        $("#returnToRootButtonId")[0].onclick = ReturnToRootButtonClick;
-        $("#backButtonId")[0].onclick = BackButtonPressed;
-        $("#forwardButtonId")[0].onclick = ForwardButtonPressed;
-        $("#upOneLevelButtonId")[0].onclick = UpOneLevelButtonClick;
-        $("#uncollapseInViewButtonId")[0].onclick = function () { UncollapseButtonClick(zoomedElement); };
-        $("#uncollapseAllButtonId")[0].onclick = function () { UncollapseButtonClick(root); };
-        $("#collapseInViewButtonId")[0].onclick = function () { CollapseOutputsButtonClick(zoomedElement); };
-        $("#collapseAllButtonId")[0].onclick = function () { CollapseOutputsButtonClick(root); };
-        $("#clearArrowsAndConnectsButtonId")[0].onclick = ClearArrowsAndConnects;
-        $("#showCurrentPathButtonId")[0].onclick = ShowPathCheckboxChange;
-        $("#showLegendButtonId")[0].onclick = ToggleLegend;
-        $("#showParamsButtonId")[0].onclick = ShowParamsCheckboxChange;
+        var div = document.getElementById('toolbarDiv');
+        $('#returnToRootButtonId')[0].onclick = ReturnToRootButtonClick;
+        $('#backButtonId')[0].onclick = BackButtonPressed;
+        $('#forwardButtonId')[0].onclick = ForwardButtonPressed;
+        $('#upOneLevelButtonId')[0].onclick = UpOneLevelButtonClick;
+        $('#uncollapseInViewButtonId')[0].onclick = function() {
+            UncollapseButtonClick(zoomedElement);
+        };
+        $('#uncollapseAllButtonId')[0].onclick = function() {
+            UncollapseButtonClick(root);
+        };
+        $('#collapseInViewButtonId')[0].onclick = function() {
+            CollapseOutputsButtonClick(zoomedElement);
+        };
+        $('#collapseAllButtonId')[0].onclick = function() {
+            CollapseOutputsButtonClick(root);
+        };
+        $(
+            '#clearArrowsAndConnectsButtonId'
+        )[0].onclick = ClearArrowsAndConnects;
+        $('#showCurrentPathButtonId')[0].onclick = ShowPathCheckboxChange;
+        $('#showLegendButtonId')[0].onclick = ToggleLegend;
+        $('#showParamsButtonId')[0].onclick = ShowParamsCheckboxChange;
 
         for (var i = 8; i <= 14; ++i) {
-            var f = function (idx) {
-                return function () { FontSizeSelectChange(idx); };
-            }(i);
-            $("#idFontSize" + i + "px")[0].onclick = f;
+            var f = (function(idx) {
+                return function() {
+                    FontSizeSelectChange(idx);
+                };
+            })(i);
+            $('#idFontSize' + i + 'px')[0].onclick = f;
         }
 
         for (var i = 600; i <= 1000; i += 50) {
-            var f = function (idx) {
-                return function () { VerticalResize(idx); };
-            }(i);
-            $("#idVerticalResize" + i + "px")[0].onclick = f;
+            var f = (function(idx) {
+                return function() {
+                    VerticalResize(idx);
+                };
+            })(i);
+            $('#idVerticalResize' + i + 'px')[0].onclick = f;
         }
 
-        $("#saveSvgButtonId")[0].onclick = function () { SaveSvg(parentDiv) };
-        $("#helpButtonId")[0].onclick = modal.DisplayModal;
+        $('#saveSvgButtonId')[0].onclick = function() {
+            SaveSvg(parentDiv);
+        };
+        $('#helpButtonId')[0].onclick = modal.DisplayModal;
     }
 
     return {
-        GetFontSize: function () { return FONT_SIZE_PX; },
-        ResizeHeight: function (h) { VerticalResize(h); },
-        Redraw: function () { Update(); }
+        GetFontSize: function() {
+            return FONT_SIZE_PX;
+        },
+        ResizeHeight: function(h) {
+            VerticalResize(h);
+        },
+        Redraw: function() {
+            Update();
+        }
     };
 }
 
@@ -1583,17 +2178,23 @@ var mouseOverOnDiagN2;
 var mouseOutN2;
 var mouseClickN2;
 var hasInputConn;
-var treeData, connectionList;
+var treeData = null;
+var connectionList;
 var url = window.location.href;
 var url_split = url.split('/');
-var case_id = "1885148375";
+var case_id = '1885148375';
 var modal;
 var search;
 
-ptn2.resize = function () {
+ptn2.resize = function() {
     var container = ptn2.container;
-    ptn2.HEIGHT_PX = container.width < container.height ? container.width*0.75 : container.height;
-    if(ptn2.HEIGHT_PX > 900) { ptn2.HEIGHT_PX *= 0.75; }
+    ptn2.HEIGHT_PX =
+        container.width < container.height
+            ? container.width * 0.75
+            : container.height;
+    if (ptn2.HEIGHT_PX > 900) {
+        ptn2.HEIGHT_PX *= 0.75;
+    }
     ptn2.WIDTH_N2_PX = ptn2.HEIGHT_PX;
     ptn2.PARENT_NODE_WIDTH_PX = 40 * (ptn2.HEIGHT_PX / 600);
     ptn2.xScalerPTree = d3.scaleLinear().range([0, ptn2.widthPTreePx]);
@@ -1608,28 +2209,34 @@ ptn2.resize = function () {
         n2s[0].parentNode.removeChild(n2s[0]);
     }
 
-    var app = PtN2Diagram(lastLeftClickedElement, treeData['tree'], treeData['connections_list']);
+    if (treeData !== null) {
+        var app = PtN2Diagram(
+            lastLeftClickedElement,
+            treeData['tree'],
+            treeData['connections_list']
+        );
+    }
 };
 
 // Set ptN2's initializeTree method
-ptn2.initializeTree = function (container) {
+ptn2.initializeTree = function(container) {
     ptn2.container = container;
-    ptn2.container.on('resize', ptn2.resize)
+    ptn2.container.on('resize', ptn2.resize);
 
-    container._contentElement[0].onclick= () => {
-        document.getElementById('n2Controls').style.display = "block";
-        document.getElementById('plotControls').style.display = "none";
-    }
+    container._contentElement[0].onclick = () => {
+        document.getElementById('n2Controls').style.display = 'block';
+        document.getElementById('plotControls').style.display = 'none';
+    };
 
-    http.get("case/" + case_id + '/driver_metadata', function (response) {
+    http.get('case/' + case_id + '/driver_metadata', function(response) {
         var data = JSON.parse(response)[0];
         treeData = data['model_viewer_data'];
-        if(typeof(data['model_viewer_data']) === 'string') {
+        if (typeof data['model_viewer_data'] === 'string') {
             treeData = JSON.parse(data['model_viewer_data']);
         }
         treeData.tree.name = 'model'; //Change 'root' to 'model'
         zoomedElement = treeData['tree'];
-        lastLeftClickedElement = document.getElementById("ptN2ContentDivId");
+        lastLeftClickedElement = document.getElementById('ptN2ContentDivId');
         parentDiv = lastLeftClickedElement;
         modal = new newModal();
         search = newSearchObj();

@@ -40,7 +40,7 @@ var createPlot = function (container, componentState) {
     }
 
     //Set up the basic plot
-    if (plotlyElement != null) {
+    if (plotlyElement !== null) {
         Plotly.plot(plotlyElement, [{
             x: [1, 2, 3, 4, 5],
             y: [0, 0, 0, 0, 0]
@@ -103,18 +103,6 @@ var createPlot = function (container, componentState) {
     };
 
     /**
-     * Called when the selectPicker is clicked. Updates plot with new data.
-     * 
-     * NOTE: Currently not used - select picker has been taken out for the moment
-     */
-    var selectClicked = function () {
-        var index = Number(selectPicker.value);
-        var finalData = setNewPlotData(index);
-        updatePlotly(finalData);
-    }
-    // selectPicker.onchange = selectClicked;
-
-    /**
      * Sorts and formats data at the given index of curData, then 
      * plots it
      * 
@@ -125,7 +113,6 @@ var createPlot = function (container, componentState) {
         curData[index].sort(compareIterations);
 
         //Set up data for plotting
-        // var finalData = formatData(index, function (obj) { return obj['type'] == 'input' || obj['type'] == 'output' });
         var finalData = formatData(index, function (obj) { return obj['type'] == 'desvar' }, variableName + ' ');
         var objectivesT = formatData(index, function (obj) { return obj['type'] == 'objective' }, variableName + ' ');
         var constraintT = formatData(index, function (obj) { return obj['type'] == 'constraint' }, variableName + ' ');
@@ -799,8 +786,10 @@ var createPlot = function (container, componentState) {
                 }
             }
 
-            if (componentState.selectedConstraints.length > 0 || componentState.selectedDesignVariables.length > 0 ||
-                componentState.selectedSysincludes.length > 0 || componentState.selectedObjectives.length > 0) {
+            if (componentState.selectedConstraints.length > 0 ||
+                componentState.selectedDesignVariables.length > 0 ||
+                componentState.selectedSysincludes.length > 0 ||
+                componentState.selectedObjectives.length > 0) {
                 //Create temporary arrays so we can iterate and change the original arrays
                 var tempConstraints = componentState.selectedConstraints;
                 var tempDesvars = componentState.selectedDesignVariables;
