@@ -203,8 +203,21 @@ class TestSqliteData(unittest.TestCase):
         self.assertIsNotNone(layout['content'])
 
     def test_metadata(self):
-        # test abs2meta
-        pass
+        self._use_sellar_grouped()
+        metadata = json.loads(_data.generic_get(collections.METADATA))
+        # make sure it isn't None
+        self.assertIsNotNone(metadata['abs2prom'])
+        self.assertIsNotNone(metadata['prom2abs'])
+
+        # make sure we have two keys ('input' and 'output')
+        self.assertEqual(len(metadata['abs2prom']), 2)
+        self.assertEqual(len(metadata['prom2abs']), 2)
+
+        # make sure we have the expected number of variables in each
+        self.assertEqual(len(metadata['abs2prom']['input']), 11)
+        self.assertEqual(len(metadata['abs2prom']['output']), 7)
+        self.assertEqual(len(metadata['prom2abs']['input']), 4)
+        self.assertEqual(len(metadata['prom2abs']['output']), 7)
 
     def test_update_layout(self):
         f_name = self._create_new_db()

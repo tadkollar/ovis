@@ -37,6 +37,8 @@ const mainWindowUrl = url.format({
     slashes: true
 });
 
+// ******************* Public Methods ******************* //
+
 /**
  * Open the file dialog for users to select their DB
  */
@@ -142,6 +144,8 @@ function startApp() {
     startServer();
 }
 
+// ******************* Events ******************* //
+
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
     // On OS X it is common for applications and their menu bar
@@ -176,6 +180,8 @@ ipcMain.on('getFilename', (event, arg) => {
 });
 
 app.on('ready', startApp);
+
+// ******************* Template Definitions ******************* //
 
 // Toolbar template
 const template = [

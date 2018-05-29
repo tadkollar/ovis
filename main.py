@@ -52,10 +52,11 @@ def get_app():
         (r"/login", presentation.LoginHandler),
         (r"/activate/([a-zA-Z0-9]+)", presentation.ActivationHandler),
         (r"/case/(\d+)/variables", presentation.VariablesHandler),
-        (r"/case/(\d+)/desvars", presentation.DesvarsHandler),
+        (r"/case/(\d+)/allvars", presentation.AllVarsHandler),
         (r"/(.*)", web.StaticFileHandler, {'path': public_root})
-    ], cookie_secret="tklskdjfsdv8982fj4kj3ookr0")
+    ])
     return app
+
 
 if __name__ == "__main__":
     tornado.options.parse_command_line()

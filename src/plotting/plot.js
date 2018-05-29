@@ -1,9 +1,11 @@
 'use strict';
 
 function createPlot(container, componentState) {
-    //Constants telling the height/weidth for plotly
-    var deltaPlotheight = 0;
-    var deltaSearchWidth = 100;
+    //Constants
+    const deltaPlotheight = 0;
+    const deltaSearchWidth = 100;
+    const checkUpdateVarsIntervalTime = 5000;
+    const saveIntervalTime = 3000;
 
     var curData = []; //The data currently being plotted. In format Plotly expects
     var plotlyElement = container.getElement()[0].lastChild; //The plotly HTML element
@@ -36,7 +38,7 @@ function createPlot(container, componentState) {
     //Setup control panel
     if (options != null) {
         options.onclick = function() {
-            onDoubleClick();
+            openInNav();
         };
     }
 
@@ -111,7 +113,7 @@ function createPlot(container, componentState) {
      * Sorts and formats data at the given index of curData, then
      * plots it
      *
-     * @param {int} index
+     * @param {Number} index
      */
     var setNewPlotData = function(index, variableName) {
         //Sort the data to be plotted
@@ -413,7 +415,7 @@ function createPlot(container, componentState) {
      *  arrays and arrays of arrays. Should find a generic way to do this that's
      *  a bit cleaner.
      *
-     * @param {int} index
+     * @param {Number} index
      * @return {Object}
      */
     var formatData = function(index, typeFunc, prependName = '') {
@@ -545,7 +547,7 @@ function createPlot(container, componentState) {
      *
      * @param {Iteration} a
      * @param {Iteration} b
-     * @return {int}
+     * @return {Number}
      */
     var compareIterations = function(a, b) {
         if (a['counter'] > b['counter']) {
@@ -567,7 +569,7 @@ function createPlot(container, componentState) {
      *  4. Otherwise, return -1
      *
      * @param {Object} iter
-     * @return {int}
+     * @return {Number}
      */
     var getIndexOfIterType = function(iter) {
         for (var i = 0; i < curData.length; ++i) {
@@ -595,6 +597,7 @@ function createPlot(container, componentState) {
      * plot it.
      *
      * @param {string} name
+     * @param {string} type
      */
     var handleSearch = function(name, type) {
         needSave = true;
@@ -617,7 +620,8 @@ function createPlot(container, componentState) {
                 }
 
                 setData(result, name);
-            }
+            },
+            null
         );
     };
 
@@ -832,41 +836,16 @@ function createPlot(container, componentState) {
         }
     };
 
-    //Get abs2prom and prom2abs metadata
-    http.server_get('case/' + case_id + '/metadata', function(result) {
-        if (result !== '[]' && result !== 'null') {
-            abs2prom = result.abs2prom;
-            prom2abs = result.prom2abs;
-        }
+    //Get metadata and vars
+    server.getMetadata(function(a2p, p2a) {
+        abs2prom = a2p;
+        prom2abs = p2a;
 
-        //Get the designVariables
-        http.server_get('case/' + case_id + '/desvars', function(result) {
-            result = JSON.parse(result);
-            designVariables = [];
-            objectives = [];
-            constraints = [];
-            sysincludes = [];
-            for (var i = 0; i < result.length; ++i) {
-                var name = result[i]['name'];
-
-                //Map to yourself just in case we don't have the metadata
-                if (!(name in prom2abs['output'])) {
-                    prom2abs['output'][name] = name;
-                }
-                if (!(name in abs2prom['output'])) {
-                    abs2prom['output'][name] = name;
-                }
-
-                if (result[i]['type'] === 'desvar') {
-                    designVariables.push(name);
-                } else if (result[i]['type'] === 'objective') {
-                    objectives.push(name);
-                } else if (result[i]['type'] === 'sysinclude') {
-                    sysincludes.push(name);
-                } else {
-                    constraints.push(name);
-                }
-            }
+        server.getVars(function(desvars, objs, consts, sysinc, inp) {
+            designVariables = desvars;
+            objectives = objs;
+            constraints = consts;
+            sysincludes = sysinc;
 
             if (
                 componentState.selectedConstraints.length > 0 ||
@@ -910,50 +889,42 @@ function createPlot(container, componentState) {
     });
 
     /**
-     * Function that opens the plot control panel if it's closed, or closes
-     * it if it's already open
+     * Opens the plot control options in the nav bar
      */
-    var onDoubleClick = function() {
-        if (!controlPanelOpen) {
-            openNav(
-                componentState.logscaleXVal,
-                componentState.logscaleYVal,
-                componentState.stackedPlotVal,
-                designVariables,
-                objectives,
-                constraints,
-                sysincludes,
-                componentState.selectedDesignVariables,
-                componentState.selectedObjectives,
-                componentState.selectedConstraints,
-                componentState.selectedSysincludes,
-                componentState.variableIndices,
-                logscaleX,
-                logscaleY,
-                stackedPlot,
-                variableFun,
-                variableIndicesFun,
-                abs2prom,
-                prom2abs
-            );
-        } else {
-            closeNav();
-        }
+    var openInNav = function() {
+        openNav(
+            componentState.logscaleXVal,
+            componentState.logscaleYVal,
+            componentState.stackedPlotVal,
+            designVariables,
+            objectives,
+            constraints,
+            sysincludes,
+            componentState.selectedDesignVariables,
+            componentState.selectedObjectives,
+            componentState.selectedConstraints,
+            componentState.selectedSysincludes,
+            componentState.variableIndices,
+            logscaleX,
+            logscaleY,
+            stackedPlot,
+            variableFun,
+            variableIndicesFun,
+            abs2prom,
+            prom2abs
+        );
     };
 
     //Start trying to update the variables so data is live
-    setInterval(tryUpdateVariables, 5000);
+    setInterval(tryUpdateVariables, checkUpdateVarsIntervalTime);
 
-    //Start trying ot save
+    //Start trying to save
     setInterval(function() {
         if (needSave) {
             needSave = false;
             saveLayout(null);
         }
-    }, 3000);
-
-    //Set plotly's event listener to open/close the control panel
-    plotlyElement.addEventListener('dblclick', onDoubleClick);
+    }, saveIntervalTime);
 
     //Set callback on resize
     container.on('resize', resize);

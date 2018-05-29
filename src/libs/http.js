@@ -6,10 +6,10 @@
 function HTTP() {
     this.baseURL = 'http://127.0.0.1:18403/';
 
-    // ******************* Server-Specific Methods ******************* //
+    // ******************* Server-specific Methods ******************* //
 
     /**
-     * function get - performs HTTP GET request at given address (after prepending
+     * Perform HTTP GET request at given address (after prepending
      *  base URL) and calls the success or error callback
      *
      * @param path - the URL excluding the base URL (which is automatically prepended)
@@ -21,7 +21,7 @@ function HTTP() {
     };
 
     /**
-     * function post - performs HTTP POST request at given address (after prepending
+     * Performs HTTP POST request at given address (after prepending
      *  base URL) and calls the success or error callback
      *
      * @param path - the URL excluding the base URL (which is automatically prepended)
@@ -37,7 +37,7 @@ function HTTP() {
     };
 
     /**
-     * function delete - performs HTTP DELETE request at given address (after prepending
+     * Perform HTTP DELETE request at given address (after prepending
      * base URL) and cals success or error callback
      *
      * @param path - the URL excluding the base URL (which is automatically prepened)
@@ -50,7 +50,7 @@ function HTTP() {
     };
 
     /**
-     * function patch - performs HTTP PATCH request at given address (after prepending base URL)
+     * Perform HTTP PATCH request at given address (after prepending base URL)
      * and calls success or error callback
      *
      * @param {String} path - the URL excluding the base URL (which is automatically prepended)
@@ -65,7 +65,7 @@ function HTTP() {
     // ******************* Generic Methods ******************* //
 
     /**
-     * function get - performs HTTP GET request at given address
+     * Perform HTTP GET request at given address
      * and calls the success or error callback
      *
      * @param path - the URL
@@ -91,7 +91,7 @@ function HTTP() {
     };
 
     /**
-     * function post - performs HTTP POST request at given address
+     * Perform HTTP POST request at given address
      * and calls the success or error callback
      *
      * @param path - the URL
@@ -122,7 +122,7 @@ function HTTP() {
     };
 
     /**
-     * function delete - performs HTTP DELETE request at given address
+     * Perform HTTP DELETE request at given address
      * and cals success or error callback
      *
      * @param path - the URL
@@ -144,7 +144,7 @@ function HTTP() {
     };
 
     /**
-     * function patch - performs HTTP PATCH request at given address
+     * Perform HTTP PATCH request at given address
      * and calls success or error callback
      *
      * @param {String} path - the URL
@@ -164,4 +164,4 @@ function HTTP() {
     };
 }
 
-var http = new HTTP();
+const http = new HTTP();

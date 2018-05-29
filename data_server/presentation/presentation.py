@@ -359,14 +359,14 @@ class DriverIterationVariableHandler(web.RequestHandler):
         self.write(data)
 
 
-class DesvarsHandler(web.RequestHandler):
+class AllVarsHandler(web.RequestHandler):
     """ Desvars handler class
 
     Contains logic to get Desvars for a given case
     """
 
     def get(self, *params):
-        variables = logic.get_desvars(params[0])
+        variables = logic.get_allvars(params[0])
 
         self.write(variables)
 

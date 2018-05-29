@@ -126,6 +126,8 @@ class SqliteData(BaseData):
             return self._get_driver_metadata()
         elif collection_name is collections.LAYOUTS:
             return self._get_layout()
+        elif collection_name is collections.METADATA:
+            return self._get_metadata()
         else:
             return "[]"
 
@@ -362,6 +364,39 @@ class SqliteData(BaseData):
             ret = self.blob_to_array(row[0])
 
         return json.dumps([{'model_viewer_data': ret}])
+
+    def _get_metadata(self):
+        """ _get_metadata
+
+        returns the stored metadata
+
+        Returns
+        -------
+        Dictionary :
+            Dictionary storing abs2prom and prom2abs
+        """
+        ret = {
+            'abs2prom': {},
+            'prom2abs': {},
+        }
+        with self.connection:
+            self.cursor = self.connection.cursor()
+            self.cursor.execute("SELECT abs2prom, prom2abs FROM metadata")
+            row = self.cursor.fetchone()
+            if row is None:
+                return ret
+            if PY2:
+                ret['abs2prom'] = pickle.loads(
+                    str(row[0])) if row[0] is not None else None
+                ret['prom2abs'] = pickle.loads(
+                    str(row[1])) if row[1] is not None else None
+            if PY3:
+                ret['abs2prom'] = pickle.loads(
+                    row[0]) if row[0] is not None else None
+                ret['prom2abs'] = pickle.loads(
+                    row[1]) if row[1] is not None else None
+
+        return json.dumps(ret)
 
     def _get_layout(self):
         """ _get_layout method
