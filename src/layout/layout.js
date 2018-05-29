@@ -27,14 +27,14 @@ let plot_file = fs.readFileSync(plot_loc);
  *
  * @returns {String} random number as string
  */
-var getRand = function() {
+function getRand() {
     return Math.floor(Math.random() * 100000000).toString();
-};
+}
 
 /**
  * Get a plot configuration
  */
-var getPlotConfig = function() {
+function getPlotConfig() {
     //Golden Layout configuration for plots
     let plotConfig = {
         type: 'component',
@@ -52,12 +52,12 @@ var getPlotConfig = function() {
         }
     };
     return plotConfig;
-};
+}
 
 /**
  * Get an N2 configuration
  */
-var getN2Config = function() {
+function getN2Config() {
     //Golden Layout configuration for N^2
     let n2Config = {
         type: 'component',
@@ -65,7 +65,7 @@ var getN2Config = function() {
         componentState: { label: getRand() }
     };
     return n2Config;
-};
+}
 
 /**
  * Creates a new Golden Layout based on the configuration passed
@@ -73,7 +73,7 @@ var getN2Config = function() {
  *
  * @param {*} newConfig
  */
-var createLayout = function(newConfig) {
+function createLayout(newConfig) {
     let layout = new GoldenLayout(newConfig);
     registerN2(layout);
     registerPlot(layout);
@@ -84,7 +84,7 @@ var createLayout = function(newConfig) {
         saveLayout(layout);
     });
     return layout;
-};
+}
 
 /**
  * Registers the N^2 Golden Layout configuration so that N^2 diagrams
@@ -92,7 +92,7 @@ var createLayout = function(newConfig) {
  *
  * @param {*} layout
  */
-var registerN2 = function(layout) {
+function registerN2(layout) {
     layout.registerComponent('Partition Tree and N<sup>2</sup>', function(
         container,
         componentState
@@ -111,7 +111,7 @@ var registerN2 = function(layout) {
             document.getElementById('addN2Button').disabled = false;
         });
     });
-};
+}
 
 /**
  * Registers the Plot Golden Layout configuration s othat plots may be
@@ -119,7 +119,7 @@ var registerN2 = function(layout) {
  *
  * @param {*} layout
  */
-var registerPlot = function(layout) {
+function registerPlot(layout) {
     layout.registerComponent('Variable vs. Iterations', function(
         container,
         componentState
@@ -130,13 +130,13 @@ var registerPlot = function(layout) {
         // Global function found in plot.js
         createPlot(container, componentState);
     });
-};
+}
 
 /**
  * Adds another plot to the current dashboard or creates a new
  * dashboard if one does not exist.
  */
-var addNewPlot = function() {
+function addNewPlot() {
     if (myLayout.root !== null && myLayout.root.contentItems.length > 0) {
         myLayout.root.contentItems[0].addChild(getPlotConfig());
     } else {
@@ -158,13 +158,13 @@ var addNewPlot = function() {
         };
         myLayout = createLayout(newConfig);
     }
-};
+}
 
 /**
  * Adds an N^2 diagram to the current dashboard or creaes a new
  * dashboard if one does not exist.
  */
-var addNewN2 = function() {
+function addNewN2() {
     if (myLayout.root !== null && myLayout.root.contentItems.length > 0) {
         myLayout.root.contentItems[0].addChild(getN2Config());
     } else {
@@ -185,14 +185,14 @@ var addNewN2 = function() {
         };
         myLayout = createLayout(newConfig);
     }
-};
+}
 
 /**
  * Saves the current layout to the server
  *
  * @param {*} layout
  */
-var saveLayout = function(layout) {
+function saveLayout(layout) {
     if (layout === null) {
         //when plots are trying to save, layout will be null
         layout = lastLayout;
@@ -211,7 +211,7 @@ var saveLayout = function(layout) {
         layout: state
     };
     http.server_post('case/' + case_id + '/layout', body, function() {});
-};
+}
 
 /**
  * Goes through, finds, and replaces all component states that are
@@ -222,7 +222,7 @@ var saveLayout = function(layout) {
  * @param {*} state
  * @param {*} componentStatesMap
  */
-var replaceComponentStates = function(state, componentStatesMap) {
+function replaceComponentStates(state, componentStatesMap) {
     if (state.hasOwnProperty('componentState')) {
         let label = state.componentState.label;
         if (Number(label) in componentStatesMap) {
@@ -235,13 +235,13 @@ var replaceComponentStates = function(state, componentStatesMap) {
             replaceComponentStates(state.content[i], componentStatesMap);
         }
     }
-};
+}
 
 /**
  * Grabs all componentStates from the configCallbacks array.
  * Returns a map from label to componentState
  */
-var getComponentStates = function() {
+function getComponentStates() {
     let ret = {};
     for (let i = 0; i < configCallbacks.length; ++i) {
         let config = configCallbacks[i]();
@@ -249,20 +249,24 @@ var getComponentStates = function() {
     }
 
     return ret;
-};
+}
 
 //Create the initial golden layout dashboard
 var url = window.location.href;
 var url_split = url.split('/');
 var case_id = '1885148375'; //url_split[url_split.length - 1];
-http.server_get('case/' + case_id + '/layout', function(ret) {
-    ret = JSON.parse(ret);
-    if (ret.length === 0) {
-        myLayout = createLayout(config);
-    } else {
-        myLayout = createLayout(JSON.parse(ret[0]['layout']));
-    }
-});
+http.server_get(
+    'case/' + case_id + '/layout',
+    function(ret) {
+        ret = JSON.parse(ret);
+        if (ret.length === 0) {
+            myLayout = createLayout(config);
+        } else {
+            myLayout = createLayout(JSON.parse(ret[0]['layout']));
+        }
+    },
+    null
+);
 
 getFilename(function(filename) {
     if (filename.length > 14) {
@@ -275,7 +279,7 @@ getFilename(function(filename) {
 
 //Initial configuration.
 // 2 plots next to an N^2
-var config = {
+let config = {
     content: [
         {
             type: 'row',

@@ -1,30 +1,30 @@
 'use strict';
 
 function createPlot(container, componentState) {
-    //Constants
+    // Constants
     const deltaPlotheight = 0;
     const deltaSearchWidth = 100;
     const checkUpdateVarsIntervalTime = 5000;
     const saveIntervalTime = 3000;
 
-    var curData = []; //The data currently being plotted. In format Plotly expects
-    var plotlyElement = container.getElement()[0].lastChild; //The plotly HTML element
-    var options = container.getElement()[0].children[0]; //The button to open the options sidebar
-    var dataInUse = {}; //Set of names telling what data is in use
-    var originalData = {}; //Set of the original data?
+    var curData = []; // The data currently being plotted. In format Plotly expects
+    var plotlyElement = container.getElement()[0].lastChild; // The plotly HTML element
+    var options = container.getElement()[0].children[0]; // The button to open the options sidebar
+    var dataInUse = {}; // Set of names telling what data is in use
+    var originalData = {}; // Set of the original data?
 
-    //Indicates if we need to update/save the config to the server
+    // Indicates if we need to update/save the config to the server
     var needSave = false;
     var updated_var = true;
 
-    //Set the original plotly width/height
+    // Set the original plotly width/height
     if (container.width != null) {
         plotlyElement.style.width = container.width.toString() + 'px';
         plotlyElement.style.height =
             (container.height - deltaPlotheight).toString() + 'px';
     }
 
-    //Arrays that keep track of the design variables, constraints, objectives, sysincludes
+    // Arrays that keep track of the design variables, constraints, objectives, sysincludes
     // and their values
     var designVariables = [];
     var constraints = [];
@@ -35,14 +35,14 @@ function createPlot(container, componentState) {
     var prom2abs = { input: {}, output: {} };
     var abs2prom = { input: {}, output: {} };
 
-    //Setup control panel
+    // Setup control panel
     if (options != null) {
         options.onclick = function() {
             openInNav();
         };
     }
 
-    //Set up the basic plot
+    // Set up the basic plot
     if (plotlyElement !== null) {
         Plotly.plot(
             plotlyElement,
@@ -61,12 +61,12 @@ function createPlot(container, componentState) {
      * Resets the dimensions for plotly
      */
     var resize = function() {
-        //Set plotlyElement's dimensions
+        // Set plotlyElement's dimensions
         plotlyElement.style.width = container.width.toString() + 'px';
         plotlyElement.style.height =
             (container.height - deltaPlotheight).toString() + 'px';
 
-        //Set up plotly's dimensions
+        // Set up plotly's dimensions
         Plotly.relayout(plotlyElement, {
             width: container.width,
             height: container.height - deltaPlotheight
@@ -83,7 +83,7 @@ function createPlot(container, componentState) {
         curData = [];
         originalData[variable] = dat;
 
-        //Place everything in the data array
+        // Place everything in the data array
         for (var i = 0; i < dat.length; ++i) {
             var indexOfIterType = getIndexOfIterType(dat[i]['iteration']);
             if (indexOfIterType == -1) {
@@ -93,7 +93,7 @@ function createPlot(container, componentState) {
             }
         }
 
-        //Determine which data set to plot by default
+        // Determine which data set to plot by default
         var largestCount = -1;
         var index = -1;
         for (var i = 0; i < curData.length; ++i) {
@@ -116,10 +116,10 @@ function createPlot(container, componentState) {
      * @param {Number} index
      */
     var setNewPlotData = function(index, variableName) {
-        //Sort the data to be plotted
+        // Sort the data to be plotted
         curData[index].sort(compareIterations);
 
-        //Set up data for plotting
+        // Set up data for plotting
         var finalData = formatData(
             index,
             function(obj) {
@@ -152,7 +152,7 @@ function createPlot(container, componentState) {
         append(finalData, constraintT);
         append(finalData, sysincludesT);
 
-        //Set the precision of the data
+        // Set the precision of the data
         for (var j = 0; j < finalData.length; ++j) {
             for (var i = 0; i < finalData[j].y.length; ++i) {
                 var val = finalData[j].y[i];
@@ -186,7 +186,7 @@ function createPlot(container, componentState) {
 
         titleString += ' vs. Iterations';
 
-        //Set up the layout
+        // Set up the layout
         var xaxis = {
             title: 'Iteration'
         };
@@ -212,17 +212,17 @@ function createPlot(container, componentState) {
             yaxis: yaxis
         };
 
-        //Deal with stacked plots
+        // Deal with stacked plots
         if (componentState.stackedPlotVal) {
             updateForStackedPlots(finalData, layout);
         } else {
-            //delete the old y-axis values if you used stacked plots previously
+            // Delete the old y-axis values if you used stacked plots previously
             for (var i = 0; i < finalData.length; ++i) {
                 delete finalData[i].yaxis;
             }
         }
 
-        //plot it
+        // Plot it
         Plotly.newPlot(plotlyElement, finalData, layout);
     };
 
@@ -242,7 +242,7 @@ function createPlot(container, componentState) {
             if (ind != null) {
                 ret[d] = [];
 
-                //Go over each index and see if it's in
+                // Go over each index and see if it's in
                 // the index set (the set of indexes to be plotted).
                 // if so, add it to our return array
                 for (var i = 0; i < data[d].length; ++i) {
@@ -251,7 +251,7 @@ function createPlot(container, componentState) {
                     }
                 }
             } else {
-                //otherwise it isn't in variableIndices and isn't restricted
+                // Otherwise it isn't in variableIndices and isn't restricted
                 ret[d] = data[d];
             }
         }
@@ -285,7 +285,7 @@ function createPlot(container, componentState) {
      * @param {Object} curLayout
      */
     var updateForStackedPlots = function(data, curLayout) {
-        //Set the y axis for each of data set and get the total number of unique variables
+        // Set the y axis for each of data set and get the total number of unique variables
         var prevYIndex = 1;
         curLayout['shapes'] = [];
 
@@ -299,12 +299,12 @@ function createPlot(container, componentState) {
                 'y' + (prevYIndex == 1 ? '' : prevYIndex.toString());
         }
 
-        //Use prevYIndex as proxy for number of unique variables
+        // Use prevYIndex as proxy for number of unique variables
         var numVars = prevYIndex;
         var delta = 1.0 / numVars;
         curLayout['yaxis']['domain'] = [0, delta];
 
-        //Set layout
+        // Set layout
         for (var i = 2; i <= numVars; ++i) {
             curLayout['yaxis' + i.toString()] = {
                 domain: [delta * (i - 1), delta * i]
@@ -374,7 +374,7 @@ function createPlot(container, componentState) {
      * @returns {Boolean} true if it's new, false if it's already used in 'data'
      */
     var checkIfNewVariable = function(name, prev) {
-        //Convert name from 'name[x][y][z]' to 'name|x|y|z|'
+        // Convert name from 'name[x][y][z]' to 'name|x|y|z|'
         var alteredName = name.replace(/\[/g, '|');
         alteredName = alteredName.replace(/]/g, '|');
         alteredName = alteredName.replace(/\|\|/g, '|');
@@ -383,11 +383,11 @@ function createPlot(container, componentState) {
         alteredPrev = alteredPrev.replace(/]/g, '|');
         alteredPrev = alteredPrev.replace(/\|\|/g, '|');
 
-        //Split so we get ['name', 'x', 'y', 'z']
+        // Split so we get ['name', 'x', 'y', 'z']
         var splitName = alteredName.split('|');
         var splitPrev = alteredPrev.split('|');
 
-        //Check the names. If they're different, then we have a new variable
+        // Check the names. If they're different, then we have a new variable
         if (splitName[0] !== splitPrev[0]) {
             return true;
         }
@@ -602,27 +602,22 @@ function createPlot(container, componentState) {
     var handleSearch = function(name, type) {
         needSave = true;
 
-        http.server_get(
-            'case/' + case_id + '/driver_iterations/' + name,
-            function(result) {
-                result = JSON.parse(result);
-                if (type === 'desvar') {
-                    componentState.selectedDesignVariables.push(name);
-                }
-                if (type === 'constraint') {
-                    componentState.selectedConstraints.push(name);
-                }
-                if (type === 'objective') {
-                    componentState.selectedObjectives.push(name);
-                }
-                if (type === 'sysinclude') {
-                    componentState.selectedSysincludes.push(name);
-                }
+        server.getVariable_DriverIteration(name, function(result) {
+            if (type === 'desvar') {
+                componentState.selectedDesignVariables.push(name);
+            }
+            if (type === 'constraint') {
+                componentState.selectedConstraints.push(name);
+            }
+            if (type === 'objective') {
+                componentState.selectedObjectives.push(name);
+            }
+            if (type === 'sysinclude') {
+                componentState.selectedSysincludes.push(name);
+            }
 
-                setData(result, name);
-            },
-            null
-        );
+            setData(result, name);
+        });
     };
 
     /**
@@ -724,7 +719,7 @@ function createPlot(container, componentState) {
      * @param {String} name
      */
     var updateArraysInControlPanel = function(data, name) {
-        //If data's length is > 1 then we're dealing with an array variable
+        // If data's length is > 1 then we're dealing with an array variable
         if (data.length > 1) {
             var newIndices = {
                 name: name,
@@ -795,11 +790,11 @@ function createPlot(container, componentState) {
      * Tries to update each variable in the plot by setting the 'cur_max_count' header
      */
     var tryUpdateVariables = function() {
-        //Try to update the variables
+        // Try to update the variables
         for (var variable in originalData) {
             var maxCount = 0;
 
-            //Find max count in data
+            // Find max count in data
             for (var i = 0; i < originalData[variable].length; ++i) {
                 var curCount = originalData[variable][i]['counter'];
                 if (curCount > maxCount) {
@@ -807,91 +802,30 @@ function createPlot(container, componentState) {
                 }
             }
 
-            //set the header for the request
-            var headers = [
-                {
-                    name: 'cur_max_count',
-                    value: maxCount
-                }
-            ];
-
+            // If we need to udpate a var, update a var
             if (updated_var) {
                 updated_var = false;
 
-                //Send the request to see if data needs to be updated
-                http.server_get(
-                    'case/' + case_id + '/driver_iterations/' + variable,
+                server.getVariable_DriverIteration(
+                    variable,
                     function(result) {
-                        updated_var = true;
-                        result = JSON.parse(result);
                         if (result.length > 0) {
                             //if data needs to be updated, update
                             setData(result, variable);
                         }
                     },
                     null,
-                    headers
+                    maxCount
                 );
             }
         }
     };
 
-    //Get metadata and vars
-    server.getMetadata(function(a2p, p2a) {
-        abs2prom = a2p;
-        prom2abs = p2a;
-
-        server.getVars(function(desvars, objs, consts, sysinc, inp) {
-            designVariables = desvars;
-            objectives = objs;
-            constraints = consts;
-            sysincludes = sysinc;
-
-            if (
-                componentState.selectedConstraints.length > 0 ||
-                componentState.selectedDesignVariables.length > 0 ||
-                componentState.selectedSysincludes.length > 0 ||
-                componentState.selectedObjectives.length > 0
-            ) {
-                //Create temporary arrays so we can iterate and change the original arrays
-                var tempConstraints = componentState.selectedConstraints;
-                var tempDesvars = componentState.selectedDesignVariables;
-                var tempSysincludes = componentState.selectedSysincludes;
-                var tempObjectives = componentState.selectedObjectives;
-
-                //Reset all arrays (they'll be set when we do 'handleSearch')
-                componentState.selectedConstraints = [];
-                componentState.selectedDesignVariables = [];
-                componentState.selectedSysincludes = [];
-                componentState.selectedObjectives = [];
-
-                for (var i = 0; i < tempConstraints.length; ++i) {
-                    handleSearch(tempConstraints[i], 'constraint');
-                }
-                for (var i = 0; i < tempDesvars.length; ++i) {
-                    handleSearch(tempDesvars[i], 'desvar');
-                }
-                for (var i = 0; i < tempSysincludes.length; ++i) {
-                    handleSearch(tempSysincludes[i], 'sysinclude');
-                }
-                for (var i = 0; i < tempObjectives.length; ++i) {
-                    handleSearch(tempObjectives[i], 'objective');
-                }
-            } else {
-                var randIndex = Math.floor(
-                    Math.random() * designVariables.length
-                );
-                if (randIndex < designVariables.length) {
-                    handleSearch(designVariables[randIndex], 'desvar');
-                }
-            }
-        });
-    });
-
     /**
-     * Opens the plot control options in the nav bar
+     * Opens the plot control options in the control panel
      */
-    var openInNav = function() {
+    function openInNav() {
+        // openNav can be found in control_panel.js
         openNav(
             componentState.logscaleXVal,
             componentState.logscaleYVal,
@@ -913,25 +847,81 @@ function createPlot(container, componentState) {
             abs2prom,
             prom2abs
         );
-    };
+    }
 
-    //Start trying to update the variables so data is live
-    setInterval(tryUpdateVariables, checkUpdateVarsIntervalTime);
+    function startPlot() {
+        // Get metadata and vars
+        server.getMetadata(function(a2p, p2a) {
+            abs2prom = a2p;
+            prom2abs = p2a;
 
-    //Start trying to save
-    setInterval(function() {
-        if (needSave) {
-            needSave = false;
-            saveLayout(null);
-        }
-    }, saveIntervalTime);
+            server.getVars(function(desvars, objs, consts, sysinc, inp) {
+                designVariables = desvars;
+                objectives = objs;
+                constraints = consts;
+                sysincludes = sysinc;
 
-    //Set callback on resize
-    container.on('resize', resize);
+                if (
+                    componentState.selectedConstraints.length > 0 ||
+                    componentState.selectedDesignVariables.length > 0 ||
+                    componentState.selectedSysincludes.length > 0 ||
+                    componentState.selectedObjectives.length > 0
+                ) {
+                    // Create temporary arrays so we can iterate and change the original arrays
+                    var tempConstraints = componentState.selectedConstraints;
+                    var tempDesvars = componentState.selectedDesignVariables;
+                    var tempSysincludes = componentState.selectedSysincludes;
+                    var tempObjectives = componentState.selectedObjectives;
 
-    //Add to layout's configCallbacks so we update our componentState
-    // on the server.
-    configCallbacks.push(function() {
-        return componentState;
-    });
+                    // Reset all arrays (they'll be set when we do 'handleSearch')
+                    componentState.selectedConstraints = [];
+                    componentState.selectedDesignVariables = [];
+                    componentState.selectedSysincludes = [];
+                    componentState.selectedObjectives = [];
+
+                    for (var i = 0; i < tempConstraints.length; ++i) {
+                        handleSearch(tempConstraints[i], 'constraint');
+                    }
+                    for (var i = 0; i < tempDesvars.length; ++i) {
+                        handleSearch(tempDesvars[i], 'desvar');
+                    }
+                    for (var i = 0; i < tempSysincludes.length; ++i) {
+                        handleSearch(tempSysincludes[i], 'sysinclude');
+                    }
+                    for (var i = 0; i < tempObjectives.length; ++i) {
+                        handleSearch(tempObjectives[i], 'objective');
+                    }
+                } else {
+                    var randIndex = Math.floor(
+                        Math.random() * designVariables.length
+                    );
+                    if (randIndex < designVariables.length) {
+                        handleSearch(designVariables[randIndex], 'desvar');
+                    }
+                }
+            });
+        });
+
+        // Start trying to update the variables so data is live
+        setInterval(tryUpdateVariables, checkUpdateVarsIntervalTime);
+
+        // Start trying to save
+        setInterval(function() {
+            if (needSave) {
+                needSave = false;
+                saveLayout(null);
+            }
+        }, saveIntervalTime);
+
+        // Set callback on resize
+        container.on('resize', resize);
+
+        // Add to layout's configCallbacks so we update our componentState
+        // on the server.
+        configCallbacks.push(function() {
+            return componentState;
+        });
+    }
+
+    startPlot();
 }

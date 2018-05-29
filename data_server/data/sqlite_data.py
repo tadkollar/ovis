@@ -379,6 +379,7 @@ class SqliteData(BaseData):
             'abs2prom': {},
             'prom2abs': {},
         }
+
         with self.connection:
             self.cursor = self.connection.cursor()
             self.cursor.execute("SELECT abs2prom, prom2abs FROM metadata")

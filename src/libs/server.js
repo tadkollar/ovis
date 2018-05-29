@@ -5,6 +5,7 @@
  */
 function Server() {
     /**
+     * Get abs2prom and prom2abs metadata from the server
      *
      * @param {function} callback - callback of the form function(abs2prom, prom2abs)
      * @param {function} error
@@ -25,6 +26,7 @@ function Server() {
     };
 
     /**
+     * Get the set names of variables for which we have data
      *
      * @param {function} callback - callback of the form function(desvars, objectives, constraints, sysincludes)
      * @param {function} error
@@ -66,6 +68,41 @@ function Server() {
                 );
             },
             error
+        );
+    };
+
+    /**
+     * Get the data for a given variable. If maxCount is given then data
+     * will only be returned for iterations > maxCount
+     *
+     * @param {String} name - the variable name
+     * @param {function} callback - callback of the form function(data)
+     * @param {function} error
+     * @param {Number} maxCount - the current max iteration count, if you only want newest data
+     */
+    this.getVariable_DriverIteration = function(
+        name,
+        callback,
+        error = null,
+        maxCount = -1
+    ) {
+        let headers = [];
+        if (maxCount > 0) {
+            headers = [
+                {
+                    name: 'cur_max_count',
+                    value: maxCount
+                }
+            ];
+        }
+
+        http.server_get(
+            'case/' + case_id + '/driver_iterations/' + name,
+            function(result) {
+                callback(JSON.parse(result));
+            },
+            error,
+            headers
         );
     };
 }

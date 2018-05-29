@@ -219,6 +219,15 @@ class TestSqliteData(unittest.TestCase):
         self.assertEqual(len(metadata['prom2abs']['input']), 4)
         self.assertEqual(len(metadata['prom2abs']['output']), 7)
 
+    def test_metadata_none(self):
+        f_name = self._create_new_db()
+        _data.connect(f_name)
+        metadata = json.loads(_data.generic_get(collections.METADATA))
+
+        # make sure it's None
+        self.assertIsNone(metadata['abs2prom'])
+        self.assertIsNone(metadata['prom2abs'])
+
     def test_update_layout(self):
         f_name = self._create_new_db()
         _data.connect(f_name)
