@@ -2228,7 +2228,7 @@ ptn2.initializeTree = function(container) {
         document.getElementById('plotControls').style.display = 'none';
     };
 
-    http.get('case/' + case_id + '/driver_metadata', function(response) {
+    http.server_get('case/' + case_id + '/driver_metadata', function(response) {
         var data = JSON.parse(response)[0];
         treeData = data['model_viewer_data'];
         if (typeof data['model_viewer_data'] === 'string') {

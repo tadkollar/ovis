@@ -210,7 +210,7 @@ var saveLayout = function(layout) {
     let body = {
         layout: state
     };
-    http.post('case/' + case_id + '/layout', body, function() {});
+    http.server_post('case/' + case_id + '/layout', body, function() {});
 };
 
 /**
@@ -255,7 +255,7 @@ var getComponentStates = function() {
 var url = window.location.href;
 var url_split = url.split('/');
 var case_id = '1885148375'; //url_split[url_split.length - 1];
-http.get('case/' + case_id + '/layout', function(ret) {
+http.server_get('case/' + case_id + '/layout', function(ret) {
     ret = JSON.parse(ret);
     if (ret.length === 0) {
         myLayout = createLayout(config);

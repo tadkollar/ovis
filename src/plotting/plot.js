@@ -1,6 +1,6 @@
 'use strict';
 
-var createPlot = function(container, componentState) {
+function createPlot(container, componentState) {
     //Constants telling the height/weidth for plotly
     var deltaPlotheight = 0;
     var deltaSearchWidth = 100;
@@ -599,25 +599,26 @@ var createPlot = function(container, componentState) {
     var handleSearch = function(name, type) {
         needSave = true;
 
-        http.get('case/' + case_id + '/driver_iterations/' + name, function(
-            result
-        ) {
-            result = JSON.parse(result);
-            if (type === 'desvar') {
-                componentState.selectedDesignVariables.push(name);
-            }
-            if (type === 'constraint') {
-                componentState.selectedConstraints.push(name);
-            }
-            if (type === 'objective') {
-                componentState.selectedObjectives.push(name);
-            }
-            if (type === 'sysinclude') {
-                componentState.selectedSysincludes.push(name);
-            }
+        http.server_get(
+            'case/' + case_id + '/driver_iterations/' + name,
+            function(result) {
+                result = JSON.parse(result);
+                if (type === 'desvar') {
+                    componentState.selectedDesignVariables.push(name);
+                }
+                if (type === 'constraint') {
+                    componentState.selectedConstraints.push(name);
+                }
+                if (type === 'objective') {
+                    componentState.selectedObjectives.push(name);
+                }
+                if (type === 'sysinclude') {
+                    componentState.selectedSysincludes.push(name);
+                }
 
-            setData(result, name);
-        });
+                setData(result, name);
+            }
+        );
     };
 
     /**
@@ -814,7 +815,7 @@ var createPlot = function(container, componentState) {
                 updated_var = false;
 
                 //Send the request to see if data needs to be updated
-                http.get(
+                http.server_get(
                     'case/' + case_id + '/driver_iterations/' + variable,
                     function(result) {
                         updated_var = true;
@@ -832,14 +833,14 @@ var createPlot = function(container, componentState) {
     };
 
     //Get abs2prom and prom2abs metadata
-    http.get('case/' + case_id + '/metadata', function(result) {
+    http.server_get('case/' + case_id + '/metadata', function(result) {
         if (result !== '[]' && result !== 'null') {
             abs2prom = result.abs2prom;
             prom2abs = result.prom2abs;
         }
 
         //Get the designVariables
-        http.get('case/' + case_id + '/desvars', function(result) {
+        http.server_get('case/' + case_id + '/desvars', function(result) {
             result = JSON.parse(result);
             designVariables = [];
             objectives = [];
@@ -962,4 +963,4 @@ var createPlot = function(container, componentState) {
     configCallbacks.push(function() {
         return componentState;
     });
-};
+}
