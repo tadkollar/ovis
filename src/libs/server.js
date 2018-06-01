@@ -8,10 +8,9 @@ function Server() {
      * Get abs2prom and prom2abs metadata from the server
      *
      * @param {function} callback - callback of the form function(abs2prom, prom2abs)
-     * @param {function} error
+     * @param {function} error - error callback
      */
     this.getMetadata = function(callback, error = null) {
-        //Get abs2prom and prom2abs metadata
         http.server_get(
             'case/' + case_id + '/metadata',
             function(result) {
@@ -29,7 +28,7 @@ function Server() {
      * Get the set names of variables for which we have data
      *
      * @param {function} callback - callback of the form function(desvars, objectives, constraints, sysincludes)
-     * @param {function} error
+     * @param {function} error - error callback
      */
     this.getVars = function(callback, error = null) {
         http.server_get(
@@ -42,6 +41,7 @@ function Server() {
                 let sysincludes = [];
                 let inputs = [];
 
+                // Separate into types
                 result.forEach(element => {
                     let name = element['name'];
                     let type = element['type'];
@@ -77,7 +77,7 @@ function Server() {
      *
      * @param {String} name - the variable name
      * @param {function} callback - callback of the form function(data)
-     * @param {function} error
+     * @param {function} error - error callback
      * @param {Number} maxCount - the current max iteration count, if you only want newest data
      */
     this.getVariable_DriverIteration = function(
@@ -86,6 +86,7 @@ function Server() {
         error = null,
         maxCount = -1
     ) {
+        // If we have a maxCount, set the header
         let headers = [];
         if (maxCount > 0) {
             headers = [
@@ -104,6 +105,54 @@ function Server() {
             error,
             headers
         );
+    };
+
+    /**
+     * Get the layout from the server
+     *
+     * @param {function} callback - callback of the form function(data)
+     * @param {function} error - error callback
+     */
+    this.getLayout = function(callback, error = null) {
+        http.server_get(
+            'case/' + case_id + '/layout',
+            function(ret) {
+                callback(JSON.parse(ret));
+            },
+            error
+        );
+    };
+
+    /**
+     * Get the driver metadata from the server
+     *
+     * @param {function} callback - callback of the form function(data)
+     * @param {function} error - error callback
+     */
+    this.getDriverMetadata = function(callback, error = null) {
+        http.server_get(
+            'case/' + case_id + '/driver_metadata',
+            function(response) {
+                var data = JSON.parse(response)[0];
+                callback(data);
+            },
+            error
+        );
+    };
+
+    /**
+     * Save the given layout
+     *
+     * @param {JSON} layout - the layout to be saved
+     * @param {*} callback - callback on success
+     * @param {*} error - error callback
+     */
+    this.saveLayout = function(layout, callback, error = null) {
+        let state = JSON.stringify(layout);
+        let body = {
+            layout: state
+        };
+        http.server_post('case/' + case_id + '/layout', body, callback, error);
     };
 }
 

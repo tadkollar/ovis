@@ -10,10 +10,10 @@
 
   <div class="wrapper">
     <div id="leftbar">
-      <button class="btn navbar-btn btn" onclick="addNewPlot()">
+      <button class="btn navbar-btn btn" onclick="layout.addNewPlot()">
         <span class="glyphicon glyphicon-stats"></span>
       </button>
-      <button class="btn navbar-btn btn" id="addN2Button" onclick="addNewN2()">
+      <button class="btn navbar-btn btn" id="addN2Button" onclick="layout.addNewN2()">
         <span class="glyphicon glyphicon-th">
       </button>
     </div>
@@ -143,19 +143,19 @@
           <table class="optionstable">
             <tr>
               <td width="15%">
-                <input type="checkbox" class="checkbox" id='logscaleXCheckbox' onclick="logscaleX()">
+                <input type="checkbox" class="checkbox" id='logscaleXCheckbox' onclick="controlPanel.logscaleX()">
               </td>
               <td class='sidebarTableText'>Logarithmic x-axis</td>
             </tr>
             <tr>
               <td width="15%">
-                <input type="checkbox" class="checkbox" id='logscaleYCheckbox' onclick="logscaleY()">
+                <input type="checkbox" class="checkbox" id='logscaleYCheckbox' onclick="controlPanel.logscaleY()">
               </td>
               <td class='sidebarTableText'>Logarithmic y-axis</td>
             </tr>
             <tr>
               <td width="15%">
-                <input type="checkbox" class="checkbox" id='stackedPlotCheckbox' onclick="stackedPlot()">
+                <input type="checkbox" class="checkbox" id='stackedPlotCheckbox' onclick="controlPanel.stackedPlot()">
               </td>
               <td class='sidebarTableText'>Stacked Plot</td>
             </tr>
@@ -250,6 +250,7 @@
 <script type="text/javascript" src="libs/d3.v4.min.js"></script>
 <script type="text/javascript" src="libs/awesomplete.js"></script>
 <script type="text/javascript" src="libs/vkBeautify.js"></script>
+<script type="text/javascript" src="src/libs/math.js"></script>
 <script type="text/javascript" src="src/libs/http.js"></script>
 <script type="text/javascript" src="src/libs/ipc.js"></script>
 <script type="text/javascript" src="src/libs/server.js"></script>
@@ -261,6 +262,7 @@
 <script type="text/javascript" src="src/partition_tree/legend.js"></script>
 <script type="text/javascript" src="src/partition_tree/draw.js"></script>
 <script type="text/javascript" src="src/partition_tree/ptN2.js"></script>
+<script type="text/javascript" src="src/plotting/plot_data.js"></script>
 <script type="text/javascript" src="src/plotting/plot.js"></script>
 <script type="text/javascript" src="src/plotting/control_panel.js"></script>
 

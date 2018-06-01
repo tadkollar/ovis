@@ -2210,7 +2210,7 @@ ptn2.resize = function() {
     }
 
     if (treeData !== null) {
-        var app = PtN2Diagram(
+        PtN2Diagram(
             lastLeftClickedElement,
             treeData['tree'],
             treeData['connections_list']
@@ -2218,7 +2218,9 @@ ptn2.resize = function() {
     }
 };
 
-// Set ptN2's initializeTree method
+/**
+ * Initialize the tree
+ */
 ptn2.initializeTree = function(container) {
     ptn2.container = container;
     ptn2.container.on('resize', ptn2.resize);
@@ -2228,8 +2230,7 @@ ptn2.initializeTree = function(container) {
         document.getElementById('plotControls').style.display = 'none';
     };
 
-    http.server_get('case/' + case_id + '/driver_metadata', function(response) {
-        var data = JSON.parse(response)[0];
+    server.getDriverMetadata(function(data) {
         treeData = data['model_viewer_data'];
         if (typeof data['model_viewer_data'] === 'string') {
             treeData = JSON.parse(data['model_viewer_data']);

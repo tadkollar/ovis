@@ -2,6 +2,10 @@
 
 /**
  * Class HTTP - allows user to contact the server for any HTTP requests
+ *
+ * Note: I'm using ajax here because we were originally using vanilla JS rather
+ * than node.js. This can likely be switched over to a node library if that's more
+ * convenient.
  */
 function HTTP() {
     this.baseURL = 'http://127.0.0.1:18403/';
