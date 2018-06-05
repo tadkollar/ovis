@@ -53,7 +53,7 @@ function findFile() {
         });
     } else {
         logger.info('Opening sellar grouped in Spectron environment');
-        openFile('../server-tests/sellar_grouped.db');
+        openFile(__dirname + '/server-tests/sellar_grouped.db');
     }
 }
 

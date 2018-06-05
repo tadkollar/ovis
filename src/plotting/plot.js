@@ -568,8 +568,8 @@ function Plot(container, componentState) {
      * Compares two iterations by their counter. Returns
      *  1 if a > b, -1 if a < b, and 0 if they're equal.
      *
-     * @param {Iteration} a
-     * @param {Iteration} b
+     * @param {String} a
+     * @param {String} b
      * @return {Number}
      */
     function compareIterations(a, b) {

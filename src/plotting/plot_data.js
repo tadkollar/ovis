@@ -5,7 +5,7 @@
  */
 class PlotData {
     /**
-     * constructor method
+     * Constructor method
      *
      * @param {[String]} desvars
      * @param {[String]} objectives

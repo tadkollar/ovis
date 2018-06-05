@@ -12,9 +12,9 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
-    "electron": "~1.7.8",
-    "electron-builder": "^20.0.5",
-    "electron-packager": "^10.1.2",
+    "electron": "~2.0.2",
+    "electron-builder": "^20.15.1",
+    "electron-packager": "^12.1.0",
     "mocha": "^5.2.0",
     "spectron": "^3.8.0"
   },
@@ -24,7 +24,7 @@
     "is-electron": "^2.1.0",
     "pickle": "^0.2.0",
     "promise": "^8.0.1",
-    "request": "^2.83.0",
+    "request": "^2.87.0",
     "sqlite3": "^4.0.0",
     "wine": "^0.9.8"
   },
