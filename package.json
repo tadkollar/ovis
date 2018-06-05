@@ -43,6 +43,7 @@
     "postinstall": "install-app-deps",
     "start": "electron .",
     "dev": "NODE_ENV='development' npm run start",
+    "dist": "build -mwl --x64 --ia32",
     "build": "./build_electron.sh",
     "test:e2e": "./node_modules/mocha/bin/mocha frontend-tests/frontend_tests.js"
   },
