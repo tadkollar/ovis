@@ -44,7 +44,7 @@ function Plot(container, componentState) {
                 (container.height - deltaPlotHeight).toString() + 'px';
         }
 
-        // Setup control panel
+        // On click open options in navigation
         options.onclick = function() {
             openInNav();
         };

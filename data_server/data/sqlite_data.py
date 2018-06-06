@@ -216,8 +216,6 @@ class SqliteData(BaseData):
     def blob_to_array(self, blob):
         """
         Convert sqlite BLOB to numpy array.
-
-        TODO: move this to a util file?
         """
         out = io.BytesIO(blob)
         out.seek(0)

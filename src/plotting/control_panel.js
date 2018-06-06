@@ -156,7 +156,7 @@ function ControlPanel() {
      * @param {String} curIndices
      */
     this.addVariableIndicesGroup = function(name, curIndices) {
-        var content =
+        let content =
             "<div id='div_" +
             name +
             "'><br/>\r\n<div class='form-group' style='padding-right: 25px'>\r\n" +
@@ -175,7 +175,7 @@ function ControlPanel() {
             '").value)\'>\r\n' +
             '</div></div>\r\n';
 
-        var variableIndicesDiv = document.getElementById('variableIndices');
+        let variableIndicesDiv = document.getElementById('variableIndices');
         variableIndicesDiv.innerHTML += content;
     };
 

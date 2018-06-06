@@ -22,7 +22,6 @@ if (process.platform === 'win32') {
 var appPath = path.join(__dirname, '..');
 
 var app = new Application({
-    env: { RUNNING_IN_SPECTRON: '1' },
     path: electronPath,
     args: [appPath],
     chromeDriverLogPath: 'chrome-driver.log'
@@ -34,6 +33,8 @@ global.before(function() {
 });
 
 describe('Test OVis', function() {
+    // ********** Set before/after methods ********** //
+
     beforeEach(function() {
         this.timeout(timeoutTime);
         return app.start();
@@ -43,6 +44,8 @@ describe('Test OVis', function() {
         this.timeout(timeoutTime);
         return app.stop();
     });
+
+    // ******************** Tests ******************** //
 
     it('opens a window', function() {
         return app.client
@@ -56,13 +59,5 @@ describe('Test OVis', function() {
             .waitUntilWindowLoaded()
             .getTitle()
             .should.eventually.equal('OpenMDAO Visualization');
-    });
-
-    it('opens test db', function() {
-        app.client.element('#openButton').click();
-        return app.client
-            .waitUntilWindowLoaded()
-            .element('#plotControls')
-            .should.eventually.not.equal(null);
     });
 });

@@ -7,6 +7,7 @@ const path = require('path');
 const url = require('url');
 const is = require('electron-is');
 const { spawn } = require('child_process');
+const { autoUpdater } = require('electron-updater');
 const {
     app,
     Menu,
@@ -23,6 +24,7 @@ const {
 const logger = require('electron-log');
 logger.transports.console.level = 'info';
 logger.transports.file.level = 'info';
+autoUpdater.logger = logger;
 
 let server = null;
 let filename = 'No file selected';
@@ -31,8 +33,12 @@ let filename = 'No file selected';
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow = null;
 
+let index = process.env.RUNNING_IN_VIS_INDEX_TESTS
+    ? 'vis_index.html'
+    : 'index.html';
+
 const mainWindowUrl = url.format({
-    pathname: path.join(__dirname, 'index.html'),
+    pathname: path.join(__dirname, index),
     protocol: 'file:',
     slashes: true
 });
@@ -43,7 +49,7 @@ const mainWindowUrl = url.format({
  * Open the file dialog for users to select their DB
  */
 function findFile() {
-    if (!process.env.RUNNING_IN_SPECTRON) {
+    if (!process.env.RUNNING_IN_VIS_INDEX_TESTS) {
         logger.info('Opening file dialog');
         dialog.showOpenDialog(mainWindow, null, fileNames => {
             if (fileNames == null || fileNames.length === 0) {
@@ -134,14 +140,29 @@ function startServer() {
  * Create the menu and load our main window
  */
 function startApp() {
+    autoUpdater.checkForUpdatesAndNotify();
     let menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
+    logger.info('Version: ' + app.getVersion());
 
     mainWindow = new BrowserWindow({});
-    mainWindow.loadURL(mainWindowUrl);
 
     // Start the server
     startServer();
+    if (process.env.RUNNING_IN_VIS_INDEX_TESTS) {
+        // If we're running a test, block process for a time so the server can start
+        let waitTill = new Date(new Date().getTime() + 1000);
+        while (waitTill > new Date()) {}
+
+        // Immediately load up the test DB
+        console.log('Running in spectron, running findFile');
+        findFile();
+
+        // Wait for connect
+        waitTill = new Date(new Date().getTime() + 1000);
+        while (waitTill > new Date()) {}
+    }
+    mainWindow.loadURL(mainWindowUrl);
 }
 
 // ******************* Events ******************* //
@@ -177,6 +198,12 @@ ipcMain.on('getFilename', (event, arg) => {
     }
 
     event.sender.send('filenameReply', fns[fns.length - 1]);
+});
+
+// Callback when an update is downloaded
+autoUpdater.on('update-downloaded', (ev, info) => {
+    logger.info('Finished downloading update. Quitting and installing');
+    autoUpdater.quitAndInstall();
 });
 
 app.on('ready', startApp);

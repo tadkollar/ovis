@@ -276,7 +276,7 @@ class TestPresentationLayer(AsyncHTTPTestCase):
 
     def test_get_desvars(self):
         self._connect_sellar_grouped()
-        response = self.fetch('/case/0/desvars')
+        response = self.fetch('/case/0/allvars')
         body = json.loads(response.body)
         self.assertEqual(response.code, 200)
         self.assertIsNotNone(body)
