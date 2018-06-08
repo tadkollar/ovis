@@ -16,6 +16,7 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
+    "chai-style": "^1.0.3",
     "electron": "~2.0.2",
     "electron-builder": "^20.15.1",
     "electron-packager": "^12.1.0",
@@ -64,7 +65,10 @@
     "postinstall": "install-app-deps",
     "start": "electron .",
     "dev": "NODE_ENV='development' npm run start",
-    "dist": "build -mwl --x64 --ia32",
+    "dist": "build -mwl --x64",
+    "dist:l": "build -l --x64",
+    "dist:m": "build -m --x64",
+    "dist:w": "build -w --x64",
     "build": "./build_electron.sh",
     "test": "./node_modules/mocha/bin/mocha frontend-tests"
   },

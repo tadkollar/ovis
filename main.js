@@ -1,5 +1,16 @@
 'use strict';
 
+/**
+ * main.js - All logic for the 'main' process is currently stored in this file
+ *
+ * NOTE: Logic is contained within this file that uses "process.env.RUNNING_IN_VIS_INDEX_TESTS".
+ *  This variable indicates that we're running vis_index tests, which require
+ *  that we immediately start the server and go to the vis_index page.
+ *  While it is bad practice to alter the logic in this file for testing, this is
+ *  an unfortunate requirement due to a hanging bug in Spectron that we run into
+ *  when we run 'loadURL'. Once that bug is fixed, this logic should be replaced.
+ */
+
 const request = require('request');
 const querystring = require('querystring');
 const fs = require('fs');
@@ -33,6 +44,7 @@ let filename = 'No file selected';
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow = null;
 
+// NOTE: See note at top of file for explanation of "process.env.RUNNING_IN_VIS_INDEX_TESTS"
 let index = process.env.RUNNING_IN_VIS_INDEX_TESTS
     ? 'vis_index.html'
     : 'index.html';
@@ -49,6 +61,7 @@ const mainWindowUrl = url.format({
  * Open the file dialog for users to select their DB
  */
 function findFile() {
+    // NOTE: See note at top of file for explanation of "process.env.RUNNING_IN_VIS_INDEX_TESTS"
     if (!process.env.RUNNING_IN_VIS_INDEX_TESTS) {
         logger.info('Opening file dialog');
         dialog.showOpenDialog(mainWindow, null, fileNames => {
@@ -149,8 +162,11 @@ function startApp() {
 
     // Start the server
     startServer();
+
+    // NOTE: See note at top of file for explanation of "process.env.RUNNING_IN_VIS_INDEX_TESTS"
     if (process.env.RUNNING_IN_VIS_INDEX_TESTS) {
         // If we're running a test, block process for a time so the server can start
+        // TODO: This is truly awful and should be replaced
         let waitTill = new Date(new Date().getTime() + 1000);
         while (waitTill > new Date()) {}
 
@@ -158,7 +174,8 @@ function startApp() {
         console.log('Running in spectron, running findFile');
         findFile();
 
-        // Wait for connect
+        // Give server time to connect to DB
+        // TODO: This is truly awful and should be replaced
         waitTill = new Date(new Date().getTime() + 1000);
         while (waitTill > new Date()) {}
     }

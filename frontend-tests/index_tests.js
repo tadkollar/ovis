@@ -32,7 +32,7 @@ global.before(function() {
     chai.use(chaiAsPromised);
 });
 
-describe('Test OVis', function() {
+describe('Test OVis Index', () => {
     // ********** Set before/after methods ********** //
 
     beforeEach(function() {
@@ -47,17 +47,46 @@ describe('Test OVis', function() {
 
     // ******************** Tests ******************** //
 
-    it('opens a window', function() {
+    // Window should open automatically
+    it('opens a window', () => {
         return app.client
             .waitUntilWindowLoaded()
             .getWindowCount()
             .should.eventually.equal(1);
     });
 
-    it('tests the title', function() {
+    // Title should be correct
+    it('test the title', () => {
         return app.client
             .waitUntilWindowLoaded()
             .getTitle()
             .should.eventually.equal('OpenMDAO Visualization');
+    });
+
+    // Make sure the open button is enabled
+    it('open button enabled', () => {
+        return app.client
+            .waitUntilWindowLoaded()
+            .element('#openButton')
+            .isEnabled()
+            .should.eventually.equal(true);
+    });
+
+    // The N2 button should be disabled initially
+    it('test disabled N2 button', () => {
+        return app.client
+            .waitUntilWindowLoaded()
+            .element('#addN2Button')
+            .isEnabled()
+            .should.eventually.equal(false);
+    });
+
+    // The plot button should be disabled initially
+    it('test disabled plot button', () => {
+        return app.client
+            .waitUntilWindowLoaded()
+            .element('#addPlotButton')
+            .isEnabled()
+            .should.eventually.equal(false);
     });
 });
