@@ -74,6 +74,11 @@ function Layout() {
      * @param {*} lt
      */
     this.saveLayout = function(lt) {
+        // If we're in tests, don't save the new layout
+        if (process.env.RUNNING_IN_VIS_INDEX_TESTS) {
+            return;
+        }
+
         if (lt == null) {
             //when plots are trying to save, layout will be null
             lt = lastLayout;
