@@ -143,6 +143,26 @@ class SqliteData(BaseData):
         """
         return self._get_driver_iterations()
 
+    def generic_delete(self, collection_name, case_id, token):
+        """ generic_delete method
+
+        Currently unimplemented, always returns False to indicate failure.
+
+        Returns:
+            False
+        """
+        return False
+
+    def generic_create(self, collection_name, body, case_id, token, update):
+        """ generic_create method
+
+        Currently unimplemented, always returns False to indicate fialure.
+
+        Freturns:
+            False
+        """
+        return False
+
     def is_new_data(self, case_id, count):
         """ is_new_data method
 
