@@ -25,11 +25,6 @@ class TestPresentationLayer(AsyncHTTPTestCase):
                               body=json.dumps(body))
         return response
 
-    def test_index(self):
-        response = self.fetch('/')
-        self.assertEqual(response.code, 200)
-        self.assertIsNotNone(response.body)
-
     def test_connect(self):
         response = self._connect_sellar_grouped()
         self.assertEqual(response.code, 200)

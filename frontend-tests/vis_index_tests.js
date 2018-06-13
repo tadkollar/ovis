@@ -3,6 +3,7 @@ const path = require('path');
 const chai = require('chai');
 const chaiStyle = require('chai-style');
 const chaiAsPromised = require('chai-as-promised');
+const helper = require('./test_helper');
 
 // High timeout time because I run this in a very slow VM
 const timeoutTime = 30000;
@@ -51,56 +52,46 @@ describe('Test OVis Vis Page', () => {
 
     // We should start with one N2
     it('verify only one N2', done => {
-        app.client
-            .waitUntilWindowLoaded()
-            .elements('#ptN2ContentDivId')
-            .then(vals => {
-                vals.value.length.should.equal(1);
-                done();
-            });
+        helper.getN2Count(app).then(count => {
+            count.should.equal(1);
+            done();
+        });
     }).timeout(timeoutTime);
 
     // We should start with two plots
     it('verify exactly two plots', done => {
-        app.client
-            .waitUntilWindowLoaded()
-            .elements('#plot')
-            .then(vals => {
-                vals.value.length.should.equal(2);
-                done();
-            });
+        helper.getPlotCount(app).then(count => {
+            count.should.equal(2);
+            done();
+        });
     }).timeout(timeoutTime);
 
     // Make sure that the add plot button adds a plot
     it('add plot button should add plot', done => {
-        app.client.waitUntilWindowLoaded().then(() => {
-            app.client
-                .element('#addPlotButton')
-                .click()
-                .then(() => {
-                    app.client.elements('#plot').then(vals => {
-                        vals.value.length.should.equal(3);
-                        done();
-                    });
-                });
+        helper.clickPlotButton(app).then(() => {
+            helper.getPlotCount(app).then(count => {
+                count.should.equal(3);
+                done();
+            });
         });
     }).timeout(timeoutTime);
 
     // Make sure that removing an N^2 re-enables the "add N^2" button
-    it('Remove N2 enables N^2 button', done => {
-        app.client.waitUntilWindowLoaded().then(() => {
-            app.client
-                .element('.lm_row')
-                .element('.lm_stack')
-                .element('.lm_close_tab')
-                .click()
-                .then(() => {
-                    app.client
-                        .element('#addN2Button')
-                        .isEnabled()
-                        .should.eventually.equal(true)
-                        .then(() => done());
+    it('Remove N2 enables N2 button', done => {
+        helper.removeN2(app).then(() => {
+            helper.assertAddN2Enabled(app).then(() => done());
+        });
+    }).timeout(timeoutTime);
+
+    // Make sure that clicking the addN2 button adds an N2
+    it('Add N2 button adds an N2', done => {
+        helper.removeN2(app).then(() => {
+            helper.clickAddN2Button(app).then(() => {
+                helper.getN2Count(app).then(count => {
+                    count.should.equal(1);
+                    done();
                 });
+            });
         });
     }).timeout(timeoutTime);
 
@@ -147,20 +138,22 @@ describe('Test OVis Vis Page', () => {
     }).timeout(timeoutTime);
 
     // The N2 button should be disabled initially
-    it('test disabled N2 button', () => {
-        return app.client
-            .waitUntilWindowLoaded()
-            .element('#addN2Button')
-            .isEnabled()
-            .should.eventually.equal(false);
-    });
+    it('initially disabled N2 button', done => {
+        helper.assertAddN2Disabled(app);
+    }).timeout(timeoutTime);
 
     // The plot button should be enabled initially
-    it('test enabled plot button', () => {
-        return app.client
-            .waitUntilWindowLoaded()
-            .element('#addPlotButton')
-            .isEnabled()
-            .should.eventually.equal(true);
-    });
+    it('initially enabled plot button', done => {
+        helper.assertAddPlotButtonEnabled(app);
+    }).timeout(timeoutTime);
+
+    // Initially, the plot controls should not display
+    // it('display none for plot controls', done => {
+    //     app.client.waitUntilWindowLoaded().then(() => {
+    //         app.client.element('#plotControls').then(e => {
+    //             e.should.have.style('display', 'none');
+    //             done();
+    //         });
+    //     });
+    // }).timeout(timeoutTime);
 });

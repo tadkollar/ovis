@@ -20,10 +20,9 @@ define("port", default=18403)
 
 public_root = os.path.join(os.path.dirname(__file__), 'public')
 
-
+# define endpoints
 def get_app():
     app = tornado.web.Application(handlers=[
-        (r"/", presentation.IndexHandler),
         (r"/connect", presentation.ConnectHandler),
         (r"/logout", presentation.LogoutHandler),
         (r"/case", presentation.CaseHandler),
@@ -48,7 +47,6 @@ def get_app():
          presentation.SystemIterationVariableHandler),
         (r"/case/(\d+)/system_metadata", presentation.SystemMetadataHandler),
         (r"/token", presentation.TokenHandler),
-        (r"/login", presentation.LoginHandler),
         (r"/login", presentation.LoginHandler),
         (r"/activate/([a-zA-Z0-9]+)", presentation.ActivationHandler),
         (r"/case/(\d+)/variables", presentation.VariablesHandler),

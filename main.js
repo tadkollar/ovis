@@ -125,12 +125,12 @@ function loadVisPage() {
  */
 function startServer() {
     // Start up the server
-    let server_loc = path.join(__dirname, '../main.py');
+    let server_loc = path.join(__dirname, '../server/main.py');
 
     // Use a different path if we're running in Electron
     if (is.dev()) {
         logger.info('Running in Electron');
-        server_loc = path.join(__dirname, 'main.py');
+        server_loc = path.join(__dirname, 'server/main.py');
     } else {
         logger.info('Running outside of Electron');
     }

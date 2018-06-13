@@ -1,6 +1,6 @@
 //NOTE: the N^2 and associated scripts were originally written
 //  to work directly in OpenMDAO as one file. Despite lots of
-//  refactoring, there's still a lot of work to be done to make
+//  refactoring, there's still so much work to be done to make
 //  this more maintainable. Associated scripts are:
 //
 //  * constants.js

@@ -245,9 +245,9 @@ class TestLogic(unittest.TestCase):
         self.assertEqual(logic.get_driver_iteration_data(
             new_case['case_id'], 'test'), '[]')
 
-    def test_empty_get_desvars(self):
+    def test_empty_get_allvars(self):
         new_case = self.logic_create_case({}, token)
-        self.assertEqual(logic.get_desvars(new_case['case_id']), '[]')
+        self.assertEqual(logic.get_allvars(new_case['case_id']), '[]')
 
     def test_get_system_iteration_data(self):
         new_case = self.logic_create_case({}, token)
@@ -334,12 +334,12 @@ class TestLogic(unittest.TestCase):
         self.assertTrue(got_var1)
         self.assertTrue(got_var2)
 
-    def test_get_desvars(self):
+    def test_get_allvars(self):
         new_case = self.logic_create_case({}, token)
         logic.generic_create(collections.DRIVER_ITERATIONS,
                              self.create_driver_iteration(),
                              new_case['case_id'], token, False)
-        variables = json.loads(logic.get_desvars(new_case['case_id']))
+        variables = json.loads(logic.get_allvars(new_case['case_id']))
         got_var1 = False
         got_var2 = False
         got_var3 = False

@@ -179,7 +179,7 @@ function ControlPanel() {
         variableIndicesDiv.innerHTML += content;
     };
 
-    // ******************* Public callbacks ******************* //
+    // ******************* Callbacks ******************* //
 
     /**
      * Callback when Logarithmic x-axis is checked/unchecked

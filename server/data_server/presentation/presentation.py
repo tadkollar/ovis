@@ -10,18 +10,7 @@ import tornado.web as web
 import data_server.logic.logic as logic
 import data_server.shared.collection_names as collections
 import data_server.shared.data_type as db_type
-
-_TOKEN = 'cef48638-0cf2-4e3a-9c57-92df0079583b'
-
-
-class IndexHandler(web.RequestHandler):
-    """ IndexHandler class
-
-    Contains logic for getting the main page from the server.
-    """
-
-    def get(self):
-        self.render("../../need_load.html")
+import data_server.shared.globals as globs
 
 
 class ConnectHandler(web.RequestHandler):
@@ -104,7 +93,7 @@ class LayoutHandler(web.RequestHandler):
     """
 
     def get(self, *params):
-        _generic_get(collections.LAYOUTS, self, params[0], _TOKEN)
+        _generic_get(collections.LAYOUTS, self, params[0], globs.BASIC_ACCESS_TOKEN)
 
     def post(self, *params):
         ret = logic.update_layout(json.loads(self.request.body), params[0])
@@ -138,7 +127,7 @@ class DriverMetadataHandler(web.RequestHandler):
     """
 
     def get(self, *params):
-        _generic_get(collections.DRIVER_METADATA, self, params[0], _TOKEN)
+        _generic_get(collections.DRIVER_METADATA, self, params[0], globs.BASIC_ACCESS_TOKEN)
 
     def post(self, *params):
         _generic_post(collections.DRIVER_METADATA, self, params[0])
@@ -172,7 +161,7 @@ class MetadataHandler(web.RequestHandler):
     """
 
     def get(self, *params):
-        ret = logic.metadata_get(params[0], _TOKEN)
+        ret = logic.metadata_get(params[0], globs.BASIC_ACCESS_TOKEN)
         self.write(ret)
 
     def post(self, *params):
