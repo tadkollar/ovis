@@ -126,3 +126,9 @@
     transform-origin: center;
     background-color: #a8a8a8;
 }
+
+#installButton {
+    position: absolute;
+    bottom: 10px;
+    left: 0.6%;
+}

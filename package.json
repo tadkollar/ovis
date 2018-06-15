@@ -1,6 +1,6 @@
 {
   "name": "OVis",
-  "version": "0.1.2",
+  "version": "0.1.7",
   "description": "A visualization tool for OpenMDAO",
   "main": "main.js",
   "repository": "https://github.com/OpenMDAO/zune",
@@ -18,7 +18,7 @@
     "chai-as-promised": "^7.1.1",
     "chai-style": "^1.0.3",
     "electron": "~2.0.2",
-    "electron-builder": "^20.15.1",
+    "electron-builder": "^20.14.7",
     "electron-packager": "^12.1.0",
     "mocha": "^5.2.0",
     "spectron": "^3.8.0"
@@ -43,7 +43,7 @@
     },
     "linux": {
       "target": [
-        "deb"
+        "appImage"
       ]
     },
     "extraResources": [

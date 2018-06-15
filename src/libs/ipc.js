@@ -1,6 +1,6 @@
 'use strict';
 
-var { ipcRenderer, remote } = require('electron');
+var { ipcRenderer } = require('electron');
 
 /**
  * Class IPC - Handles render-side communications between the main and render process
@@ -27,6 +27,13 @@ function IPC() {
         ipcRenderer.send('getFilename');
     };
 
+    /**
+     * Tell main process to install newest update
+     */
+    this.installUpdate = function() {
+        ipcRenderer.send('installUpdate');
+    };
+
     //Call the filename callback, if it exists
     ipcRenderer.on('filenameReply', (event, arg) => {
         if (filenameCallback != null) {
@@ -35,6 +42,15 @@ function IPC() {
 
         filenameCallback = null;
     });
+
+    ipcRenderer.on('updateReady', () => {
+        document.getElementById('installButton').style.display = 'block';
+    });
+
+    // Check if we're ready to update every 5 seconds
+    setInterval(() => {
+        ipcRenderer.send('checkUpdateReady');
+    }, 5000);
 }
 
 var ipc = new IPC();

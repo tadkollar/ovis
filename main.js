@@ -35,6 +35,7 @@ logger.transports.console.level = 'info';
 logger.transports.file.level = 'info';
 autoUpdater.logger = logger;
 
+let updateReady = false;
 let server = null;
 let filename = 'No file selected';
 
@@ -70,7 +71,7 @@ function findFile() {
         });
     } else {
         logger.info('Opening sellar grouped in Spectron environment');
-        openFile(__dirname + '/server-tests/sellar_grouped.db');
+        openFile(__dirname + '/server/server-tests/sellar_grouped.db');
     }
 }
 
@@ -215,10 +216,39 @@ ipcMain.on('getFilename', (event, arg) => {
     event.sender.send('filenameReply', fns[fns.length - 1]);
 });
 
+// Renderer telling main process to install the update
+ipcMain.on('installUpdate', (event, arg) => {
+    if (updateReady) {
+        updateReady = false;
+        autoUpdater.quitAndInstall();
+    }
+});
+
+// Renderer querying if the update is ready
+ipcMain.on('checkUpdateReady', (event, arg) => {
+    if (updateReady) {
+        event.sender.send('updateReady');
+    }
+});
+
 // Callback when an update is downloaded
 autoUpdater.on('update-downloaded', (ev, info) => {
     logger.info('Finished downloading update. Quitting and installing');
-    autoUpdater.quitAndInstall();
+    updateReady = true;
+    mainWindow.webContents.send('updateReady');
+});
+
+autoUpdater.on('checking-for-update', () => {
+    logger.info('Checking for updates');
+});
+
+autoUpdater.on('update-available', () => {
+    logger.info('Update available');
+});
+
+autoUpdater.on('error', (ev, err) => {
+    logger.error('Error in auto updater');
+    logger.error(err.toString());
 });
 
 app.on('ready', startApp);
