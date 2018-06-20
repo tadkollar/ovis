@@ -19,6 +19,8 @@ import SocketServer
 import threading
 import re
 
+release_filename = "newest_release"
+
 def remove_files(pattern):
     """ remove_old_files function
 
@@ -30,6 +32,34 @@ def remove_files(pattern):
     for f in os.listdir('.'):
         if re.search(pattern, f):
             os.remove(f)
+
+def is_new_version(release_name):
+    """ is_new_version function
+
+    Check if the given release is new
+
+    Args:
+        release_name (String): the name of the release to be tested
+    Return:
+        True if release name indicates it's a new release, False otherwise
+    """
+    # in the case that the file doesn't exist, always return true
+    if not os.path.isfile(release_filename):
+        return True
+    with open(release_filename, 'r') as handle:
+        release = handle.readline()
+        return release != release_name
+
+def write_new_release_version(release_name):
+    """ write_new_release_version function
+
+    Write the given release name to our release file
+
+    Args:
+        release_name (String): the name to be written to the release file
+    """
+    with open(release_filename, 'wt') as handle:
+        handle.writelines(release_name)
 
 def update_release():
     """ update_release
@@ -47,13 +77,6 @@ def update_release():
         print("ERROR: could not find GHNAME in environment variables for GitHub authentication")
         return
 
-    print("Deleting old files")
-    remove_files('.*yml')
-    remove_files('.*json')
-    remove_files('.*zip')
-    remove_files('.*AppImage')
-    remove_files('.*exe*')
-    remove_files('.*dmg*')
 
     print("Updating release files")
     ghname = os.environ['GHNAME']
@@ -87,6 +110,21 @@ def update_release():
         return
 
     latest_release = releases[0]
+    release_name = latest_release['name']
+    if not is_new_version(release_name):
+        print("Already up to date")
+        return
+
+    write_new_release_version(release_name)
+
+    print("Deleting old files")
+    remove_files('.*yml')
+    remove_files('.*json')
+    remove_files('.*zip')
+    remove_files('.*AppImage')
+    remove_files('.*exe.*')
+    remove_files('.*dmg.*')
+
     for asset in latest_release['assets']:
         print("Downloading asset: " + asset['name'])
         full_asset_url = assets_url + str(asset['id'])
