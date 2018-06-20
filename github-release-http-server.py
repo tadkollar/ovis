@@ -9,7 +9,7 @@ pulling the most recent GitHub release of the Zune project every hour.
 NOTE: this has only the most basic security and should be updated to only accept requests
 related to OVis.
 
-This file should be running independently on its own server.
+This file should be running independently on a server.
 """
 import json
 import requests
@@ -143,6 +143,7 @@ class BasicRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path == '/':
             return self.send_error(404)
+        self.path = self.path.replace('%20', '.')
         return SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 
 
