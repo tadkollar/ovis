@@ -18,7 +18,7 @@ _data = SqliteData()
 class TestSqliteData(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(TestSqliteData, self).__init__(*args, **kwargs)
-        self._sellar_grouped_location = os.path.join(os.path.dirname(__file__),
+        self._sellar_grouped_location_py3 = os.path.join(os.path.dirname(__file__),
                                                      'sellar_grouped_py3.db')
         self._sellar_grouped_location_py2 = os.path.join(os.path.dirname(__file__),
                                                          'sellar_grouped_py2.db')
@@ -37,7 +37,11 @@ class TestSqliteData(unittest.TestCase):
 
     def test_connect_sellar(self):
         self._use_sellar_grouped()
-        self.assertEqual(_data.filename, self._sellar_grouped_location)
+        self.assertEqual(_data.filename, self._sellar_grouped_location_py3)
+
+    def test_connect_sellar_py2(self):
+        self._use_sellar_grouped_py2()
+        self.assertEqual(_data.filename, self._sellar_grouped_location_py2)
 
     def test_connect_bad_db(self):
         self.assertFalse(_data.connect('not a real file'))
@@ -139,6 +143,53 @@ class TestSqliteData(unittest.TestCase):
         for i in inputs:
             self._assert_array_close(i, t_iter['inputs'])
 
+    def test_get_driver_iteration_py2(self):
+        self._use_sellar_grouped_py2()
+        iterations = json.loads(_data.generic_get(
+            collections.DRIVER_ITERATIONS))
+
+        self.assertEqual(len(iterations), 7)
+        t_iter = iterations[0]
+        desvars = [
+            {'name': 'pz.z', 'values': [[5.0, 2.0]]},
+            {'name': 'px.x', 'values': [[1.0]]}
+        ]
+        objectives = [
+            {'name': 'obj_cmp.obj', 'values': [[28.5883081]]}
+        ]
+        sysincludes = [
+            {'name': 'mda.d2.y2', 'values': [[12.05848815]]},
+            {'name': 'mda.d1.y1', 'values': [[25.58830237]]}
+        ]
+        constraints = [
+            {'name': 'con_cmp1.con1', 'values': [[-22.42830237]]},
+            {'name': 'con_cmp2.con2', 'values': [[-11.94151184]]}
+        ]
+        inputs = [
+            {'name': 'mda.d2.y1', 'values': [[25.58830237]]},
+            {'name': 'con_cmp2.y2', 'values': [[12.05848815]]},
+            {'name': 'mda.d1.x', 'values': [[1.0]]},
+            {'name': 'mda.d1.z', 'values': [[5.0, 2.0]]},
+            {'name': 'obj_cmp.x', 'values': [[1.0]]},
+            {'name': 'obj_cmp.z', 'values': [[5.0, 2.0]]},
+            {'name': 'obj_cmp.y1', 'values': [[25.58830237]]},
+            {'name': 'obj_cmp.y2', 'values': [[12.05848815062]]},
+            {'name': 'mda.d2.z', 'values': [[5.0, 2.0]]},
+            {'name': 'con_cmp1.y1', 'values': [[25.58830237]]},
+            {'name': 'mda.d1.y2', 'values': [[12.058488150]]},
+        ]
+
+        for c in constraints:
+            self._assert_array_close(c, t_iter['constraints'])
+        for d in desvars:
+            self._assert_array_close(d, t_iter['desvars'])
+        for o in objectives:
+            self._assert_array_close(o, t_iter['objectives'])
+        for s in sysincludes:
+            self._assert_array_close(s, t_iter['sysincludes'])
+        for i in inputs:
+            self._assert_array_close(i, t_iter['inputs'])
+
     def test_get_driver_iteration2(self):
         self._use_sellar_grouped()
         iterations = _data.get_driver_iteration_data('')
@@ -195,6 +246,16 @@ class TestSqliteData(unittest.TestCase):
         self.assertEqual(
             len(metadata['model_viewer_data']['connections_list']), 11)
 
+    def test_get_driver_metadata_py2(self):
+        self._use_sellar_grouped_py2()
+        metadata_s = _data.generic_get(collections.DRIVER_METADATA)
+        metadata = json.loads(metadata_s)[0]
+        self.assertIsNotNone(metadata['model_viewer_data'])
+        self.assertIsNotNone(metadata['model_viewer_data']['tree'])
+        self.assertIsNotNone(metadata['model_viewer_data']['connections_list'])
+        self.assertEqual(
+            len(metadata['model_viewer_data']['connections_list']), 11)
+
     def test_get_layout(self):
         self._use_sellar_grouped()
         layout_s = _data.generic_get(collections.LAYOUTS)
@@ -204,8 +265,34 @@ class TestSqliteData(unittest.TestCase):
         self.assertIsNotNone(layout['labels'])
         self.assertIsNotNone(layout['content'])
 
+    def test_get_layout_py2(self):
+        self._use_sellar_grouped_py2()
+        layout_s = _data.generic_get(collections.LAYOUTS)
+        layout = json.loads(json.loads(layout_s)[0]['layout'])
+        self.assertIsNotNone(layout['settings'])
+        self.assertIsNotNone(layout['dimensions'])
+        self.assertIsNotNone(layout['labels'])
+        self.assertIsNotNone(layout['content'])
+
     def test_metadata(self):
         self._use_sellar_grouped()
+        metadata = json.loads(_data.generic_get(collections.METADATA))
+        # make sure it isn't None
+        self.assertIsNotNone(metadata['abs2prom'])
+        self.assertIsNotNone(metadata['prom2abs'])
+
+        # make sure we have two keys ('input' and 'output')
+        self.assertEqual(len(metadata['abs2prom']), 2)
+        self.assertEqual(len(metadata['prom2abs']), 2)
+
+        # make sure we have the expected number of variables in each
+        self.assertEqual(len(metadata['abs2prom']['input']), 11)
+        self.assertEqual(len(metadata['abs2prom']['output']), 7)
+        self.assertEqual(len(metadata['prom2abs']['input']), 4)
+        self.assertEqual(len(metadata['prom2abs']['output']), 7)
+
+    def test_metadata_py2(self):
+        self._use_sellar_grouped_py2()
         metadata = json.loads(_data.generic_get(collections.METADATA))
         # make sure it isn't None
         self.assertIsNotNone(metadata['abs2prom'])
@@ -306,7 +393,14 @@ class TestSqliteData(unittest.TestCase):
 
         Connects _data to the sellar grouped DB
         """
-        _data.connect(self._sellar_grouped_location)
+        _data.connect(self._sellar_grouped_location_py3)
+
+    def _use_sellar_grouped_py2(self):
+        """ use_sellar_grouped_py2 private method
+
+        Connects _data to the py2 version of the sellar grouped DB
+        """
+        _data.connect(self._sellar_grouped_location_py2)
 
     def _create_new_db(self):
         """ create_new_db private method
