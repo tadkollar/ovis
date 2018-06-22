@@ -19,7 +19,9 @@ class TestSqliteData(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(TestSqliteData, self).__init__(*args, **kwargs)
         self._sellar_grouped_location = os.path.join(os.path.dirname(__file__),
-                                                     'sellar_grouped.db')
+                                                     'sellar_grouped_py3.db')
+        self._sellar_grouped_location_py2 = os.path.join(os.path.dirname(__file__),
+                                                         'sellar_grouped_py2.db')
         self._temp_filepath = 'temp'
         self._generated_dbs = []
 

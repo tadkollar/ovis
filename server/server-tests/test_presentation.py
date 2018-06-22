@@ -19,7 +19,7 @@ class TestPresentationLayer(AsyncHTTPTestCase):
 
     def _connect_sellar_grouped(self):
         file_path = os.path.join(os.path.dirname(__file__),
-                                 'sellar_grouped.db')
+                                 'sellar_grouped_py3.db')
         body = {'location': file_path}
         response = self.fetch('/connect', method='POST',
                               body=json.dumps(body))

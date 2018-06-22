@@ -13,7 +13,6 @@ function Plot(container, componentState) {
 
     // Constants
     const deltaPlotHeight = 0;
-    const deltaSearchWidth = 100;
     const checkUpdateVarsIntervalTime = 5000;
     const saveIntervalTime = 3000;
 
@@ -148,7 +147,7 @@ function Plot(container, componentState) {
             if (randIndex < plotData.desvars.data.length) {
                 plotData.desvars.selectVarAndGetData(
                     setData,
-                    plotData.desvars[randIndex]
+                    plotData.desvars.data[randIndex]
                 );
             }
         }
