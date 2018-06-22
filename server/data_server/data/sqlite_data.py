@@ -76,12 +76,20 @@ class SqliteData(BaseData):
                 self.abs2meta = pickle.loads(
                     str(row[2])) if row[2] is not None else None
             if PY3:
-                self.abs2prom = pickle.loads(
-                    row[0]) if row[0] is not None else None
-                self.prom2abs = pickle.loads(
-                    row[1]) if row[1] is not None else None
-                self.abs2meta = pickle.loads(
-                    row[2]) if row[2] is not None else None
+                try:
+                    self.abs2prom = pickle.loads(
+                        row[0]) if row[0] is not None else None
+                    self.prom2abs = pickle.loads(
+                        row[1]) if row[1] is not None else None
+                    self.abs2meta = pickle.loads(
+                        row[2]) if row[2] is not None else None
+                except: # case where this DB was generated with python 2
+                    self.abs2prom = pickle.loads(
+                        bytes(row[0], 'utf-8')) if row[0] is not None else None
+                    self.prom2abs = pickle.loads(
+                        bytes(row[1], 'utf-8')) if row[1] is not None else None
+                    self.abs2meta = pickle.loads(
+                        bytes(row[2], 'utf-8')) if row[2] is not None else None
 
         return True
 
@@ -390,10 +398,16 @@ class SqliteData(BaseData):
                 ret['prom2abs'] = pickle.loads(
                     str(row[1])) if row[1] is not None else None
             if PY3:
-                ret['abs2prom'] = pickle.loads(
-                    row[0]) if row[0] is not None else None
-                ret['prom2abs'] = pickle.loads(
-                    row[1]) if row[1] is not None else None
+                try:
+                    ret['abs2prom'] = pickle.loads(
+                        row[0]) if row[0] is not None else None
+                    ret['prom2abs'] = pickle.loads(
+                        row[1]) if row[1] is not None else None
+                except:
+                    ret['abs2prom'] = pickle.loads(
+                        bytes(row[0], 'utf-8')) if row[0] is not None else None
+                    ret['prom2abs'] = pickle.loads(
+                        bytes(row[1], 'utf-8')) if row[1] is not None else None
 
         return json.dumps(ret)
 
