@@ -33,7 +33,7 @@ class TestSqliteData(unittest.TestCase):
                     os.remove(p)
             except OSError as e:
                 print(e)
-        self._generated_dbs.clear()
+        self._generated_dbs = []
 
     def test_connect_sellar(self):
         self._use_sellar_grouped()

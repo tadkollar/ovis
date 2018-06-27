@@ -139,12 +139,12 @@ describe('Test OVis Vis Page', () => {
 
     // The N2 button should be disabled initially
     it('initially disabled N2 button', done => {
-        helper.assertAddN2Disabled(app);
+        helper.assertAddN2Disabled(app).then(() => done());
     }).timeout(timeoutTime);
 
     // The plot button should be enabled initially
     it('initially enabled plot button', done => {
-        helper.assertAddPlotButtonEnabled(app);
+        helper.assertAddPlotButtonEnabled(app).then(() => done());
     }).timeout(timeoutTime);
 
     // Initially, the plot controls should not display

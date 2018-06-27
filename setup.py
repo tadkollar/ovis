@@ -24,6 +24,7 @@ setup(
         'sqlitedict',
         'pymongo',
         'python-dateutil',
-        'numpy'
+        'numpy',
+        'minimock'
     ]
 )
