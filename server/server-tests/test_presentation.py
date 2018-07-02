@@ -9,8 +9,9 @@ from tornado.testing import AsyncHTTPTestCase
 
 sys.path.append(os.path.abspath(os.path.join(
     os.path.dirname(__file__), os.path.pardir)))
-import main
 import data_server.shared.data_type as db_type
+db_type.DB_TYPE = 'SQLite'
+import main
 
 
 class TestPresentationLayer(AsyncHTTPTestCase):

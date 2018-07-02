@@ -20,10 +20,16 @@ logic.activate_account(token)
 smtplib.SMTP = Mock('smtplib.SMTP')
 smtplib.SMTP.mock_returns = Mock('smtp_connection')
 
+token_list = [token]
 
 def cleanup():
-    logic.delete_token(token)
+    for t in token_list:
+        logic.data.delete_token(t)
 
+def get_new_token(name, email):
+    tok = logic.create_token(name, email)
+    token_list.append(tok)
+    return tok
 
 class TestLogic(unittest.TestCase):
     def logic_create_case(self, body, token):
@@ -67,19 +73,16 @@ class TestLogic(unittest.TestCase):
         self.assertEqual(case_obj['users'][0], token)
 
     def test_cleanup(self):
-        new_token = logic.create_token('Unit Test Cleanup', 'blah@fake4.com')
+        new_token = get_new_token('Unit Test', 'blah@fake4.com')
         logic.activate_account(new_token)
-        try:
-            new_case = self.logic_create_case({}, new_token)
-            self.assertEqual(logic.token_exists(new_token), True)
-            self.assertNotEqual(logic.get_case_with_id(
-                new_case['case_id'], new_token), {})
-            logic.delete_token(new_token)
-            self.assertEqual(logic.token_exists(new_token), False)
-            self.assertEqual(logic.get_case_with_id(
-                new_case['case_id'], new_token), {})
-        finally:
-            logic.delete_token(new_token)
+        new_case = self.logic_create_case({}, new_token)
+        self.assertEqual(logic.token_exists(new_token), True)
+        self.assertNotEqual(logic.get_case_with_id(
+            new_case['case_id'], new_token), {})
+        logic.delete_token(new_token)
+        self.assertEqual(logic.token_exists(new_token), False)
+        self.assertEqual(logic.get_case_with_id(
+            new_case['case_id'], new_token), {})
 
     def test_delete_case(self):
         new_case = self.logic_create_case({}, token)
@@ -90,25 +93,19 @@ class TestLogic(unittest.TestCase):
             new_case['case_id'], token), {})
 
     def test_get_all_cases_empty(self):
-        new_token = logic.create_token(
-            'test cases empty', 'TestCasesEmpty@fake.com')
+        new_token = get_new_token(
+            'Unit Test', 'TestCasesEmpty@fake.com')
         logic.activate_account(new_token)
-        try:
-            self.assertEqual(logic.get_all_cases(new_token), [])
-        finally:
-            logic.delete_token(new_token)
+        self.assertEqual(logic.get_all_cases(new_token), [])
 
     def test_get_all_cases_not_empty(self):
-        new_token = logic.create_token(
-            'test cases not empty', 'TestCasesNotEmpty@fake.com')
+        new_token = get_new_token(
+            'Unit Test', 'TestCasesNotEmpty@fake.com')
         logic.activate_account(new_token)
-        try:
-            case1 = self.logic_create_case({}, new_token)
-            case2 = self.logic_create_case({}, new_token)
-            case3 = self.logic_create_case({}, new_token)
-            self.assertEqual(len(logic.get_all_cases(new_token)), 3)
-        finally:
-            logic.delete_token(new_token)
+        case1 = self.logic_create_case({}, new_token)
+        case2 = self.logic_create_case({}, new_token)
+        case3 = self.logic_create_case({}, new_token)
+        self.assertEqual(len(logic.get_all_cases(new_token)), 3)
 
     def test_get_case_with_id(self):
         new_case = self.logic_create_case({}, token)
@@ -121,15 +118,12 @@ class TestLogic(unittest.TestCase):
             new_case['case_id'], 'badToken'), {})
 
     def test_get_case_with_id_bad_token(self):
-        new_token = logic.create_token(
-            'test get case with bad token', 'TestGetCaseBadToken@fake.com')
+        new_token = get_new_token(
+            'Unit Test', 'TestGetCaseBadToken@fake.com')
         logic.activate_account(new_token)
-        try:
-            new_case = self.logic_create_case({}, token)
-            self.assertEqual(logic.get_case_with_id(
-                new_case['case_id'], new_token), {})
-        finally:
-            logic.delete_token(new_token)
+        new_case = self.logic_create_case({}, token)
+        self.assertEqual(logic.get_case_with_id(
+            new_case['case_id'], new_token), {})
 
     def test_delete_case_with_id(self):
         new_case = self.logic_create_case({}, token)
@@ -141,15 +135,12 @@ class TestLogic(unittest.TestCase):
             new_case['case_id'], 'bad token'))
 
     def test_delete_case_bad_token(self):
-        new_token = logic.create_token(
-            'test delete with bad token', 'TestDeleteBadToken@fake.com')
+        new_token = get_new_token(
+            'Unit Test', 'TestDeleteBadToken@fake.com')
         logic.activate_account(new_token)
-        try:
-            new_case = self.logic_create_case({}, token)
-            self.assertFalse(logic.delete_case_with_id(
-                new_case['case_id'], new_token))
-        finally:
-            logic.delete_token(new_token)
+        new_case = self.logic_create_case({}, token)
+        self.assertFalse(logic.delete_case_with_id(
+            new_case['case_id'], new_token))
 
     def test_generic_create(self):
         new_case = self.logic_create_case({}, token)
@@ -355,12 +346,9 @@ class TestLogic(unittest.TestCase):
         self.assertTrue(got_var3)
 
     def test_user_already_exists(self):
-        new_token = logic.create_token('unitTest', 'UnitTest@fake2.com')
-        try:
-            self.assertEqual(logic.create_token(
-                'unitTest', 'UnitTest@fake2.com'), -1)
-        finally:
-            logic.delete_token(new_token)
+        new_token = get_new_token('Unit Test', 'UnitTest@fake2.com')
+        self.assertEqual(logic.create_token(
+            'Unit Test', 'UnitTest@fake2.com'), -1)
 
     def test_get_driver_iteration_based_on_count(self):
         new_case = self.logic_create_case({}, token)
@@ -388,28 +376,19 @@ class TestLogic(unittest.TestCase):
         self.assertEqual(len(dat), 2)
 
     def test_get_case_without_validation(self):
-        new_token = logic.create_token('test token', 'UnitTest123@fake.com')
-        try:
-            new_case = self.logic_create_case({}, new_token)
-            self.assertEqual(new_case['status'], 'Failed')
-        finally:
-            logic.delete_token(new_token)
+        new_token = get_new_token('Unit Test', 'UnitTest123@fake.com')
+        new_case = self.logic_create_case({}, new_token)
+        self.assertEqual(new_case['status'], 'Failed')
 
     def test_activate_token_email(self):
-        new_token = logic.create_token('test token', 'UnitTest1234@fake.com')
-        try:
-            logic.send_activation_email(
-                new_token, 'test token', 'UnitTest1234@fake.com')
-        finally:
-            logic.delete_token(new_token)
+        new_token = get_new_token('Unit Test', 'UnitTest1234@fake.com')
+        logic.send_activation_email(
+            new_token, 'Unit Test', 'UnitTest1234@fake.com')
 
     def test_activated_email(self):
-        new_token = logic.create_token('test token', 'UnitTest12345@fake.com')
-        try:
-            logic.activate_account(new_token)
-            logic.send_activated_email(new_token)
-        finally:
-            logic.delete_token(new_token)
+        new_token = get_new_token('Unit Test', 'UnitTest12345@fake.com')
+        logic.activate_account(new_token)
+        logic.send_activated_email(new_token)
 
     def test_update_case_name(self):
         new_case = self.logic_create_case({'case_name': 'test'}, token)
