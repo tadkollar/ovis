@@ -93,7 +93,7 @@ class SqliteData(BaseData):
 
         return True
 
-    def update_layout(self, body, case_id):
+    def update_layout(self, body):
         """ update_layout method
 
         Updates the layout for a given case. Creates new layout if
@@ -101,7 +101,6 @@ class SqliteData(BaseData):
 
         Args:
             body (JSON): the body of the POST request
-            case_id (string): the case to be updated
         Returns:
             True if success, False otherwies
         """
@@ -112,17 +111,14 @@ class SqliteData(BaseData):
 
         return True
 
-    def generic_get(self, collection_name, case_id='',
-                    token='', get_many=True):
+    def generic_get(self, collection_name, get_many=True):
         """ generic_get method
 
         Performs a generic 'get' request, which attempts to query and return
-        all documents with the given case_id from the given collection.
+        all documents from the given collection.
 
         Args:
             collection_name (string): the collection to query
-            case_id (string || int): ID to be used for querying
-            token (string): the token to be used for authentication
             get_many (bool): whether you should query to get one or all
                              instances
         Returns:
@@ -139,19 +135,17 @@ class SqliteData(BaseData):
         else:
             return "[]"
 
-    def get_driver_iteration_data(self, case_id):
+    def get_driver_iteration_data(self):
         """ get_driver_iteration_data method
 
         Grabs all data for all driver iterations for a given case
 
-        Args:
-            case_id (string): the case to use for querying
         Returns:
             Array of data
         """
         return self._get_driver_iterations()
 
-    def generic_delete(self, collection_name, case_id, token):
+    def generic_delete(self, collection_name):
         """ generic_delete method
 
         Currently unimplemented, always returns False to indicate failure.
@@ -161,7 +155,7 @@ class SqliteData(BaseData):
         """
         return False
 
-    def generic_create(self, collection_name, body, case_id, token, update):
+    def generic_create(self, collection_name, body, update):
         """ generic_create method
 
         Currently unimplemented, always returns False to indicate fialure.
@@ -171,13 +165,12 @@ class SqliteData(BaseData):
         """
         return False
 
-    def is_new_data(self, case_id, count):
+    def is_new_data(self, count):
         """ is_new_data method
 
         Determines if there's new data based on the count
 
         Args:
-            case_id (string): the case to use for querying
             count (int): the current max counter value
         Returns:
             True if new data is available, False otherwise

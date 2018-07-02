@@ -9,8 +9,6 @@ at the presentation layer and the expectation at the data layer.
 """
 import os
 import json
-import time
-import smtplib
 import warnings
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -18,17 +16,9 @@ from dateutil import tz
 from datetime import datetime
 from six import PY2, PY3
 import data_server.shared.collection_names as collections
-import data_server.shared.data_type as db_type
-from data_server.data.mongo_data import MongoData
 from data_server.data.sqlite_data import SqliteData
 
-
-data = None
-if db_type.is_mongodb():
-    data = MongoData()
-    data.connect()
-else:
-    data = SqliteData()
+data = SqliteData()
 
 
 def connect(location):
@@ -40,136 +30,29 @@ def connect(location):
     Returns:
         bool: True if connection established, False otherwise
     """
-    if db_type.is_sqlite():
-        return data.connect(location)
-    else:
-        return data.connect()
+    return data.connect(location)
 
 
-def get_all_cases(token):
-    """ get_all_cases method
-
-    Grabs all case documents from the data layer.
-    NOTE: this should be altered to only grab case documents for a given user
-
-    Args:
-        token (string): the token to be used for authentication
-    Returns:
-        JSON array of all case documents
-    """
-    if db_type.is_sqlite():
-        return []
-    cases = json.loads(data.get_all_cases(token))
-    for case in cases:
-        ind = case['date'].find('.')
-        if ind > -1:
-            case['date'] = case['date'][:ind]
-        from_zone = tz.tzutc()
-        to_zone = tz.tzlocal()
-        case['date'] = datetime.strptime(case['date'], '%Y-%m-%d %H:%M:%S')
-        case['date'] = case['date'].replace(
-            tzinfo=from_zone).astimezone(to_zone)
-        case['datestring'] = case['date'].strftime('%b %d, %Y at %I:%M %p')
-
-    # sort by date
-    cases.sort(key=lambda x: x['date'])
-    cases = list(reversed(cases))
-
-    return cases
-
-
-def get_case_with_id(c_id, token):
-    """ get_case_with_id method
-
-    Uses the data layer to query and return a case with the given
-    case ID.
-
-    Args:
-        case_id (string || int): the associated case_id for querying
-        token (string): the token to be used for authentication
-    Returns:
-        JSON document of the case
-    """
-    if db_type.is_sqlite():
-        return {}
-    return data.get_case_with_id(c_id, token)
-
-
-def delete_case_with_id(c_id, token):
-    """ delete_case_with_id method
-
-    Deletes a case with the given ID. Returns true if it deleted anything
-    or false if it did not.
-
-    Args:
-        case_id (string || int): the associated case_id for querying
-        token (string): the token to be used for authentication
-    Returns:
-        True if successfull, False otherwise
-    """
-    if db_type.is_sqlite():
-        return False
-    return data.delete_case_with_id(c_id, token)
-
-
-def create_case(body, token):
-    """ create_case method
-
-    Adds the given case to the cases collection through the data layer
-    and responds with a unique integer ID that is the new case_id to be
-    used for all other queries.
-
-    Args:
-        body (JSON): the body of the original POST request to be put in the
-            collection
-        token (string): the token to be used for authentication
-    Returns:
-        Integer case_id to be used in all other HTTP requests
-    """
-    if db_type.is_sqlite():
-        return -1
-    c_id = data.create_case(body, token)
-    return c_id
-
-
-def update_case_name(name, case_id):
-    """ update_case_name method
-
-    Updates a given case to have a specific name
-
-    Args:
-        name (string): the new name of the case
-        case_id (string): the case to be updated
-    Returns:
-        True if success, False otherwise
-    """
-    if db_type.is_sqlite():
-        return False
-    return data.update_case_name(name, case_id)
-
-
-def update_layout(body, case_id):
+def update_layout(body):
     """ update_layout method
 
     Updates the layout for a given case.
 
     Args:
         body (JSON): the body of the POST request
-        case_id (string): the case to be updated
     Returns:
         True if success, False otherwies
     """
-    return data.update_layout(body, case_id)
+    return data.update_layout(body)
 
 
-def metadata_create(body, case_id, token):
+def metadata_create(body):
     """ metadata_create method
 
     Creates/updates the metadata for a given case
 
     Args:
         body (JSON): the body containing abs2prom and prom2abs
-        token (string): the token for verification
     Returns:
         True if success, False otherwise
     """
@@ -191,27 +74,20 @@ def metadata_create(body, case_id, token):
             'abs2prom': n_abs2prom,
             'prom2abs': n_prom2abs
         }
-        return data.generic_create(collections.METADATA, n_body, case_id,
-                                   token, False)
+        return data.generic_create(collections.METADATA, n_body, False)
     else:
-        return data.generic_create(collections.METADATA, body, case_id, token,
-                                   False)
+        return data.generic_create(collections.METADATA, body, False)
 
 
-def metadata_get(case_id, token):
+def metadata_get():
     """ metadata_get method
 
     Grabs and returns the metadata for a given case
-
-    Args:
-        case_id (string): the case whose metadata needs to be grabbed
-        token (string): the token for verification
     """
     n_abs2prom = {'input': {}, 'output': {}}
     n_prom2abs = {'input': {}, 'output': {}}
 
-    res = json.loads(data.generic_get(collections.METADATA, case_id, token,
-                                      False))
+    res = json.loads(data.generic_get(collections.METADATA, False))
 
     if res is not None and 'abs2prom' in res:
         for io in ['input', 'output']:
@@ -229,40 +105,33 @@ def metadata_get(case_id, token):
         return res
     else:
         print("No metadata stored")
-        return data.generic_get(collections.METADATA, case_id, token, False)
+        return data.generic_get(collections.METADATA, False)
 
 
-def generic_get(collection_name, case_id, token, get_many=True):
+def generic_get(collection_name, get_many=True):
     """ generic_get method
 
-    Performs the typical 'get' request, passing the case_id to the data layer
-    and returning the list of documents in the given collection with that
-    case_id.
+    Performs the typical 'get' request, returning the list of documents in the given collection.
 
     Args:
         collection_name (string): the collection to be queried
-        case_id (string || int): the case_id for querying
-        token (string): the token to be used for authentication
         get_many (bool): true if you want to get all, false if you only want
         one
     Returns:
-        Array of documents with the given case_id from the given collection
+        Array of documents
     """
-    return data.generic_get(collection_name, case_id, token, get_many)
+    return data.generic_get(collection_name, get_many)
 
 
-def generic_create(collection_name, body, case_id, token, update):
+def generic_create(collection_name, body, update):
     """ generic_create method
 
-    Performs the typical 'post' request. Takes the body and case_id, passes
-    them to the data layer to be added to the collection. Returns True if it
-    was successfully added and False otherwise.
+    Performs the typical 'post' request. Takes the body, passes
+    it to the data layer to be added to the collection.
 
     Args:
         collection_name (string): the collection to be queried
         body (json): document to be added to the collection
-        case_id (string || int): the case_id for querying
-        token (string): the token to be used for authentication
         update (string): whether or not we're simply updating an existing
             recording
     Returns:
@@ -271,89 +140,36 @@ def generic_create(collection_name, body, case_id, token, update):
     converted_update = False
     if update == 'True':
         converted_update = True
-    return data.generic_create(collection_name, body, case_id, token,
-                               converted_update)
+    return data.generic_create(collection_name, body, converted_update)
 
 
-def generic_delete(collection_name, case_id, token):
+def generic_delete(collection_name):
     """ generic_delete method
 
     Performs the typical 'delete'. Passes the collection name and ID to the
         data layer.
-    This should delete all documents in the collection with the given case_id.
-    Returns True if anything was deleted, False otherwise.
+    This should delete all documents in the collection.
 
     Args:
         collection_name (string): the collection to be queried
-        case_id (string || int): the case_id for querying
-        token (string): the token to be used for authentication
     Returns:
         True if successfull, False otherwise
     """
-    return data.generic_delete(collection_name, case_id, token)
+    return data.generic_delete(collection_name)
 
 
-def create_token(name, email):
-    """ create_token method
-
-    Checks to see if a user already exists. If not, sends a new token.
-
-    Args:
-        name (string): the user name
-        email (string): the user's email
-    Returns:
-        token if successful or -1 otherwise
-    """
-    if db_type.is_sqlite():
-        return -1
-    if data.user_exists(email):
-        return -1
-
-    return data.get_new_token(name, email)
-
-
-def token_exists(token):
-    """ token_exists method
-
-    Checks to see if a token exists in the database
-
-    Args:
-        token (string): the token to be checked
-    Returns:
-        True if exists, False otherwise
-    """
-    if db_type.is_sqlite():
-        return False
-    return data.token_exists(token)
-
-
-def delete_token(token):
-    """ delete_token method
-
-    deletes a given token
-
-    Args:
-        token (string): the token to be deleted
-    Returns:
-        None
-    """
-    if db_type.is_mongodb():
-        data.delete_token(token)
-
-
-def get_system_iteration_data(case_id, variable):
+def get_system_iteration_data(variable):
     """ get_system_iteration_data method
 
     Grabs and returns all data for a given variable over each iteration
     in the system_iteration collection
 
     Args:
-        case_id (string): the case whose data will be checked
         variable (string): the variable whose data is to be used for querying
     Returns:
         Array of data
     """
-    dat = data.get_system_iteration_data(case_id)
+    dat = data.get_system_iteration_data()
     ret = []
     for i in dat:
         for v in i['inputs']:
@@ -383,17 +199,15 @@ def get_system_iteration_data(case_id, variable):
     return json.dumps(ret)
 
 
-def get_variables(case_id):
+def get_variables():
     """ get_variables method
 
-    Grabs all variables in system_iterations for a given case_id
+    Grabs all variables in system_iterations
 
-    Args:
-        case_id (string): the case to be queried
     Returns:
         Array of string variable names
     """
-    dat = data.get_system_iteration_data(case_id)
+    dat = data.get_system_iteration_data()
     ret = []
     for i in dat:
         for v in i['inputs']:
@@ -406,19 +220,18 @@ def get_variables(case_id):
     return json.dumps(ret)
 
 
-def get_driver_iteration_data(case_id, variable):
+def get_driver_iteration_data(variable):
     """ get_driver_iteration_data method
 
     Grabs and returns all data for a given variable over each iteration
     in the driver_iteration collection
 
     Args:
-        case_id (string): the case whose data will be checked
         variable (string): the variable whose data is to be used for querying
     Returns:
         Array of data
     """
-    dat = data.get_driver_iteration_data(case_id)
+    dat = data.get_driver_iteration_data()
     ret = []
     for i in dat:
         for v in i['desvars']:
@@ -464,17 +277,15 @@ def get_driver_iteration_data(case_id, variable):
     return json.dumps(ret)
 
 
-def get_allvars(case_id):
+def get_all_driver_vars():
     """ get_allvars method
 
-    Grabs all variables in driver_iterations for a given case_id
+    Grabs all variables in driver_iterations
 
-    Args:
-        case_id (string): the case to be queried
     Returns:
         Array of string variable names
     """
-    dat = data.get_driver_iteration_data(case_id)
+    dat = data.get_driver_iteration_data()
     ret = []
     cache = []
     for i in dat:
@@ -521,114 +332,22 @@ def get_allvars(case_id):
     return json.dumps(ret)
 
 
-def get_driver_iteration_based_on_count(case_id, variable, count):
+def get_driver_iteration_based_on_count(variable, count):
     """ get_highest_driver_iteartion_count method
 
     Returns data if new data is available (checked by count)
 
     Args:
-        case_id (string): the case to be queried
         variable (string): the variable to be checked
         count (int): the max count up to this point
     Returns:
         JSON string of '[]' if no update necessary or the data
     """
-    if data.is_new_data(case_id, count):
-        s_data = get_driver_iteration_data(case_id, variable)
+    if data.is_new_data(count):
+        s_data = get_driver_iteration_data(variable)
         return s_data
 
     return "[]"
-
-
-def send_activated_email(token):
-    """ send_activated_email
-
-    Sends an email to the given user indicating that their
-    token has been activated
-
-    Args:
-        token (string): the token associated with the user
-    """
-    user = data.get_user(token)
-    if 'active' in user and user['active']:
-        subject = 'OpenMDAO Visualization Token Activated'
-        recipient = user['email']
-        message = 'Hey ' + user['name'] + ',\r\n\r\n'
-        message += 'Your OpenMDAO Visualization token has been activated.\
-                    \r\n\r\n'
-        message += 'Token: ' + user['token'] + '\r\n\r\n'
-        message += 'Sincerely,\r\nThe OpenMDAO Team'
-        _send_email(recipient, subject, message)
-
-
-def send_activation_email(token, name, email):
-    """ send_activation_email method
-
-    Sends an email over SMTP to request that an account be activated
-
-    Args:
-        token (string): the token that needs activating
-        name (string): the person's name
-        email (string): the person's email
-    """
-    if 'OPENMDAO_EMAIL' in os.environ:
-        recipient = os.environ['OPENMDAO_EMAIL']
-    else:
-        recipient = 'test_email@fake.com'
-        warnings.warn("OPENMDAO_EMAIL enivronment variable not set")
-    message = 'Activate new user: ' + name + ' with the email: ' + \
-        email + '\r\nhttp://openmdao.org/visualization/activate/' + token
-    subject = 'Activate OpenMDAO Visualization User'
-    _send_email(recipient, subject, message)
-
-
-def activate_account(token):
-    """ activate_account method
-
-    Activates the account associated with a given token
-
-    Args:
-        token(string): the token that needs activating
-    """
-    if db_type.is_mongodb():
-        data.activate_account(token)
-
-
-def _send_email(recipient, subject, message):
-    """ _send_email private method
-
-    Sends an email to the recipient with the given subject and message.
-
-    Args:
-        recipient (string): the email address to receive the message
-        subject (string): the email subject
-        message (string): the email body
-    """
-    if 'VISUALIZATION_EMAIL' in os.environ:
-        gmail_user = os.environ['VISUALIZATION_EMAIL']
-    else:
-        gmail_user = 'vis_email@fake.com'
-        warnings.warn("VISUALIZATION_EMAIL enivronment variable not set")
-    if 'VISUALIZATION_EMAIL_PASSWORD' in os.environ:
-        gmail_password = os.environ['VISUALIZATION_EMAIL_PASSWORD']
-    else:
-        gmail_password = ''
-        warnings.warn(
-            "VISUALIZATION_EMAIL_PASSWORD environment variable not set")
-
-    msg = MIMEMultipart()
-    msg['From'] = gmail_user
-    msg['To'] = recipient
-    msg['Subject'] = subject
-    msg.attach(MIMEText(message))
-
-    mail_server = smtplib.SMTP('smtp.gmail.com', 587)
-    mail_server.ehlo()
-    mail_server.starttls()
-    mail_server.ehlo()
-    mail_server.login(gmail_user, gmail_password)
-    mail_server.sendmail(gmail_user, recipient, msg.as_string())
-    mail_server.close()
 
 
 def _extract_iteration_coordinate(coord):

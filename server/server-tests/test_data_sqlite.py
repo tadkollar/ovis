@@ -11,6 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(
 
 from data_server.data.sqlite_data import SqliteData
 from data_server.shared import collection_names as collections
+from test_utils import create_new_db
 
 _data = SqliteData()
 
@@ -22,8 +23,21 @@ class TestSqliteData(unittest.TestCase):
                                                      'sellar_grouped_py3.db')
         self._sellar_grouped_location_py2 = os.path.join(os.path.dirname(__file__),
                                                          'sellar_grouped_py2.db')
-        self._temp_filepath = 'temp'
         self._generated_dbs = []
+
+    def create_new_db(self):
+        """ create_new_db
+
+        Generate a new SQLite DB and return path.
+
+        Returns:
+            Filepath as string
+        """
+        db_id = len(self._generated_dbs)
+        fname = create_new_db(db_id)
+        self._generated_dbs.append(fname)
+        return fname
+
 
     def tearDown(self):
         _data.disconnect()
@@ -47,7 +61,7 @@ class TestSqliteData(unittest.TestCase):
         self.assertFalse(_data.connect('not a real file'))
 
     def test_generate_layout_table(self):
-        f_name = self._create_new_db()
+        f_name = self.create_new_db()
 
         con = sqlite3.connect(f_name)
         with con:
@@ -69,28 +83,28 @@ class TestSqliteData(unittest.TestCase):
         self.assertIsNotNone(res)
 
     def test_generic_get_empty_driver_iteration(self):
-        f_name = self._create_new_db()
+        f_name = self.create_new_db()
         _data.connect(f_name)
         iteration = _data.generic_get(collections.DRIVER_ITERATIONS)
 
         self.assertEqual(iteration, "[]")
 
     def test_generic_get_empty_driver_metadata(self):
-        f_name = self._create_new_db()
+        f_name = self.create_new_db()
         _data.connect(f_name)
         metadata = _data.generic_get(collections.DRIVER_METADATA)
 
         self.assertEqual(json.loads(metadata), [])
 
     def test_generic_get_empty_layout(self):
-        f_name = self._create_new_db()
+        f_name = self.create_new_db()
         _data.connect(f_name)
         layout = _data.generic_get(collections.LAYOUTS)
 
         self.assertEqual(layout, "[]")
 
     def test_generic_get_unsupported_collection(self):
-        f_name = self._create_new_db()
+        f_name = self.create_new_db()
         _data.connect(f_name)
         sys_metadata = _data.generic_get(collections.SYSTEM_METADATA)
 
@@ -309,7 +323,7 @@ class TestSqliteData(unittest.TestCase):
         self.assertEqual(len(metadata['prom2abs']['output']), 7)
 
     def test_metadata_none(self):
-        f_name = self._create_new_db()
+        f_name = self.create_new_db()
         _data.connect(f_name)
         metadata = json.loads(_data.generic_get(collections.METADATA))
 
@@ -318,7 +332,7 @@ class TestSqliteData(unittest.TestCase):
         self.assertIsNone(metadata['prom2abs'])
 
     def test_update_layout(self):
-        f_name = self._create_new_db()
+        f_name = self.create_new_db()
         _data.connect(f_name)
         layout_s = _data.generic_get(collections.LAYOUTS)
         self.assertEqual(layout_s, '[]')
@@ -334,7 +348,7 @@ class TestSqliteData(unittest.TestCase):
         self.assertEqual(_data.get_driver_iteration_data(''), "[]")
 
     def test_is_no_new_data(self):
-        f_name = self._create_new_db()
+        f_name = self.create_new_db()
         _data.connect(f_name)
         self.assertFalse(_data.is_new_data('', 0))
 
@@ -343,7 +357,7 @@ class TestSqliteData(unittest.TestCase):
         self.assertFalse(_data.is_new_data('', 300))
 
     def test_is_new_data(self):
-        f_name = self._create_new_db()
+        f_name = self.create_new_db()
         _data.connect(f_name)
         self.assertFalse(_data.is_new_data('', 0))
         _data.disconnect()
@@ -401,56 +415,6 @@ class TestSqliteData(unittest.TestCase):
         Connects _data to the py2 version of the sellar grouped DB
         """
         _data.connect(self._sellar_grouped_location_py2)
-
-    def _create_new_db(self):
-        """ create_new_db private method
-
-        Generates a new SQLite DB with the appropriate schema and returns
-        the path to that DB.
-
-        Returns:
-            Filepath as string
-        """
-        f_name = os.path.join(os.path.dirname(__file__),
-                              self._temp_filepath +
-                              str(len(self._generated_dbs)) +
-                              '.db')
-        con = sqlite3.connect(f_name)
-        self._generated_dbs.append(f_name)
-
-        with con:
-            self.cursor = con.cursor()
-            self.cursor.execute("CREATE TABLE metadata( format_version INT, "
-                                "abs2prom BLOB, prom2abs BLOB, abs2meta BLOB)")
-            self.cursor.execute("INSERT INTO metadata(format_version, abs2prom, "
-                                "prom2abs) VALUES(?,?,?)",
-                                (1.0, None, None))
-
-            # used to keep track of the order of the case records across all
-            # three tables
-            self.cursor.execute("CREATE TABLE global_iterations(id INTEGER PRIMARY KEY, "
-                                "record_type TEXT, rowid INT)")
-            self.cursor.execute("CREATE TABLE driver_iterations(id INTEGER PRIMARY KEY, "
-                                "counter INT,iteration_coordinate TEXT, timestamp REAL, "
-                                "success INT, msg TEXT, inputs BLOB, outputs BLOB)")
-            self.cursor.execute("CREATE TABLE system_iterations(id INTEGER PRIMARY KEY, "
-                                "counter INT, iteration_coordinate TEXT,  timestamp REAL, "
-                                "success INT, msg TEXT, inputs BLOB, outputs BLOB, "
-                                "residuals BLOB)")
-            self.cursor.execute("CREATE TABLE solver_iterations(id INTEGER PRIMARY KEY, "
-                                "counter INT, iteration_coordinate TEXT, timestamp REAL, "
-                                "success INT, msg TEXT, abs_err REAL, rel_err REAL, "
-                                "solver_inputs BLOB, solver_output BLOB, "
-                                "solver_residuals BLOB)")
-
-            self.cursor.execute("CREATE TABLE driver_metadata(id TEXT PRIMARY KEY, "
-                                "model_viewer_data BLOB)")
-            self.cursor.execute("CREATE TABLE system_metadata(id TEXT PRIMARY KEY, "
-                                "scaling_factors BLOB, component_metadata BLOB)")
-            self.cursor.execute("CREATE TABLE solver_metadata(id TEXT PRIMARY KEY, "
-                                "solver_options BLOB, solver_class TEXT)")
-        con.close()
-        return f_name
 
 
 if __name__ == "__main__":

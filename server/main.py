@@ -18,40 +18,23 @@ import data_server.presentation.presentation as presentation
 from tornado.options import define, options
 define("port", default=18403)
 
-public_root = os.path.join(os.path.dirname(__file__), 'public')
-
 # define endpoints
 def get_app():
     app = tornado.web.Application(handlers=[
         (r"/connect", presentation.ConnectHandler),
-        (r"/logout", presentation.LogoutHandler),
-        (r"/case", presentation.CaseHandler),
-        (r"/case/([a-zA-Z]+)/(.*)",
-         web.StaticFileHandler, {'path': public_root}),
-        (r"/case/(\d+)", presentation.CaseHandler),
-        (r"/case/(\d+)/driver_iterations",
-            presentation.DriverIterationsHandler),
-        (r"/case/(\d+)/driver_iterations/([a-zA-Z0-9_.:]+)",
-         presentation.DriverIterationVariableHandler),
-        (r"/case/(\d+)/layout", presentation.LayoutHandler),
-        (r"/case/(\d+)/driver_metadata", presentation.DriverMetadataHandler),
-        (r"/case/(\d+)/global_iterations",
-            presentation.GlobalIterationsHandler),
-        (r"/case/(\d+)/metadata", presentation.MetadataHandler),
-        (r"/case/(\d+)/solver_iterations",
-            presentation.SolverIterationsHandler),
-        (r"/case/(\d+)/solver_metadata", presentation.SolverMetadataHandler),
-        (r"/case/(\d+)/system_iterations",
-            presentation.SystemIterationsHandler),
-        (r"/case/(\d+)/system_iterations/([a-zA-Z0-9_.:]+)",
-         presentation.SystemIterationVariableHandler),
-        (r"/case/(\d+)/system_metadata", presentation.SystemMetadataHandler),
-        (r"/token", presentation.TokenHandler),
-        (r"/login", presentation.LoginHandler),
-        (r"/activate/([a-zA-Z0-9]+)", presentation.ActivationHandler),
-        (r"/case/(\d+)/variables", presentation.VariablesHandler),
-        (r"/case/(\d+)/allvars", presentation.AllVarsHandler),
-        (r"/(.*)", web.StaticFileHandler, {'path': public_root})
+        (r"/driver_iterations", presentation.DriverIterationsHandler),
+        (r"/driver_iterations/([a-zA-Z0-9_.:]+)", presentation.DriverIterationVariableHandler),
+        (r"/layout", presentation.LayoutHandler),
+        (r"/driver_metadata", presentation.DriverMetadataHandler),
+        (r"/global_iterations", presentation.GlobalIterationsHandler),
+        (r"/metadata", presentation.MetadataHandler),
+        (r"/solver_iterations", presentation.SolverIterationsHandler),
+        (r"/solver_metadata", presentation.SolverMetadataHandler),
+        (r"/system_iterations", presentation.SystemIterationsHandler),
+        (r"/system_iterations/([a-zA-Z0-9_.:]+)", presentation.SystemIterationVariableHandler),
+        (r"/system_metadata", presentation.SystemMetadataHandler),
+        (r"/variables", presentation.VariablesHandler),
+        (r"/allvars", presentation.AllVarsHandler),
     ])
     return app
 

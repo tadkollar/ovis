@@ -9,7 +9,6 @@ import json
 import tornado.web as web
 import data_server.logic.logic as logic
 import data_server.shared.collection_names as collections
-import data_server.shared.data_type as db_type
 import data_server.shared.globals as globs
 
 
@@ -26,63 +25,6 @@ class ConnectHandler(web.RequestHandler):
             self.write({"Success": True})
         else:
             self.write({"Success": False})
-
-
-class LogoutHandler(web.RequestHandler):
-    """ LogoutHandler class
-
-    Contains logic for logging out a user
-    """
-
-    def get(self):
-        self.clear_cookie("token")
-
-
-class CaseHandler(web.RequestHandler):
-    """ CaseHandler class
-
-    Handles all get/post/delete for /case and /case/[0-9]+, which includes
-    rendering the dashboard if it is given a case ID, responding with
-    all cases if it isn't, posting a new case (responding with an ID),
-    and deleting everything associated with a given case ID.
-    """
-
-    def get(self, *params):
-        if db_type.is_mongodb():
-            if len(params) == 0:
-                self.write(logic.get_all_cases(
-                    self.request.headers.get('token')))
-            else:
-                self.render("../../public/dashboard.html")
-        else:
-            self.send_error(400)
-
-    def post(self):
-        body = json.loads(self.request.body)
-        c_id = logic.create_case(body, self.request.headers.get('token'))
-        ret = {'case_id': c_id}
-        ret['status'] = 'Success' if c_id != -1 else 'Failed to create ID'
-        self.write(ret)
-
-    def delete(self, *params):
-        ret = _get_ret()
-        if len(params) > 0 and \
-            logic.delete_case_with_id(params[0],
-                                      self.request.headers.get('token')):
-            self.write(ret)
-        else:
-            ret['status'] = 'Failed'
-            self.write(ret)
-
-    def patch(self, *params):
-        ret = _get_ret()
-        body = json.loads(self.request.body)
-        if 'name' in body and\
-                logic.update_case_name(body['name'], params[0]):
-            self.write(ret)
-        else:
-            ret['status'] = 'Failed'
-            self.write(ret)
 
 
 class LayoutHandler(web.RequestHandler):
@@ -244,66 +186,6 @@ class SystemMetadataHandler(web.RequestHandler):
         _generic_delete(collections.SYSTEM_METADATA, self, params[0])
 
 
-class TokenHandler(web.RequestHandler):
-    """ Token Handler class
-
-    Contains logic to create a new token if passed a username
-    """
-
-    def post(self, *params):
-        body = json.loads(self.request.body)
-        token = logic.create_token(body['name'], body['email'])
-        ret = _get_ret()
-        if token == -1:
-            ret['status'] = 'Failed'
-            ret['reasoning'] = 'Name already exists'
-        else:
-            logic.send_activation_email(token, body['name'], body['email'])
-            ret['token'] = token
-        self.write(ret)
-
-
-class LoginHandler(web.RequestHandler):
-    """ Login Handler class
-
-    Contains logic to determine if login is successfull
-    """
-
-    def post(self, *params):
-        body = json.loads(self.request.body)
-        ret = _get_ret()
-        if logic.token_exists(body['token']):
-            self.set_secure_cookie("token", body['token'])
-            self.write(ret)
-        else:
-            ret['status'] = 'Failed'
-            ret['reasoning'] = 'Bad key'
-            self.write(ret)
-
-    def get(self, *params):
-        token = str(self.get_secure_cookie("token"))
-        token = token.replace("b'", '')
-        token = token.replace("'", '')
-        if self.get_secure_cookie("token"):
-            cases = logic.get_all_cases(token)
-            self.render("../../public/list_cases.html",
-                        cases=cases, token=token)
-        else:
-            self.render("../../public/login.html")
-
-
-class ActivationHandler(web.RequestHandler):
-    """ Activation Handler class
-
-    Contains logic for activating an account
-    """
-
-    def get(self, *params):
-        self.write("<html>Account Activated</html>")
-        logic.activate_account(params[0])
-        logic.send_activated_email(params[0])
-
-
 class SystemIterationVariableHandler(web.RequestHandler):
     """ System Iteration Variable Handler class
 
@@ -355,11 +237,9 @@ class AllVarsHandler(web.RequestHandler):
     """
 
     def get(self, *params):
-        variables = logic.get_allvars(params[0])
+        variables = logic.get_all_driver_vars(params[0])
 
         self.write(variables)
-
-# region private_methods
 
 
 def _get_ret():
@@ -450,5 +330,3 @@ def _generic_delete(collection_name, request_handler, case_id):
     else:
         ret['status'] = 'Failed'
         request_handler.write(ret)
-
-# endregion
