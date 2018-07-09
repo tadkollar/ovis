@@ -108,6 +108,9 @@ class MetadataHandler(web.RequestHandler):
     def delete(self, *params):
         _generic_delete(collections.METADATA, self)
 
+    def post(self, *params):
+        _generic_post(collections.METADATA, self)
+
 
 class SolverIterationsHandler(web.RequestHandler):
     """ SolverIterationsHandler class
@@ -258,11 +261,8 @@ def _generic_post(collection_name, request_handler):
 
     ret=_get_ret()
     body=json.loads(request_handler.request.body)
-    if logic.generic_create(collection_name, body, request_handler.request.headers.get('update')):
-        request_handler.write(ret)
-    else:
-        ret['status']='Failed'
-        request_handler.write(ret)
+    ret['status']='Failed'
+    request_handler.write(ret)
 
 
 def _generic_delete(collection_name, request_handler):
@@ -280,8 +280,5 @@ def _generic_delete(collection_name, request_handler):
     """
 
     ret=_get_ret()
-    if logic.generic_delete(collection_name):
-        request_handler.write(ret)
-    else:
-        ret['status']='Failed'
-        request_handler.write(ret)
+    ret['status']='Failed'
+    request_handler.write(ret)
