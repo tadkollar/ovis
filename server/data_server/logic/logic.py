@@ -18,7 +18,7 @@ from six import PY2, PY3
 import data_server.shared.collection_names as collections
 from data_server.data.sqlite_data import SqliteData
 
-data = SqliteData()
+_data = SqliteData()
 
 
 def connect(location):
@@ -30,7 +30,15 @@ def connect(location):
     Returns:
         bool: True if connection established, False otherwise
     """
-    return data.connect(location)
+    return _data.connect(location)
+
+def disconnect():
+    """ disconnect method
+
+    Disconnect the data layer.
+    """
+    if _data is not None:
+        _data.disconnect()
 
 
 def update_layout(body):
@@ -39,44 +47,11 @@ def update_layout(body):
     Updates the layout for a given case.
 
     Args:
-        body (JSON): the body of the POST request
+        body (JSON): the new layout
     Returns:
         True if success, False otherwies
     """
-    return data.update_layout(body)
-
-
-def metadata_create(body):
-    """ metadata_create method
-
-    Creates/updates the metadata for a given case
-
-    Args:
-        body (JSON): the body containing abs2prom and prom2abs
-    Returns:
-        True if success, False otherwise
-    """
-    n_abs2prom = {'input': {}, 'output': {}}
-    n_prom2abs = {'input': {}, 'output': {}}
-
-    if body is not None and 'abs2prom' in body:
-        # replace all '.' with '___' in abs2prom and prom2abs
-        for io in ['input', 'output']:
-            for k in body['abs2prom'][io]:
-                n_k = k.replace('.', '___')
-                n_abs2prom[io][n_k] = body['abs2prom'][io][k]
-
-            for k in body['prom2abs'][io]:
-                n_k = k.replace('.', '___')
-                n_prom2abs[io][n_k] = body['prom2abs'][io][k]
-
-        n_body = {
-            'abs2prom': n_abs2prom,
-            'prom2abs': n_prom2abs
-        }
-        return data.generic_create(collections.METADATA, n_body, False)
-    else:
-        return data.generic_create(collections.METADATA, body, False)
+    return _data.update_layout(json.dumps(body))
 
 
 def metadata_get():
@@ -87,7 +62,7 @@ def metadata_get():
     n_abs2prom = {'input': {}, 'output': {}}
     n_prom2abs = {'input': {}, 'output': {}}
 
-    res = json.loads(data.generic_get(collections.METADATA, False))
+    res = _data.generic_get(collections.METADATA, False)
 
     if res is not None and 'abs2prom' in res:
         for io in ['input', 'output']:
@@ -102,10 +77,10 @@ def metadata_get():
         res['abs2prom'] = n_abs2prom
         res['prom2abs'] = n_prom2abs
 
-        return res
+        return json.dumps(res)
     else:
         print("No metadata stored")
-        return data.generic_get(collections.METADATA, False)
+        return "{}"
 
 
 def generic_get(collection_name, get_many=True):
@@ -120,104 +95,7 @@ def generic_get(collection_name, get_many=True):
     Returns:
         Array of documents
     """
-    return data.generic_get(collection_name, get_many)
-
-
-def generic_create(collection_name, body, update):
-    """ generic_create method
-
-    Performs the typical 'post' request. Takes the body, passes
-    it to the data layer to be added to the collection.
-
-    Args:
-        collection_name (string): the collection to be queried
-        body (json): document to be added to the collection
-        update (string): whether or not we're simply updating an existing
-            recording
-    Returns:
-        True if successfull, False otherwise
-    """
-    converted_update = False
-    if update == 'True':
-        converted_update = True
-    return data.generic_create(collection_name, body, converted_update)
-
-
-def generic_delete(collection_name):
-    """ generic_delete method
-
-    Performs the typical 'delete'. Passes the collection name and ID to the
-        data layer.
-    This should delete all documents in the collection.
-
-    Args:
-        collection_name (string): the collection to be queried
-    Returns:
-        True if successfull, False otherwise
-    """
-    return data.generic_delete(collection_name)
-
-
-def get_system_iteration_data(variable):
-    """ get_system_iteration_data method
-
-    Grabs and returns all data for a given variable over each iteration
-    in the system_iteration collection
-
-    Args:
-        variable (string): the variable whose data is to be used for querying
-    Returns:
-        Array of data
-    """
-    dat = data.get_system_iteration_data()
-    ret = []
-    for i in dat:
-        for v in i['inputs']:
-            if v['name'] == variable:
-                v['iteration'] = _extract_iteration_coordinate(
-                    i['iteration_coordinate'])
-                v['counter'] = i['counter']
-                v['type'] = 'input'
-                ret.append(v)
-
-        for v in i['outputs']:
-            if v['name'] == variable:
-                v['iteration'] = _extract_iteration_coordinate(
-                    i['iteration_coordinate'])
-                v['counter'] = i['counter']
-                v['type'] = 'output'
-                ret.append(v)
-
-        for v in i['residuals']:
-            if v['name'] == variable:
-                v['iteration'] = _extract_iteration_coordinate(
-                    i['iteration_coordinate'])
-                v['counter'] = i['counter']
-                v['type'] = 'residual'
-                ret.append(v)
-
-    return json.dumps(ret)
-
-
-def get_variables():
-    """ get_variables method
-
-    Grabs all variables in system_iterations
-
-    Returns:
-        Array of string variable names
-    """
-    dat = data.get_system_iteration_data()
-    ret = []
-    for i in dat:
-        for v in i['inputs']:
-            if v['name'] not in ret:
-                ret.append(v['name'])
-        for v in i['outputs']:
-            if v['name'] not in ret:
-                ret.append(v['name'])
-
-    return json.dumps(ret)
+    return json.dumps(_data.generic_get(collection_name, get_many))
 
 
 def get_driver_iteration_data(variable):
@@ -231,7 +109,7 @@ def get_driver_iteration_data(variable):
     Returns:
         Array of data
     """
-    dat = data.get_driver_iteration_data()
+    dat = _data.get_driver_iteration_data()
     ret = []
     for i in dat:
         for v in i['desvars']:
@@ -278,14 +156,14 @@ def get_driver_iteration_data(variable):
 
 
 def get_all_driver_vars():
-    """ get_allvars method
+    """ get_all_driver_vars method
 
     Grabs all variables in driver_iterations
 
     Returns:
         Array of string variable names
     """
-    dat = data.get_driver_iteration_data()
+    dat = _data.get_driver_iteration_data()
     ret = []
     cache = []
     for i in dat:
@@ -341,9 +219,9 @@ def get_driver_iteration_based_on_count(variable, count):
         variable (string): the variable to be checked
         count (int): the max count up to this point
     Returns:
-        JSON string of '[]' if no update necessary or the data
+        JSON string of the data or of '[]' if no update necessary
     """
-    if data.is_new_data(count):
+    if _data.is_new_data(count):
         s_data = get_driver_iteration_data(variable)
         return s_data
 

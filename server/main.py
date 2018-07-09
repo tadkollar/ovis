@@ -31,9 +31,7 @@ def get_app():
         (r"/solver_iterations", presentation.SolverIterationsHandler),
         (r"/solver_metadata", presentation.SolverMetadataHandler),
         (r"/system_iterations", presentation.SystemIterationsHandler),
-        (r"/system_iterations/([a-zA-Z0-9_.:]+)", presentation.SystemIterationVariableHandler),
         (r"/system_metadata", presentation.SystemMetadataHandler),
-        (r"/variables", presentation.VariablesHandler),
         (r"/allvars", presentation.AllVarsHandler),
     ])
     return app

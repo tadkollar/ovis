@@ -52,46 +52,6 @@ class BaseData(object):
         """
         raise NotImplementedError()
 
-    def generic_create(self, collection_name, body, update):
-        """ generic_create method
-
-        Performs a generic 'post' request, which takes the body,
-        adds a timestamp, and inserts it into the collection.
-        Returns True if it succeeded, False otherwise.
-
-        Args:
-            collection_name (string): the collection to query
-            body (json): the document to be added to the collection
-            update (bool): if we're updating the data or simply adding new data
-        Returns:
-            True if successfull, False otherwise
-        """
-        raise NotImplementedError()
-
-    def generic_delete(self, collection_name):
-        """ generic_delete method
-
-        Performs a generic 'delete' request, which attempts to delete all
-        documents from the given collection.
-        Returns True if anything was deleted, False otherwise.
-
-        Args:
-            collection_name (string): the collection to query
-        Returns:
-            True if successfull, False otherwise
-        """
-        raise NotImplementedError()
-
-    def get_system_iteration_data(self):
-        """ get_system_iteration_data method
-
-        Grabs all data for all system iterations for a given case
-
-        Returns:
-            Array of data
-        """
-        raise NotImplementedError()
-
     def get_driver_iteration_data(self):
         """ get_driver_iteration_data method
 

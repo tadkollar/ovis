@@ -56,7 +56,7 @@ class SqliteData(BaseData):
             return False
 
         if self.connection is not None:
-            self.connection.close()
+            self.disconnect()
 
         self.connection = sqlite3.connect(self.filename)
         with self.connection:
@@ -97,17 +97,20 @@ class SqliteData(BaseData):
         """ update_layout method
 
         Updates the layout for a given case. Creates new layout if
-        one does not already exist.abs
+        one does not already exist.
 
         Args:
-            body (JSON): the body of the POST request
+            body (string): the layout as a JSON string
         Returns:
             True if success, False otherwies
         """
+        if self.connection is None:
+            return False
+
         with self.connection:
             self.cursor = self.connection.cursor()
             self.cursor.execute("INSERT OR REPLACE INTO layouts VALUES (?,?)",
-                                (0, json.dumps(body)))
+                                (0, body))
 
         return True
 
@@ -125,7 +128,7 @@ class SqliteData(BaseData):
             JSON array of documents returned from the query
         """
         if collection_name is collections.DRIVER_ITERATIONS:
-            return json.dumps(self._get_driver_iterations())
+            return self._get_driver_iterations(get_many)
         elif collection_name is collections.DRIVER_METADATA:
             return self._get_driver_metadata()
         elif collection_name is collections.LAYOUTS:
@@ -133,7 +136,7 @@ class SqliteData(BaseData):
         elif collection_name is collections.METADATA:
             return self._get_metadata()
         else:
-            return "[]"
+            return []
 
     def get_driver_iteration_data(self):
         """ get_driver_iteration_data method
@@ -144,26 +147,6 @@ class SqliteData(BaseData):
             Array of data
         """
         return self._get_driver_iterations()
-
-    def generic_delete(self, collection_name):
-        """ generic_delete method
-
-        Currently unimplemented, always returns False to indicate failure.
-
-        Returns:
-            False
-        """
-        return False
-
-    def generic_create(self, collection_name, body, update):
-        """ generic_create method
-
-        Currently unimplemented, always returns False to indicate fialure.
-
-        Freturns:
-            False
-        """
-        return False
 
     def is_new_data(self, count):
         """ is_new_data method
@@ -176,6 +159,9 @@ class SqliteData(BaseData):
             True if new data is available, False otherwise
         """
         rows = None
+
+        if self.connection is None:
+            return False
 
         with self.connection:
             self.cursor = self.connection.cursor()
@@ -240,21 +226,26 @@ class SqliteData(BaseData):
         else:
             return obj
 
-    def _get_driver_iterations(self):
+    def _get_driver_iterations(self, get_many=True):
         """ _get_driver_iterations method
 
         Grabs all of the driver iterations in the current DB and returns
         them as JSON.
+
+        Args:
+        -----
+        get_many (bool): if True, grabs all, otherwise grabs first
 
         Returns
         -------
         [JSON] :
             the list of all driver iterations as JSON
         """
-        if self.connection is None:
-            return "[]"
-
         ret = []
+
+        if self.connection is None:
+            return []
+
         with self.connection:
             self.cursor = self.connection.cursor()
             self.cursor.execute(
@@ -262,9 +253,7 @@ class SqliteData(BaseData):
                  inputs, outputs, counter FROM driver_iterations")
             rows = self.cursor.fetchall()
 
-            # NOTE: responses is None right now because blob_to_array isn't working for responses
-            #   that are made in python3 when you're running the server in python2. However,
-            #   they're irrelevant for visualization.
+            # format the rows so we can use them most easily
             for row in rows:
                 n_row = {}
                 n_row['iteration_coordinate'] = row[0]
@@ -277,10 +266,10 @@ class SqliteData(BaseData):
 
                 ret.append(n_row)
 
+        # gather desvars, objectives, constraints, sysincludes, and inputs
         final_ret = []
         for data in ret:
             desvars_array = []
-            responses_array = []
             objectives_array = []
             constraints_array = []
             sysincludes_array = []
@@ -288,36 +277,31 @@ class SqliteData(BaseData):
             for name in data['outputs'].dtype.names:
                 types = self.abs2meta[name]['type']
 
-                if 'response' in types:
-                    responses_array.append({
-                        'name': name,
-                        'values': self.convert_to_list(data['outputs'][name])
-                    })
                 if 'desvar' in types:
                     desvars_array.append({
                         'name': name,
-                        'values': self.convert_to_list(data['outputs'][name])
+                        'values': self.convert_to_list(data['outputs'][name])[0]
                     })
                 elif 'objective' in types:
                     objectives_array.append({
                         'name': name,
-                        'values': self.convert_to_list(data['outputs'][name])
+                        'values': self.convert_to_list(data['outputs'][name])[0]
                     })
                 elif 'constraint' in types:
                     constraints_array.append({
                         'name': name,
-                        'values': self.convert_to_list(data['outputs'][name])
+                        'values': self.convert_to_list(data['outputs'][name])[0]
                     })
                 else:
                     sysincludes_array.append({
                         'name': name,
-                        'values': self.convert_to_list(data['outputs'][name])
+                        'values': self.convert_to_list(data['outputs'][name])[0]
                     })
 
             for name in data['inputs'].dtype.names:
                 inputs_array.append({
                     'name': name,
-                    'values': self.convert_to_list(data['inputs'][name])
+                    'values': self.convert_to_list(data['inputs'][name])[0]
                 })
 
             final_ret.append({
@@ -328,8 +312,6 @@ class SqliteData(BaseData):
                 'counter': data['counter'],
                 "desvars": [] if len(desvars_array) is 0
                 else desvars_array,
-                "responses": [] if len(responses_array) is 0
-                else responses_array,
                 "objectives": [] if len(objectives_array) is 0
                 else objectives_array,
                 "constraints": [] if len(constraints_array) is 0
@@ -339,7 +321,12 @@ class SqliteData(BaseData):
                 "inputs": [] if len(inputs_array) is 0 else inputs_array
             })
 
-        return final_ret
+        if get_many:
+            return final_ret
+        elif len(final_ret) > 0:
+            return [final_ret[0]]
+        else:
+            return []
 
     def _get_driver_metadata(self):
         """ _get_driver_metadata(self):
@@ -348,21 +335,25 @@ class SqliteData(BaseData):
 
         Returns
         -------
-        String :
+        JSON :
             The JSON driver metadata
         """
         ret = {}
+
+        if self.connection is None:
+            return {}
+
         with self.connection:
             self.cursor = self.connection.cursor()
             self.cursor.execute("SELECT model_viewer_data\
                                  FROM driver_metadata")
             row = self.cursor.fetchone()
             if row is None:
-                return "[]"
+                return {}
 
             ret = self.blob_to_array(row[0])
 
-        return json.dumps([{'model_viewer_data': ret}])
+        return [{'model_viewer_data': ret}]
 
     def _get_metadata(self):
         """ _get_metadata
@@ -378,6 +369,9 @@ class SqliteData(BaseData):
             'abs2prom': {},
             'prom2abs': {},
         }
+        
+        if self.connection is None:
+            return {}
 
         with self.connection:
             self.cursor = self.connection.cursor()
@@ -402,7 +396,7 @@ class SqliteData(BaseData):
                     ret['prom2abs'] = pickle.loads(
                         bytes(row[1], 'utf-8')) if row[1] is not None else None
 
-        return json.dumps(ret)
+        return ret
 
     def _get_layout(self):
         """ _get_layout method
@@ -415,13 +409,17 @@ class SqliteData(BaseData):
             the layout for this case if one exists, [] otherwise
         """
         ret = None
+
+        if self.connection is None:
+            return []
+
         with self.connection:
             self.cursor = self.connection.cursor()
             self.cursor.execute("SELECT layout FROM layouts WHERE id=0")
             row = self.cursor.fetchone()
             if row is None:
-                ret = "[]"
+                ret = []
             else:
-                ret = json.dumps([json.loads(row[0])])
+                ret = [json.loads(row[0])]
 
         return ret

@@ -9,8 +9,6 @@ from tornado.testing import AsyncHTTPTestCase
 
 sys.path.append(os.path.abspath(os.path.join(
     os.path.dirname(__file__), os.path.pardir)))
-import data_server.shared.data_type as db_type
-db_type.DB_TYPE = 'SQLite'
 import main
 
 
@@ -20,7 +18,7 @@ class TestPresentationLayer(AsyncHTTPTestCase):
 
     def _connect_sellar_grouped(self):
         file_path = os.path.join(os.path.dirname(__file__),
-                                 'sellar_grouped_py3.db')
+                                 'sellar_grouped_py2.db')
         body = {'location': file_path}
         response = self.fetch('/connect', method='POST',
                               body=json.dumps(body))
@@ -36,10 +34,7 @@ class TestPresentationLayer(AsyncHTTPTestCase):
 
     def test_case_handler_get(self):
         response = self.fetch('/case')
-        if db_type.is_sqlite():
-            self.assertEqual(response.code, 400)
-        else:
-            self.assertEqual(response.code, 200)
+        self.assertEqual(response.code, 400)
 
     def test_case_handler_post(self):
         response = self.fetch('/case', method='POST', body='{"token": 123}')

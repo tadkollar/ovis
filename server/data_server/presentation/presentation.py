@@ -9,7 +9,6 @@ import json
 import tornado.web as web
 import data_server.logic.logic as logic
 import data_server.shared.collection_names as collections
-import data_server.shared.globals as globs
 
 
 class ConnectHandler(web.RequestHandler):
@@ -35,10 +34,10 @@ class LayoutHandler(web.RequestHandler):
     """
 
     def get(self, *params):
-        _generic_get(collections.LAYOUTS, self, params[0], globs.BASIC_ACCESS_TOKEN)
+        _generic_get(collections.LAYOUTS, self)
 
     def post(self, *params):
-        ret = logic.update_layout(json.loads(self.request.body), params[0])
+        ret = logic.update_layout(json.loads(self.request.body))
         write = {}
         write['status'] = 'Success' if ret else 'Failed'
         self.write(write)
@@ -52,13 +51,13 @@ class DriverIterationsHandler(web.RequestHandler):
     """
 
     def get(self, *params):
-        _generic_get(collections.DRIVER_ITERATIONS, self, params[0])
+        _generic_get(collections.DRIVER_ITERATIONS, self)
 
     def post(self, *params):
-        _generic_post(collections.DRIVER_ITERATIONS, self, params[0])
+        _generic_post(collections.DRIVER_ITERATIONS, self)
 
     def delete(self, *params):
-        _generic_delete(collections.DRIVER_ITERATIONS, self, params[0])
+        _generic_delete(collections.DRIVER_ITERATIONS, self)
 
 
 class DriverMetadataHandler(web.RequestHandler):
@@ -69,13 +68,13 @@ class DriverMetadataHandler(web.RequestHandler):
     """
 
     def get(self, *params):
-        _generic_get(collections.DRIVER_METADATA, self, params[0], globs.BASIC_ACCESS_TOKEN)
+        _generic_get(collections.DRIVER_METADATA, self)
 
     def post(self, *params):
-        _generic_post(collections.DRIVER_METADATA, self, params[0])
+        _generic_post(collections.DRIVER_METADATA, self)
 
     def delete(self, *params):
-        _generic_delete(collections.DRIVER_METADATA, self, params[0])
+        _generic_delete(collections.DRIVER_METADATA, self)
 
 
 class GlobalIterationsHandler(web.RequestHandler):
@@ -86,13 +85,13 @@ class GlobalIterationsHandler(web.RequestHandler):
     """
 
     def get(self, *params):
-        _generic_get(collections.GLOBAL_ITERATIONS, self, params[0])
+        _generic_get(collections.GLOBAL_ITERATIONS, self)
 
     def post(self, *params):
-        _generic_post(collections.GLOBAL_ITERATIONS, self, params[0])
+        _generic_post(collections.GLOBAL_ITERATIONS, self)
 
     def delete(self, *params):
-        _generic_delete(collections.GLOBAL_ITERATIONS, self, params[0])
+        _generic_delete(collections.GLOBAL_ITERATIONS, self)
 
 
 class MetadataHandler(web.RequestHandler):
@@ -103,19 +102,11 @@ class MetadataHandler(web.RequestHandler):
     """
 
     def get(self, *params):
-        ret = logic.metadata_get(params[0], globs.BASIC_ACCESS_TOKEN)
+        ret = logic.metadata_get()
         self.write(ret)
 
-    def post(self, *params):
-        body = json.loads(self.request.body)
-        if(logic.metadata_create(body, params[0],
-                                 self.request.headers.get('token'))):
-            self.write({'status': 'Success'})
-        else:
-            self.write({'status': 'Failed'})
-
     def delete(self, *params):
-        _generic_delete(collections.METADATA, self, params[0])
+        _generic_delete(collections.METADATA, self)
 
 
 class SolverIterationsHandler(web.RequestHandler):
@@ -126,13 +117,13 @@ class SolverIterationsHandler(web.RequestHandler):
     """
 
     def get(self, *params):
-        _generic_get(collections.SOLVER_ITERATIONS, self, params[0])
+        _generic_get(collections.SOLVER_ITERATIONS, self)
 
     def post(self, *params):
-        _generic_post(collections.SOLVER_ITERATIONS, self, params[0])
+        _generic_post(collections.SOLVER_ITERATIONS, self)
 
     def delete(self, *params):
-        _generic_delete(collections.SOLVER_ITERATIONS, self, params[0])
+        _generic_delete(collections.SOLVER_ITERATIONS, self)
 
 
 class SolverMetadataHandler(web.RequestHandler):
@@ -143,13 +134,13 @@ class SolverMetadataHandler(web.RequestHandler):
     """
 
     def get(self, *params):
-        _generic_get(collections.SOLVER_METADATA, self, params[0])
+        _generic_get(collections.SOLVER_METADATA, self)
 
     def post(self, *params):
-        _generic_post(collections.SOLVER_METADATA, self, params[0])
+        _generic_post(collections.SOLVER_METADATA, self)
 
     def delete(self, *params):
-        _generic_delete(collections.SOLVER_METADATA, self, params[0])
+        _generic_delete(collections.SOLVER_METADATA, self)
 
 
 class SystemIterationsHandler(web.RequestHandler):
@@ -160,13 +151,13 @@ class SystemIterationsHandler(web.RequestHandler):
     """
 
     def get(self, *params):
-        _generic_get(collections.SYSTEM_ITERATIONS, self, params[0])
+        _generic_get(collections.SYSTEM_ITERATIONS, self)
 
     def post(self, *params):
-        _generic_post(collections.SYSTEM_ITERATIONS, self, params[0])
+        _generic_post(collections.SYSTEM_ITERATIONS, self)
 
     def delete(self, *params):
-        _generic_delete(collections.SYSTEM_ITERATIONS, self, params[0])
+        _generic_delete(collections.SYSTEM_ITERATIONS, self)
 
 
 class SystemMetadataHandler(web.RequestHandler):
@@ -177,38 +168,13 @@ class SystemMetadataHandler(web.RequestHandler):
     """
 
     def get(self, *params):
-        _generic_get(collections.SYSTEM_METADATA, self, params[0])
+        _generic_get(collections.SYSTEM_METADATA, self)
 
     def post(self, *params):
-        _generic_post(collections.SYSTEM_METADATA, self, params[0])
+        _generic_post(collections.SYSTEM_METADATA, self)
 
     def delete(self, *params):
-        _generic_delete(collections.SYSTEM_METADATA, self, params[0])
-
-
-class SystemIterationVariableHandler(web.RequestHandler):
-    """ System Iteration Variable Handler class
-
-    Contains logic to grab the system iteration data for
-    a specific variable
-    """
-
-    def get(self, *params):
-        data = logic.get_system_iteration_data(params[0], params[1])
-
-        self.write(data)
-
-
-class VariablesHandler(web.RequestHandler):
-    """ Variables handler class
-
-    Contains logic to get variables for a given case
-    """
-
-    def get(self, *params):
-        variables = logic.get_variables(params[0])
-
-        self.write(variables)
+        _generic_delete(collections.SYSTEM_METADATA, self)
 
 
 class DriverIterationVariableHandler(web.RequestHandler):
@@ -220,12 +186,11 @@ class DriverIterationVariableHandler(web.RequestHandler):
 
     def get(self, *params):
         if 'cur_max_count' in self.request.headers:
-            data =\
-                logic.get_driver_iteration_based_on_count(params[0], params[1],
+            data=logic.get_driver_iteration_based_on_count(params[0],
                                                           self.request.headers.
                                                           get('cur_max_count'))
         else:
-            data = logic.get_driver_iteration_data(params[0], params[1])
+            data=logic.get_driver_iteration_data(params[0])
 
         self.write(data)
 
@@ -237,7 +202,7 @@ class AllVarsHandler(web.RequestHandler):
     """
 
     def get(self, *params):
-        variables = logic.get_all_driver_vars(params[0])
+        variables=logic.get_all_driver_vars()
 
         self.write(variables)
 
@@ -254,12 +219,12 @@ def _get_ret():
         hashmap: 'status' set to 'Success'
     """
 
-    ret = {}
-    ret['status'] = 'Success'
+    ret={}
+    ret['status']='Success'
     return ret
 
 
-def _generic_get(collection_name, request_handler, case_id, token=None):
+def _generic_get(collection_name, request_handler):
     """ _generic_get private method
 
     Performs a typical 'get' request which accesses the collection given
@@ -269,20 +234,15 @@ def _generic_get(collection_name, request_handler, case_id, token=None):
     Args:
         collection_name (string): name of collection to access
         request_handler (Object): object used for responding with data
-        case_id (string || int): the associated case_id for querying
-        token (string): token to be used. If set to None (default)
-            will automaticlaly grab from header
     Returns:
         None
     """
 
-    if token is None:
-        token = request_handler.request.headers.get('token')
-    dat = logic.generic_get(collection_name, case_id, token)
+    dat=logic.generic_get(collection_name)
     request_handler.write(dat)
 
 
-def _generic_post(collection_name, request_handler, case_id):
+def _generic_post(collection_name, request_handler):
     """ _generic_post private method
 
     Performs a typical 'post' request which adds the body of the
@@ -292,23 +252,20 @@ def _generic_post(collection_name, request_handler, case_id):
     Args:
         collection_name (string): name of collection to access
         request_handler (Object): object used for responding with data
-        case_id (string || int): the associated case_id for querying
     Returns:
         None
     """
 
-    ret = _get_ret()
-    body = json.loads(request_handler.request.body)
-    if logic.generic_create(collection_name, body, case_id,
-                            request_handler.request.headers.get('token'),
-                            request_handler.request.headers.get('update')):
+    ret=_get_ret()
+    body=json.loads(request_handler.request.body)
+    if logic.generic_create(collection_name, body, request_handler.request.headers.get('update')):
         request_handler.write(ret)
     else:
-        ret['status'] = 'Failed'
+        ret['status']='Failed'
         request_handler.write(ret)
 
 
-def _generic_delete(collection_name, request_handler, case_id):
+def _generic_delete(collection_name, request_handler):
     """ _generic_delete private method
 
     Performs a typical 'delete' request which removes all instances
@@ -318,15 +275,13 @@ def _generic_delete(collection_name, request_handler, case_id):
     Args:
         collection_name (string): name of collection to access
         request_handler (Object): object used for responding with data
-        case_id (string || int): the associated case_id for querying
     Returns:
         None
     """
 
-    ret = _get_ret()
-    if logic.generic_delete(collection_name, case_id,
-                            request_handler.request.headers.get('token')):
+    ret=_get_ret()
+    if logic.generic_delete(collection_name):
         request_handler.write(ret)
     else:
-        ret['status'] = 'Failed'
+        ret['status']='Failed'
         request_handler.write(ret)
