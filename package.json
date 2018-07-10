@@ -69,7 +69,7 @@
     "dist:m": "build -m --x64",
     "dist:w": "build -w --x64",
     "build": "./build_electron.sh",
-    "test": "./node_modules/mocha/bin/mocha frontend-tests"
+    "test": "python -m unittest discover server/server-tests; ./node_modules/mocha/bin/mocha frontend-tests",
   },
   "postinstall": "electron-builder install-app-deps"
 }

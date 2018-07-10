@@ -213,3 +213,14 @@ exports.removeN2 = function(app) {
         });
     });
 };
+
+exports.clickPlot = function(app) {
+    return new Promise(function(resolve, reject) {
+        app.client.waitUntilWindowLoaded().then(() => {
+            app.client
+                .element('#plot')
+                .click()
+                .then(() => resolve());
+        });
+    });
+};

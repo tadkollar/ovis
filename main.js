@@ -71,7 +71,7 @@ function findFile() {
         });
     } else {
         logger.info('Opening sellar grouped in Spectron environment');
-        openFile(__dirname + '/server/server-tests/sellar_grouped_py3.db');
+        openFile(__dirname + '/server/server-tests/sellar_grouped_py2.db');
     }
 }
 

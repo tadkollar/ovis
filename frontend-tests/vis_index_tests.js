@@ -146,14 +146,4 @@ describe('Test OVis Vis Page', () => {
     it('initially enabled plot button', done => {
         helper.assertAddPlotButtonEnabled(app).then(() => done());
     }).timeout(timeoutTime);
-
-    // Initially, the plot controls should not display
-    // it('display none for plot controls', done => {
-    //     app.client.waitUntilWindowLoaded().then(() => {
-    //         app.client.element('#plotControls').then(e => {
-    //             e.should.have.style('display', 'none');
-    //             done();
-    //         });
-    //     });
-    // }).timeout(timeoutTime);
 });
