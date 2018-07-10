@@ -12,9 +12,10 @@ function Server() {
      */
     this.getMetadata = function(callback, error = null) {
         http.server_get(
-            'case/' + case_id + '/metadata',
+            'metadata',
             function(result) {
                 if (result !== '[]' && result !== 'null') {
+                    result = JSON.parse(result);
                     callback(result.abs2prom, result.prom2abs);
                 } else {
                     callback(null, null);
@@ -32,7 +33,7 @@ function Server() {
      */
     this.getVars = function(callback, error = null) {
         http.server_get(
-            'case/' + case_id + '/allvars',
+            'allvars',
             function(result) {
                 result = JSON.parse(result);
                 let designVariables = [];
@@ -98,7 +99,7 @@ function Server() {
         }
 
         http.server_get(
-            'case/' + case_id + '/driver_iterations/' + name,
+            'driver_iterations/' + name,
             function(result) {
                 callback(JSON.parse(result));
             },
@@ -115,7 +116,7 @@ function Server() {
      */
     this.getLayout = function(callback, error = null) {
         http.server_get(
-            'case/' + case_id + '/layout',
+            'layout',
             function(ret) {
                 callback(JSON.parse(ret));
             },
@@ -131,7 +132,7 @@ function Server() {
      */
     this.getDriverMetadata = function(callback, error = null) {
         http.server_get(
-            'case/' + case_id + '/driver_metadata',
+            'driver_metadata',
             function(response) {
                 var data = JSON.parse(response)[0];
                 callback(data);
@@ -152,7 +153,7 @@ function Server() {
         let body = {
             layout: state
         };
-        http.server_post('case/' + case_id + '/layout', body, callback, error);
+        http.server_post('layout', body, callback, error);
     };
 }
 

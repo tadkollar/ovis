@@ -45,12 +45,11 @@ function HTTP() {
      * base URL) and cals success or error callback
      *
      * @param path - the URL excluding the base URL (which is automatically prepened)
-     * @param token - the token to use to delete
      * @param success - the success callback
      * @param error - the failure callback.
      */
-    this.server_delete = function(path, token, success, error) {
-        this.delete(this.baseURL + path, token, success, error);
+    this.server_delete = function(path, success, error) {
+        this.delete(this.baseURL + path, success, error);
     };
 
     /**
@@ -130,19 +129,15 @@ function HTTP() {
      * and cals success or error callback
      *
      * @param path - the URL
-     * @param token - the token to use to delete
      * @param success - the success callback
      * @param error - the failure callback.
      */
-    this.delete = function(path, token, success, error) {
+    this.delete = function(path, success, error) {
         $.ajax({
             url: path,
             type: 'DELETE',
             success: function(response) {
                 success(response);
-            },
-            beforeSend: function(request) {
-                request.setRequestHeader('token', token);
             }
         });
     };

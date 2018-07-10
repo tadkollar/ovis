@@ -322,5 +322,4 @@ function Layout() {
 
 // Arbitrary case ID at the moment because it isn't used by the server
 // at this time (vestigial).
-var case_id = '1885148375';
 const layout = new Layout();

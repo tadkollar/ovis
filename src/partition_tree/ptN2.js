@@ -2182,7 +2182,6 @@ var treeData = null;
 var connectionList;
 var url = window.location.href;
 var url_split = url.split('/');
-var case_id = '1885148375';
 var modal;
 var search;
 
