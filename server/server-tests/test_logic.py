@@ -95,6 +95,22 @@ class TestLogic(unittest.TestCase):
     def test_read_metadata_empty(self):
         self.assertEqual(logic.metadata_get(), '{}')
 
+    def test_get_all_driver_vars_sellar(self):
+        self.connect_to_sellar2()
+        vs = json.loads(logic.get_all_driver_vars())
+        self.assertEqual(len(vs), 18)
+        expected_vars = ['pz.z', 'px.x', 'obj_cmp.obj', 'con_cmp1.con1', 'con_cmp2.con2',
+                         'mda.d2.y2', 'mda.d1.y1', 'mda.d2.y1', 'con_cmp2.y2', 'mda.d1.x',
+                         'mda.d1.z', 'obj_cmp.x', 'obj_cmp.z', 'obj_cmp.y1', 'obj_cmp.y2',
+                         'mda.d2.z', 'con_cmp1.y1', 'mda.d1.y2']
+
+        for v in vs:
+            name = v['name']
+            self.assertTrue(name in expected_vars)
+            expected_vars.remove(name)
+
+        self.assertEqual(len(expected_vars), 0)
+
     def test_get_layout_empty(self):
         self.assertEqual(logic.generic_get(collections.LAYOUTS), '[]')
 
@@ -152,6 +168,34 @@ class TestLogic(unittest.TestCase):
     def test_empty_get_driver_iteration(self):
         self.connect_basic_db()
         self.assertEqual(logic.get_driver_iteration_data('test'), '[]')
+
+    def test_get_driver_iteration_data_desvar(self):
+        self.connect_to_sellar2()
+        pz_z = json.loads(logic.get_driver_iteration_data('pz.z'))
+        self.assertEqual(len(pz_z), 7)
+        for it in pz_z:
+            self.assertEqual(it['name'], 'pz.z')
+
+    def test_get_driver_iteration_data_objective(self):
+        self.connect_to_sellar2()
+        o_cmp = json.loads(logic.get_driver_iteration_data('obj_cmp.obj'))
+        self.assertEqual(len(o_cmp), 7)
+        for it in o_cmp:
+            self.assertEqual(it['name'], 'obj_cmp.obj')
+
+    def test_get_driver_iteration_data_constraint(self):
+        self.connect_to_sellar2()
+        con1 = json.loads(logic.get_driver_iteration_data('con_cmp1.con1'))
+        self.assertEqual(len(con1), 7)
+        for it in con1:
+            self.assertEqual(it['name'], 'con_cmp1.con1')
+
+    def test_get_driver_iteration_data_sysinclude(self):
+        self.connect_to_sellar2()
+        mda_y2 = json.loads(logic.get_driver_iteration_data('mda.d2.y2'))
+        self.assertEqual(len(mda_y2), 7)
+        for it in mda_y2:
+            self.assertEqual(it['name'], 'mda.d2.y2')
 
     def test_sellar_get_driver_iteration(self):
         self.connect_to_sellar2()

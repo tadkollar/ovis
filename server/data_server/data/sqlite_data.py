@@ -40,10 +40,14 @@ class SqliteData(BaseData):
         """ disconnect method
 
         Closes the DB connection if it is still open
+
+        Returns:
+            bool: True if success, False otherwise
         """
         if self.connection is not None:
             self.connection.close()
         self.connection = None
+        return True
 
     def connect(self, location):
         """ connect method

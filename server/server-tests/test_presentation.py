@@ -10,11 +10,38 @@ from tornado.testing import AsyncHTTPTestCase
 sys.path.append(os.path.abspath(os.path.join(
     os.path.dirname(__file__), os.path.pardir)))
 import main
+from test_utils import create_basic_db
 
 
 class TestPresentationLayer(AsyncHTTPTestCase):
     def get_app(self):
         return main.get_app()
+
+    def __init__(self, *args, **kwargs):
+        super(TestPresentationLayer, self).__init__(*args, **kwargs)
+        self._generated_dbs = []
+
+    def tearDown(self):
+        for p in self._generated_dbs:
+            try:
+                if os.path.isfile(p):
+                    os.remove(p)
+            except OSError as e:
+                print(e)
+        self._generated_dbs = []
+
+    def create_basic_db(self):
+        """ use_basic_db
+
+        Generate a basic SQLite DB with one driver iteration
+
+        Returns:
+            filename
+        """
+        db_id = len(self._generated_dbs)
+        fname = create_basic_db(db_id)
+        self._generated_dbs.append(fname)
+        return fname
 
     def _connect_sellar_grouped(self):
         file_path = os.path.join(os.path.dirname(__file__),
@@ -28,11 +55,31 @@ class TestPresentationLayer(AsyncHTTPTestCase):
         response = self._connect_sellar_grouped()
         self.assertEqual(response.code, 200)
 
+    def test_disconnect(self):
+        self._connect_sellar_grouped()
+        response = self.fetch('/disconnect')
+        self.assertEqual(response.code, 200)
+        res_body = json.loads(response.body)
+        self.assertEqual(res_body, {'status': 'Success'})
+
     def test_get_layout(self):
         self._connect_sellar_grouped()
         response = self.fetch('/layout')
         self.assertEqual(response.code, 200)
         self.assertIsNotNone(response.body)
+
+    def test_post_layout(self):
+        fname = self.create_basic_db()
+        response = self.fetch('/connect', method='POST', body=json.dumps({'location': fname}))
+        self.assertEqual(response.code, 200)
+        response_layout1 = json.loads(self.fetch('/layout').body)
+        self.assertEqual(response_layout1, [])
+        succ = self.fetch('/layout', method='POST', body=json.dumps({'test': True}))
+        self.assertEqual(succ.code, 200)
+        self.assertEqual(json.loads(succ.body), {'status': 'Success'})
+        response_layout2 = json.loads(self.fetch('/layout').body)
+        self.assertEqual(response_layout2, [{'test': True}])
+        self.fetch('/disconnect')
 
     def test_driver_iteration_get(self):
         self._connect_sellar_grouped()

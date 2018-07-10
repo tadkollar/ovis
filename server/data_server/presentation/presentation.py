@@ -25,6 +25,20 @@ class ConnectHandler(web.RequestHandler):
         else:
             self.write({"Success": False})
 
+class DisconnectHandler(web.RequestHandler):
+    """ ConnectHandler class
+
+    Contains logic to tell Logic/Data layers to connect to the given
+    DB.
+    """
+
+    def get(self):
+        ret = logic.disconnect()
+        write = {'status': 'Failed'}
+        if ret:
+            write = {'status': 'Success'}
+        self.write(write)
+
 
 class LayoutHandler(web.RequestHandler):
     """ LayoutHandler class

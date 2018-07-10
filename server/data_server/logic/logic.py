@@ -36,9 +36,13 @@ def disconnect():
     """ disconnect method
 
     Disconnect the data layer.
+
+    Returns:
+        bool: True if disconnected, False otherwise. Defaults to True
     """
     if _data is not None:
-        _data.disconnect()
+        return _data.disconnect()
+    return True
 
 
 def update_layout(body):

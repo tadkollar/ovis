@@ -22,6 +22,7 @@ define("port", default=18403)
 def get_app():
     app = tornado.web.Application(handlers=[
         (r"/connect", presentation.ConnectHandler),
+        (r"/disconnect", presentation.DisconnectHandler),
         (r"/driver_iterations", presentation.DriverIterationsHandler),
         (r"/driver_iterations/([a-zA-Z0-9_.:]+)", presentation.DriverIterationVariableHandler),
         (r"/layout", presentation.LayoutHandler),
