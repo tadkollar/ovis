@@ -29,6 +29,7 @@ function Plot(container, componentState) {
 
     // All plotting data
     let plotData = null;
+    let active = true;
 
     // ******************* Initialization ******************* //
 
@@ -82,6 +83,7 @@ function Plot(container, componentState) {
 
         // Set callback on resize
         container.on('resize', resize);
+        container.on('destroy', destroy);
 
         // Add to layout's configCallbacks so we update our componentState
         // on the server.
@@ -170,6 +172,13 @@ function Plot(container, componentState) {
             width: container.width,
             height: container.height - deltaPlotHeight
         });
+    }
+
+    /**
+     * Function called when 'destroy' is called from layout
+     */
+    function destroy() {
+        active = false;
     }
 
     /**

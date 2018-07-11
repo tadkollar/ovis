@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    name='ZuneServerReqs',
+    name='OVis_Server',
     version='1.0',
     description='Zune server for OpenMDAO',
     classifiers=[

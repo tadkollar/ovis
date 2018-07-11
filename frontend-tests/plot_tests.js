@@ -4,6 +4,7 @@ const chai = require('chai');
 const chaiStyle = require('chai-style');
 const chaiAsPromised = require('chai-as-promised');
 const helper = require('./test_helper');
+const spectron = require('spectron');
 
 // High timeout time because I run this in a very slow VM
 const timeoutTime = 30000;
@@ -51,7 +52,13 @@ describe('Test Plots', () => {
     // ******************** Tests ******************** //
 
     // We should start with one N2
-    it('verify only one N2', done => {
-        helper.clickPlot(app).then();
+    it('verify plots active', done => {
+        app.client.waitUntilWindowLoaded().then(() => {
+            console.log(app.client.plotList);
+            for (var i = 0; i < 2; ++i) {
+                app.client.plotList[i].active.should.equal(true);
+            }
+            done();
+        });
     }).timeout(timeoutTime);
 });

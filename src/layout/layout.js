@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const is = require('electron-is');
 
+var plotList = [];
+
 /**
  * Class Layout - Handles loading/saving/updating the layout
  */
@@ -258,7 +260,7 @@ function Layout() {
             container.getElement().html(plot_file.toString());
 
             // Global function found in plot.js
-            new Plot(container, componentState);
+            plotList.push(new Plot(container, componentState));
         });
     }
 
