@@ -2,6 +2,7 @@ import sqlite3
 import os
 import io
 import numpy as np
+import json
 from six import PY2, PY3, iteritems
 
 if PY2:
@@ -62,16 +63,16 @@ def create_new_db(id):
                     "record_type TEXT, rowid INT)")
         c.execute("CREATE TABLE driver_iterations(id INTEGER PRIMARY KEY, "
                     "counter INT,iteration_coordinate TEXT, timestamp REAL, "
-                    "success INT, msg TEXT, inputs BLOB, outputs BLOB)")
+                    "success INT, msg TEXT, inputs TEXT, outputs TEXT)")
         c.execute("CREATE INDEX driv_iter_ind on driver_iterations(iteration_coordinate)")
         c.execute("CREATE TABLE system_iterations(id INTEGER PRIMARY KEY, "
                     "counter INT, iteration_coordinate TEXT, timestamp REAL, "
-                    "success INT, msg TEXT, inputs BLOB, outputs BLOB, residuals BLOB)")
+                    "success INT, msg TEXT, inputs TEXT, outputs TEXT, residuals TEXT)")
         c.execute("CREATE INDEX sys_iter_ind on system_iterations(iteration_coordinate)")
         c.execute("CREATE TABLE solver_iterations(id INTEGER PRIMARY KEY, "
                     "counter INT, iteration_coordinate TEXT, timestamp REAL, "
                     "success INT, msg TEXT, abs_err REAL, rel_err REAL, "
-                    "solver_inputs BLOB, solver_output BLOB, solver_residuals BLOB)")
+                    "solver_inputs TEXT, solver_output TEXT, solver_residuals TEXT)")
         c.execute("CREATE INDEX solv_iter_ind on solver_iterations(iteration_coordinate)")
         c.execute("CREATE TABLE driver_metadata(id TEXT PRIMARY KEY, "
                     "model_viewer_data BLOB)")
@@ -103,19 +104,22 @@ def record_driver_iteration(f_name, inputs, outputs, id, counter, iteration_coor
         for v in vals:
             vals[v] = np.array(vals[v])
 
-    outputs_array = _values_to_array(outputs)
-    inputs_array = _values_to_array(inputs)
+    for in_out in (inputs, outputs):
+        if in_out is None:
+            continue
+        for var in in_out:
+            in_out[var] = _convert_to_list(in_out[var])
 
-    outputs_blob = _array_to_blob(outputs_array)
-    inputs_blob = _array_to_blob(inputs_array)
+    outputs_text = json.dumps(outputs)
+    inputs_text = json.dumps(inputs)
 
     con = sqlite3.connect(f_name)
     with con:
         c = con.cursor()
         c.execute("INSERT INTO driver_iterations(counter, iteration_coordinate, "
                   "timestamp, success, msg, inputs, outputs) VALUES(?,?,?,?,?,?,?)",
-                  (counter, iteration_coordinate, timestamp, success, msg, inputs_blob,
-                   outputs_blob))
+                  (counter, iteration_coordinate, timestamp, success, msg, inputs_text,
+                   outputs_text))
 
 def record_metadata(f_name, abs2meta, abs2prom, prom2abs):
     """ record_metadata function
@@ -129,14 +133,37 @@ def record_metadata(f_name, abs2meta, abs2prom, prom2abs):
         prom2abs (dict): dictionary mapping promoted var name to absolute var name
     """
     abs2meta = pickle.dumps(abs2meta)
-    abs2prom = pickle.dumps(abs2prom)
-    prom2abs = pickle.dumps(prom2abs)
+    abs2prom = json.dumps(abs2prom)
+    prom2abs = json.dumps(prom2abs)
 
     con = sqlite3.connect(f_name)
     with con:
         c = con.cursor()
         c.execute("UPDATE metadata SET abs2prom=?, prom2abs=?, abs2meta=?",
                   (abs2prom, prom2abs, abs2meta))
+
+def _convert_to_list(vals):
+    """
+    Convert values to list (so that it may be sent as JSON).
+
+    Parameters
+    ----------
+    vals : numpy.array or list or tuple
+        the object to be converted to a list
+
+    Returns
+    -------
+    list :
+        The converted list.
+    """
+    if isinstance(vals, np.ndarray):
+        return _convert_to_list(vals.tolist())
+    elif isinstance(vals, (list, tuple)):
+        return [_convert_to_list(item) for item in vals]
+    elif vals is None:
+        return []
+    else:
+        return vals
 
 def _values_to_array(values):
     """ _values_to_array private function

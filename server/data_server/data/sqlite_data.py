@@ -72,26 +72,16 @@ class SqliteData(BaseData):
                 "SELECT abs2prom, prom2abs, abs2meta FROM metadata")
             row = self.cursor.fetchone()
 
+            self.abs2prom = json.loads(row[0]) if row[0] is not None else None
+            self.prom2abs = json.loads(row[1]) if row[1] is not None else None
             if PY2:
-                self.abs2prom = pickle.loads(
-                    str(row[0])) if row[0] is not None else None
-                self.prom2abs = pickle.loads(
-                    str(row[1])) if row[1] is not None else None
                 self.abs2meta = pickle.loads(
                     str(row[2])) if row[2] is not None else None
             if PY3:
                 try:
-                    self.abs2prom = pickle.loads(
-                        row[0]) if row[0] is not None else None
-                    self.prom2abs = pickle.loads(
-                        row[1]) if row[1] is not None else None
                     self.abs2meta = pickle.loads(
                         row[2]) if row[2] is not None else None
                 except: # case where this DB was generated with python 2
-                    self.abs2prom = pickle.loads(
-                        bytes(row[0], 'utf-8')) if row[0] is not None else None
-                    self.prom2abs = pickle.loads(
-                        bytes(row[1], 'utf-8')) if row[1] is not None else None
                     self.abs2meta = pickle.loads(
                         bytes(row[2], 'utf-8')) if row[2] is not None else None
 
@@ -212,24 +202,6 @@ class SqliteData(BaseData):
         out.seek(0)
         return np.load(out)
 
-    def convert_to_list(self, obj):
-        """
-        Convert object to list (so that it may be sent as JSON).
-
-        Parameters
-        ----------
-        obj <Object>
-            the object to be converted to a list
-        """
-        if isinstance(obj, np.ndarray):
-            return self.convert_to_list(obj.tolist())
-        elif isinstance(obj, (list, tuple)):
-            return [self.convert_to_list(item) for item in obj]
-        elif obj is None:
-            return []
-        else:
-            return obj
-
     def _get_driver_iterations(self, get_many=True):
         """ _get_driver_iterations method
 
@@ -264,8 +236,8 @@ class SqliteData(BaseData):
                 n_row['timestamp'] = row[1]
                 n_row['success'] = row[2]
                 n_row['msg'] = row[3]
-                n_row['inputs'] = self.blob_to_array(row[4])
-                n_row['outputs'] = self.blob_to_array(row[5])
+                n_row['inputs'] = json.loads(row[4])
+                n_row['outputs'] = json.loads(row[5])
                 n_row['counter'] = row[6]
 
                 ret.append(n_row)
@@ -278,34 +250,34 @@ class SqliteData(BaseData):
             constraints_array = []
             sysincludes_array = []
             inputs_array = []
-            for name in data['outputs'].dtype.names:
+            for name in data['outputs']:
                 types = self.abs2meta[name]['type']
 
                 if 'desvar' in types:
                     desvars_array.append({
                         'name': name,
-                        'values': self.convert_to_list(data['outputs'][name])[0]
+                        'values': data['outputs'][name]
                     })
                 elif 'objective' in types:
                     objectives_array.append({
                         'name': name,
-                        'values': self.convert_to_list(data['outputs'][name])[0]
+                        'values': data['outputs'][name]
                     })
                 elif 'constraint' in types:
                     constraints_array.append({
                         'name': name,
-                        'values': self.convert_to_list(data['outputs'][name])[0]
+                        'values': data['outputs'][name]
                     })
                 else:
                     sysincludes_array.append({
                         'name': name,
-                        'values': self.convert_to_list(data['outputs'][name])[0]
+                        'values': data['outputs'][name]
                     })
 
-            for name in data['inputs'].dtype.names:
+            for name in data['inputs']:
                 inputs_array.append({
                     'name': name,
-                    'values': self.convert_to_list(data['inputs'][name])[0]
+                    'values': data['inputs'][name]
                 })
 
             final_ret.append({
@@ -383,22 +355,9 @@ class SqliteData(BaseData):
             row = self.cursor.fetchone()
             if row is None:
                 return ret
-            if PY2:
-                ret['abs2prom'] = pickle.loads(
-                    str(row[0])) if row[0] is not None else None
-                ret['prom2abs'] = pickle.loads(
-                    str(row[1])) if row[1] is not None else None
-            if PY3:
-                try:
-                    ret['abs2prom'] = pickle.loads(
-                        row[0]) if row[0] is not None else None
-                    ret['prom2abs'] = pickle.loads(
-                        row[1]) if row[1] is not None else None
-                except:
-                    ret['abs2prom'] = pickle.loads(
-                        bytes(row[0], 'utf-8')) if row[0] is not None else None
-                    ret['prom2abs'] = pickle.loads(
-                        bytes(row[1], 'utf-8')) if row[1] is not None else None
+
+            ret['abs2prom'] = json.loads(row[0]) if row[0] is not None else None
+            ret['prom2abs'] = json.loads(row[1]) if row[1] is not None else None
 
         return ret
 

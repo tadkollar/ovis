@@ -391,8 +391,8 @@ class TestSqliteData(unittest.TestCase):
 
     def test_is_new_data2(self):
         self._use_sellar_grouped()
-        self.assertFalse(_data.is_new_data(59))
-        self.assertTrue(_data.is_new_data(57))
+        self.assertFalse(_data.is_new_data(14))
+        self.assertTrue(_data.is_new_data(13))
 
     # Helper methods
 
