@@ -1,4 +1,8 @@
 const Application = require('spectron').Application;
+const chai = require('chai');
+const assert = chai.assert;
+const expect = chai.expect;
+const sqlite3 = require('sqlite3');
 
 /**
  * String identifier for N^2 diagrams
@@ -222,5 +226,111 @@ exports.clickPlot = function(app) {
                 .click()
                 .then(() => resolve());
         });
+    });
+};
+
+/**
+ * Get the number of keys in the object
+ *
+ * @param {JSON} obj
+ * @returns {number}
+ */
+exports.length = function(obj) {
+    return Object.keys(obj).length;
+};
+
+/**
+ * Assert that the test value is close to its corresponding value
+ * in the compSet.
+ *
+ * @param {*} testVal
+ * @param {*} compSet
+ * @param {number} delta expect vals to be close within delta
+ */
+exports.assertArrayClose = function(testVal, compSet, delta = 0.1) {
+    let values_arr = [];
+    for (let i = 0; i < compSet.length; ++i) {
+        let t = compSet[i];
+        if (t['name'] === testVal['name']) {
+            values_arr.push(t);
+        }
+    }
+
+    assert.equal(
+        values_arr.length,
+        1,
+        'Expected to find a value with a unique name in the compSet but found 0 or more than 1 instead for name: ' +
+            testVal['name']
+    );
+
+    for (let i = 0; i < testVal['values'].length; ++i) {
+        let curVal = testVal['values'][i];
+        let tVal = values_arr[0]['values'][i];
+        expect(curVal).to.be.closeTo(tVal, delta);
+    }
+};
+
+/**
+ * Create a new empty database.
+ *
+ * @param {*} id
+ */
+exports.createNewDatabase = async function(id) {
+    let tempFilepath = 'temp';
+    let filename = __dirname + '/' + tempFilepath + id;
+    let db = new sqlite3.Database(filename);
+
+    // this is silly. Should find a way to replace this with chained promises
+    return new Promise(function(resolve, reject) {
+        db.run(
+            'CREATE TABLE metadata(format_version INT, abs2prom TEXT, prom2abs TEXT, abs2meta TEXT)',
+            () => {
+                db.run(
+                    'INSERT INTO metadata(format_version, abs2prom, prom2abs) VALUES(?,?,?)',
+                    [1, null, null],
+                    () => {
+                        db.run(
+                            'CREATE TABLE global_iterations(id INTEGER PRIMARY KEY, record_type TEXT, rowid INT)',
+                            () => {
+                                db.run(
+                                    'CREATE TABLE driver_iterations(id INTEGER PRIMARY KEY, counter INT,iteration_coordinate TEXT, timestamp REAL, success INT, msg TEXT, inputs TEXT, outputs TEXT)',
+                                    () => {
+                                        db.run(
+                                            'CREATE TABLE system_iterations(id INTEGER PRIMARY KEY, counter INT, iteration_coordinate TEXT, timestamp REAL, success INT, msg TEXT, inputs TEXT, outputs TEXT, residuals TEXT)',
+                                            () => {
+                                                db.run(
+                                                    'CREATE TABLE solver_iterations(id INTEGER PRIMARY KEY, counter INT, iteration_coordinate TEXT, timestamp REAL, success INT, msg TEXT, abs_err REAL, rel_err REAL, solver_inputs TEXT, solver_output TEXT, solver_residuals TEXT)',
+                                                    () => {
+                                                        db.run(
+                                                            'CREATE TABLE driver_metadata(id TEXT PRIMARY KEY, model_viewer_data TEXT)',
+                                                            () => {
+                                                                db.run(
+                                                                    'CREATE TABLE system_metadata(id TEXT PRIMARY KEY, scaling_factors BLOB, component_metadata BLOB)',
+                                                                    () => {
+                                                                        db.run(
+                                                                            'CREATE TABLE solver_metadata(id TEXT PRIMARY KEY, solver_options BLOB, solver_class TEXT)',
+                                                                            () => {
+                                                                                db.close();
+                                                                                resolve(
+                                                                                    filename
+                                                                                );
+                                                                            }
+                                                                        );
+                                                                    }
+                                                                );
+                                                            }
+                                                        );
+                                                    }
+                                                );
+                                            }
+                                        );
+                                    }
+                                );
+                            }
+                        );
+                    }
+                );
+            }
+        );
     });
 };

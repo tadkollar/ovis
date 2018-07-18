@@ -15,8 +15,8 @@ const request = require('request');
 const path = require('path');
 const url = require('url');
 const is = require('electron-is');
-const { spawn } = require('child_process');
 const { autoUpdater } = require('electron-updater');
+const DataInterface = require('./src/data_server/presentation/DataInterface');
 const {
     app,
     Menu,
@@ -38,6 +38,7 @@ autoUpdater.logger = logger;
 let updateReady = false;
 let server = null;
 let filename = 'No file selected';
+let dataInterface = new DataInterface(logger);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -71,7 +72,7 @@ function findFile() {
         });
     } else {
         logger.info('Opening sellar grouped in Spectron environment');
-        openFile(__dirname + '/server/server-tests/sellar_grouped_py2.db');
+        openFile(__dirname + '/test/sellar_grouped.db');
     }
 }
 
@@ -88,21 +89,17 @@ function openFile(fName) {
         return;
     }
 
-    // Send POST to have server connect to DB
-    logger.info("Sending 'connect' with: " + filename);
-    let loc = { json: { location: filename } };
-    request.post('http://127.0.0.1:18403/connect', loc, function(
-        error,
-        response,
-        body
-    ) {
-        if (error) {
-            logger.error('Error connecting to DB: ' + error.toString());
-            return;
-        }
-        logger.info('Connect response: ' + body['Success']);
-        loadVisPage();
-    });
+    // Connect to DB
+    logger.info('Connect to: ' + filename);
+    dataInterface
+        .connect(fName)
+        .then(() => {
+            logger.info('Successfully connected');
+            loadVisPage();
+        })
+        .catch(err => {
+            logger.error('Could not connect to DB. Error: ' + err.toString());
+        });
 }
 
 /**
@@ -122,33 +119,6 @@ function loadVisPage() {
 }
 
 /**
- * Spawn the python server
- */
-function startServer() {
-    // Start up the server
-    let server_loc = path.join(__dirname, '../server/main.py');
-
-    // Use a different path if we're running in Electron
-    if (is.dev()) {
-        logger.info('Running in Electron');
-        server_loc = path.join(__dirname, 'server/main.py');
-    } else {
-        logger.info('Running outside of Electron');
-    }
-    server = spawn('python', [server_loc]);
-
-    // Redirect stdout
-    server.stdout.on('data', function(data) {
-        logger.info('SERVER: ' + data);
-    });
-
-    // Redirect stderr
-    server.stderr.on('data', function(data) {
-        logger.info('SERVER: ' + data);
-    });
-}
-
-/**
  * Create the menu and load our main window
  */
 function startApp() {
@@ -158,9 +128,6 @@ function startApp() {
     logger.info('Version: ' + app.getVersion());
 
     mainWindow = new BrowserWindow({});
-
-    // Start the server
-    startServer();
 
     // NOTE: See note at top of file for explanation of "process.env.RUNNING_IN_VIS_INDEX_TESTS"
     if (process.env.RUNNING_IN_VIS_INDEX_TESTS) {
@@ -190,14 +157,6 @@ app.on('window-all-closed', function() {
     if (process.platform !== 'darwin') {
         app.quit();
     }
-});
-
-// On will-quit we'll close the server
-app.on('will-quit', function() {
-    server.stdin.pause();
-    server.stderr.pause();
-    server.stdout.pause();
-    server.kill();
 });
 
 // On openFile open up file dialog

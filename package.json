@@ -20,6 +20,7 @@
     "electron": "~2.0.2",
     "electron-builder": "^20.14.7",
     "electron-packager": "^12.1.0",
+    "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
     "spectron": "^3.8.0"
   },
@@ -30,7 +31,7 @@
     "is-electron": "^2.1.0",
     "promise": "^8.0.1",
     "request": "^2.87.0",
-    "sqlite3": "^4.0.0",
+    "sqlite3": "^4.0.1",
     "wine": "^0.9.8"
   },
   "build": {
@@ -38,7 +39,8 @@
     "mac": {
       "category": "public.app-category.developer-tools",
       "target": [
-        "dmg", "zip"
+        "dmg",
+        "zip"
       ]
     },
     "linux": {
@@ -69,7 +71,9 @@
     "dist:m": "build -m --x64",
     "dist:w": "build -w --x64",
     "build": "./build_electron.sh",
-    "test": "python -m unittest discover server/server-tests; ./node_modules/mocha/bin/mocha frontend-tests",
+    "test": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/mocha tests",
+    "test:data": "./node_modules/mocha/bin/mocha test/test_sqlite_data.js",
+    "test:logic": "./node_modules/mocha/bin/mocha test/test_logic.js"
   },
   "postinstall": "electron-builder install-app-deps"
 }
