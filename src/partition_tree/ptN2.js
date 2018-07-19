@@ -160,12 +160,12 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             if (!search.showParams) return;
             var coords = d3.mouse(this);
             var c = Math.floor(
-                coords[0] *
-                    d3RightTextNodesArrayZoomed.length /
+                (coords[0] * d3RightTextNodesArrayZoomed.length) /
                     ptn2.WIDTH_N2_PX
             );
             var r = Math.floor(
-                coords[1] * d3RightTextNodesArrayZoomed.length / ptn2.HEIGHT_PX
+                (coords[1] * d3RightTextNodesArrayZoomed.length) /
+                    ptn2.HEIGHT_PX
             );
             if (
                 r == c ||
@@ -212,12 +212,12 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             if (!search.showParams) return;
             var coords = d3.mouse(this);
             var c = Math.floor(
-                coords[0] *
-                    d3RightTextNodesArrayZoomed.length /
+                (coords[0] * d3RightTextNodesArrayZoomed.length) /
                     ptn2.WIDTH_N2_PX
             );
             var r = Math.floor(
-                coords[1] * d3RightTextNodesArrayZoomed.length / ptn2.HEIGHT_PX
+                (coords[1] * d3RightTextNodesArrayZoomed.length) /
+                    ptn2.HEIGHT_PX
             );
             if (
                 r == c ||
@@ -420,15 +420,13 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                         'px'
                 )
                 .style('height', ptn2.HEIGHT_PX + 2 * ptn2.SVG_MARGIN + 'px');
-            svg
-                .attr(
-                    'width',
-                    ptn2.widthPTreePx +
-                        PTREE_N2_GAP_PX +
-                        ptn2.WIDTH_N2_PX +
-                        2 * ptn2.SVG_MARGIN
-                )
-                .attr('height', ptn2.HEIGHT_PX + 2 * ptn2.SVG_MARGIN);
+            svg.attr(
+                'width',
+                ptn2.widthPTreePx +
+                    PTREE_N2_GAP_PX +
+                    ptn2.WIDTH_N2_PX +
+                    2 * ptn2.SVG_MARGIN
+            ).attr('height', ptn2.HEIGHT_PX + 2 * ptn2.SVG_MARGIN);
             n2Group.attr(
                 'transform',
                 'translate(' +
@@ -461,8 +459,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                     'px'
             )
             .style('height', ptn2.HEIGHT_PX + 2 * ptn2.SVG_MARGIN + 'px');
-        svg
-            .transition(sharedTransition)
+        svg.transition(sharedTransition)
             .attr(
                 'width',
                 ptn2.widthPTreePx +
@@ -540,7 +537,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                     'translate(' +
                     anchorX +
                     ',' +
-                    d.height0 * ptn2.ky0 / 2 +
+                    (d.height0 * ptn2.ky0) / 2 +
                     ')'
                 );
             })
@@ -580,7 +577,11 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             .attr('transform', function(d) {
                 var anchorX = d.width * ptn2.kx - RIGHT_TEXT_MARGIN_PX;
                 return (
-                    'translate(' + anchorX + ',' + d.height * ptn2.ky / 2 + ')'
+                    'translate(' +
+                    anchorX +
+                    ',' +
+                    (d.height * ptn2.ky) / 2 +
+                    ')'
                 );
             })
             .style('opacity', function(d) {
@@ -618,7 +619,11 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             .attr('transform', function(d) {
                 var anchorX = d.width * ptn2.kx - RIGHT_TEXT_MARGIN_PX;
                 return (
-                    'translate(' + anchorX + ',' + d.height * ptn2.ky / 2 + ')'
+                    'translate(' +
+                    anchorX +
+                    ',' +
+                    (d.height * ptn2.ky) / 2 +
+                    ')'
                 );
                 //return "translate(8," + d.height * ptn2.ky / 2 + ")";
             })
@@ -908,7 +913,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                     return;
 
                 var heightPx =
-                    ptn2.HEIGHT_PX * d.numLeaves / zoomedElement.numLeaves;
+                    (ptn2.HEIGHT_PX * d.numLeaves) / zoomedElement.numLeaves;
                 d.textOpacity0 = d.hasOwnProperty('textOpacity')
                     ? d.textOpacity
                     : 0;
@@ -2229,7 +2234,7 @@ ptn2.initializeTree = function(container) {
         document.getElementById('plotControls').style.display = 'none';
     };
 
-    server.getDriverMetadata(function(data) {
+    server.getDriverMetadata().then(data => {
         treeData = data['model_viewer_data'];
         if (typeof data['model_viewer_data'] === 'string') {
             treeData = JSON.parse(data['model_viewer_data']);

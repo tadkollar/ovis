@@ -38,7 +38,7 @@ function Layout() {
      */
     function initialize() {
         //Create the initial golden layout dashboard
-        server.getLayout(function(ret) {
+        server.getLayout().then(ret => {
             if (ret.length === 0) {
                 myLayout = createLayout(config);
             } else {
@@ -94,7 +94,7 @@ function Layout() {
         let state = lt.toConfig();
         let componentStates = getComponentStates();
         replaceComponentStates(state, componentStates);
-        server.saveLayout(state, function() {});
+        server.saveLayout(state);
     };
 
     /**

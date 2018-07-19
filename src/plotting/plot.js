@@ -63,12 +63,25 @@ function Plot(container, componentState) {
             );
         }
 
-        // Get metadata and vars
-        server.getMetadata(function(a2p, p2a) {
-            server.getVars((d, o, c, s, i) => {
+        server.getMetadata().then(data => {
+            let a2p = data['abs2prom'];
+            let p2a = data['prom2abs'];
+            server.getVars().then(d2 => {
+                let d = d2['desvars'];
+                let o = d2['objectives'];
+                let c = d2['constraints'];
+                let s = d2['sysincludes'];
+                let i = d2['inputs'];
                 plotVarsInitial(d, o, c, s, i, a2p, p2a);
             });
         });
+
+        // Get metadata and vars
+        // server.getMetadata(function(a2p, p2a) {
+        //     server.getVars((d, o, c, s, i) => {
+        //         plotVarsInitial(d, o, c, s, i, a2p, p2a);
+        //     });
+        // });
 
         // Start trying to update the variables so data is live
         setInterval(tryUpdateVariables, checkUpdateVarsIntervalTime);
@@ -733,17 +746,22 @@ function Plot(container, componentState) {
             if (updatedVar) {
                 updatedVar = false;
 
-                server.getVariable_DriverIteration(
-                    variable,
-                    function(result) {
-                        if (result.length > 0) {
-                            //if data needs to be updated, update
-                            setData(result, variable);
+                server
+                    .getVariable_DriverIteration(variable, maxCount)
+                    .then(data => {
+                        if (data.length > 0) {
+                            setData(data, variable);
                         }
-                    },
-                    null,
-                    maxCount
-                );
+                    });
+                //     function(result) {
+                //         if (result.length > 0) {
+                //             //if data needs to be updated, update
+                //             setData(result, variable);
+                //         }
+                //     },
+                //     null,
+                //     maxCount
+                // );
             }
         }
     }

@@ -159,6 +159,10 @@ app.on('window-all-closed', function() {
     }
 });
 
+app.on('will-quit', () => {
+    this.dataInterface.disconnect();
+});
+
 // On openFile open up file dialog
 ipcMain.on('openFile', (event, arg) => {
     logger.info('Received IPC in main to open file');
@@ -188,6 +192,46 @@ ipcMain.on('checkUpdateReady', (event, arg) => {
     if (updateReady) {
         event.sender.send('updateReady');
     }
+});
+
+ipcMain.on('getMetadata', (event, arg) => {
+    dataInterface.getMetadata().then(data => {
+        event.sender.send('metadataReply', data);
+    });
+});
+
+ipcMain.on('updateLayout', (event, arg) => {
+    dataInterface.updateLayout(arg);
+});
+
+ipcMain.on('getLayout', (event, arg) => {
+    dataInterface.getLayout().then(layout => {
+        event.sender.send('layoutReply', layout);
+    });
+});
+
+ipcMain.on('getDriverIterationData', (event, arg) => {
+    dataInterface.getDriverIterationData(arg).then(data => {
+        event.sender.send('driverIterationReply', data);
+    });
+});
+
+ipcMain.on('getDriverIterationsBasedOnCount', (event, varname, count) => {
+    dataInterface.getDriverIterationsBasedOnCount(varname, count).then(data => {
+        event.sender.send('driverIterationCountReply', data);
+    });
+});
+
+ipcMain.on('getModelViewerData', (event, arg) => {
+    dataInterface.getModelViewerData().then(data => {
+        event.sender.send('modelViewerDataReply', data);
+    });
+});
+
+ipcMain.on('getAllDriverVars', (event, arg) => {
+    dataInterface.getAllDriverVars().then(data => {
+        event.sender.send('allDriverVarsReply', data);
+    });
 });
 
 // Callback when an update is downloaded

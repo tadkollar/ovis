@@ -1,75 +1,109 @@
 'use strict';
 
+var { ipcRenderer } = require('electron');
+
 /**
- * Class Server - series of functions to interface with the REST server
+ * Class Server - series of functions to interface with the data server
  */
 function Server() {
     /**
      * Get abs2prom and prom2abs metadata from the server
      *
-     * @param {function} callback - callback of the form function(abs2prom, prom2abs)
-     * @param {function} error - error callback
+     * @returns {Promise} resolves to {'abs2prom':..., 'prom2abs':...}
      */
-    this.getMetadata = function(callback, error = null) {
-        http.server_get(
-            'metadata',
-            function(result) {
-                if (result !== '[]' && result !== 'null') {
-                    result = JSON.parse(result);
-                    callback(result.abs2prom, result.prom2abs);
-                } else {
-                    callback(null, null);
-                }
-            },
-            error
-        );
+    this.getMetadata = async function() {
+        return new Promise(function(resolve, reject) {
+            ipc.getMetadata(data => {
+                resolve(data);
+            });
+        });
+        // http.server_get(
+        //     'metadata',
+        //     function(result) {
+        //         if (result !== '[]' && result !== 'null') {
+        //             result = JSON.parse(result);
+        //             callback(result.abs2prom, result.prom2abs);
+        //         } else {
+        //             callback(null, null);
+        //         }
+        //     },
+        //     error
+        // );
     };
 
     /**
      * Get the set names of variables for which we have data
-     *
-     * @param {function} callback - callback of the form function(desvars, objectives, constraints, sysincludes)
-     * @param {function} error - error callback
      */
-    this.getVars = function(callback, error = null) {
-        http.server_get(
-            'allvars',
-            function(result) {
-                result = JSON.parse(result);
+    this.getVars = async function() {
+        return new Promise(function(resolve, reject) {
+            ipc.getAllDriverVars(data => {
                 let designVariables = [];
                 let objectives = [];
                 let constraints = [];
                 let sysincludes = [];
                 let inputs = [];
-
-                // Separate into types
-                result.forEach(element => {
+                data.forEach(element => {
                     let name = element['name'];
                     let type = element['type'];
-
                     if (type === 'desvar') {
                         designVariables.push(name);
                     } else if (type === 'objective') {
                         objectives.push(name);
+                    } else if (type === 'constraint') {
+                        constraints.push(name);
                     } else if (type === 'sysinclude') {
                         sysincludes.push(name);
-                    } else if (type === 'input') {
-                        inputs.push(name);
                     } else {
-                        constraints.push(name);
+                        inputs.push(name);
                     }
                 });
 
-                callback(
-                    designVariables,
-                    objectives,
-                    constraints,
-                    sysincludes,
-                    inputs
-                );
-            },
-            error
-        );
+                let ret = {
+                    desvars: designVariables,
+                    objectives: objectives,
+                    constraints: constraints,
+                    sysincludes: sysincludes,
+                    inputs: inputs
+                };
+
+                resolve(ret);
+            });
+        });
+        // http.server_get(
+        //     'allvars',
+        //     function(result) {
+        //         result = JSON.parse(result);
+        //         let designVariables = [];
+        //         let objectives = [];
+        //         let constraints = [];
+        //         let sysincludes = [];
+        //         let inputs = [];
+        //         // Separate into types
+        //         result.forEach(element => {
+        //             let name = element['name'];
+        //             let type = element['type'];
+        //             if (type === 'desvar') {
+        //                 designVariables.push(name);
+        //             } else if (type === 'objective') {
+        //                 objectives.push(name);
+        //             } else if (type === 'sysinclude') {
+        //                 sysincludes.push(name);
+        //             } else if (type === 'input') {
+        //                 inputs.push(name);
+        //             } else {
+        //                 constraints.push(name);
+        //             }
+        //         });
+        //         callback(
+        //             designVariables,
+        //             objectives,
+        //             constraints,
+        //             sysincludes,
+        //             inputs
+        //         );
+        //     },
+        //     error
+        // );
     };
 
     /**
@@ -77,83 +111,95 @@ function Server() {
      * will only be returned for iterations > maxCount
      *
      * @param {String} name - the variable name
-     * @param {function} callback - callback of the form function(data)
-     * @param {function} error - error callback
      * @param {Number} maxCount - the current max iteration count, if you only want newest data
      */
-    this.getVariable_DriverIteration = function(
-        name,
-        callback,
-        error = null,
-        maxCount = -1
-    ) {
+    this.getVariable_DriverIteration = async function(name, maxCount = -1) {
+        return new Promise(function(resolve, reject) {
+            if (maxCount >= 0) {
+                ipc.getDriverIterationCount(name, maxCount, data => {
+                    resolve(data);
+                });
+            } else {
+                ipc.getDriverIterationData(name, data => {
+                    resolve(data);
+                });
+            }
+        });
         // If we have a maxCount, set the header
-        let headers = [];
-        if (maxCount > 0) {
-            headers = [
-                {
-                    name: 'cur_max_count',
-                    value: maxCount
-                }
-            ];
-        }
+        // let headers = [];
+        // if (maxCount > 0) {
+        //     headers = [
+        //         {
+        //             name: 'cur_max_count',
+        //             value: maxCount
+        //         }
+        //     ];
+        // }
 
-        http.server_get(
-            'driver_iterations/' + name,
-            function(result) {
-                callback(JSON.parse(result));
-            },
-            error,
-            headers
-        );
+        // http.server_get(
+        //     'driver_iterations/' + name,
+        //     function(result) {
+        //         callback(JSON.parse(result));
+        //     },
+        //     error,
+        //     headers
+        // );
     };
 
     /**
      * Get the layout from the server
      *
-     * @param {function} callback - callback of the form function(data)
-     * @param {function} error - error callback
      */
-    this.getLayout = function(callback, error = null) {
-        http.server_get(
-            'layout',
-            function(ret) {
-                callback(JSON.parse(ret));
-            },
-            error
-        );
+    this.getLayout = function() {
+        return new Promise(function(resolve, reject) {
+            ipc.getLayout(data => {
+                resolve(data);
+            });
+        });
+        // http.server_get(
+        //     'layout',
+        //     function(ret) {
+        //         callback(JSON.parse(ret));
+        //     },
+        //     error
+        // );
     };
 
     /**
      * Get the driver metadata from the server
      *
-     * @param {function} callback - callback of the form function(data)
-     * @param {function} error - error callback
      */
-    this.getDriverMetadata = function(callback, error = null) {
-        http.server_get(
-            'driver_metadata',
-            function(response) {
-                var data = JSON.parse(response)[0];
-                callback(data);
-            },
-            error
-        );
+    this.getDriverMetadata = function() {
+        return new Promise(function(resolve, reject) {
+            ipc.getModelViewerData(data => {
+                resolve(data[0]);
+            });
+        });
+        // http.server_get(
+        //     'driver_metadata',
+        //     function(response) {
+        //         var data = JSON.parse(response)[0];
+        //         callback(data);
+        //     },
+        //     error
+        // );
     };
 
     /**
      * Save the given layout
      *
      * @param {JSON} layout - the layout to be saved
-     * @param {*} callback - callback on success
-     * @param {*} error - error callback
      */
-    this.saveLayout = function(layout, callback, error = null) {
-        let state = JSON.stringify(layout);
-        let body = {
-            layout: state
-        };
-        http.server_post('layout', body, callback, error);
+    this.saveLayout = function(layout) {
+        return new Promise(function(resolve, reject) {
+            let state = JSON.stringify(layout);
+            ipc.updateLayout({ layout: state });
+        });
+
+        // let body = {
+        //     layout: state
+        // };
+        // http.server_post('layout', body, callback, error);
     };
 }
 
