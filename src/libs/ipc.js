@@ -13,6 +13,7 @@ function IPC() {
     let driverIterationCountCallback = null;
     let modelViewerDataCallback = null;
     let allDriverVarsCallback = null;
+    let filenameFullCallback = null;
 
     /**
      * Send an IPC message to the main process to
@@ -74,6 +75,11 @@ function IPC() {
         ipcRenderer.send('getAllDriverVars');
     };
 
+    this.getFilenameFull = function(callback, error) {
+        filenameFullCallback = callback;
+        ipcRenderer.send('getFilenameFull');
+    };
+
     // ********************** Callbacks ********************** \\
 
     //Call the filename callback, if it exists
@@ -123,6 +129,12 @@ function IPC() {
 
     ipcRenderer.on('updateReady', () => {
         document.getElementById('installButton').style.display = 'block';
+    });
+
+    ipcRenderer.on('fullFilenameReply', (event, arg) => {
+        if (filenameFullCallback != null) {
+            filenameFullCallback(arg);
+        }
     });
 
     // Check if we're ready to update every 5 seconds

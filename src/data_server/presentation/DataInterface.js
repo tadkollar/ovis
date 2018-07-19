@@ -60,7 +60,7 @@ class DataInterface {
      * @returns {Promise} resolves to iteration data
      */
     async getDriverIterationData(variable) {
-        return this._logger.getDriverIterationData(variable);
+        return this._logic.getDriverIterationData(variable);
     }
 
     /**

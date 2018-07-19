@@ -1,22 +1,34 @@
 'use strict';
 
-var { ipcRenderer } = require('electron');
+const logger = require('electron-log');
+const DataInterface = require('./src/data_server/presentation/DataInterface');
 
 /**
  * Class Server - series of functions to interface with the data server
  */
 function Server() {
+    let self = this;
+    self.connected = false;
+
+    ipc.getFilenameFull(name => {
+        self.dataInterface = new DataInterface(logger);
+        self.dataInterface.connect(name).then(() => {
+            self.connected = true;
+        });
+    });
+
     /**
      * Get abs2prom and prom2abs metadata from the server
      *
      * @returns {Promise} resolves to {'abs2prom':..., 'prom2abs':...}
      */
     this.getMetadata = async function() {
-        return new Promise(function(resolve, reject) {
-            ipc.getMetadata(data => {
-                resolve(data);
-            });
-        });
+        return self.dataInterface.getMetadata();
+        // return new Promise(function(resolve, reject) {
+        //     ipc.getMetadata(data => {
+        //         resolve(data);
+        //     });
+        // });
         // http.server_get(
         //     'metadata',
         //     function(result) {
@@ -35,40 +47,43 @@ function Server() {
      * Get the set names of variables for which we have data
      */
     this.getVars = async function() {
-        return new Promise(function(resolve, reject) {
-            ipc.getAllDriverVars(data => {
-                let designVariables = [];
-                let objectives = [];
-                let constraints = [];
-                let sysincludes = [];
-                let inputs = [];
-                data.forEach(element => {
-                    let name = element['name'];
-                    let type = element['type'];
-                    if (type === 'desvar') {
-                        designVariables.push(name);
-                    } else if (type === 'objective') {
-                        objectives.push(name);
-                    } else if (type === 'constraint') {
-                        constraints.push(name);
-                    } else if (type === 'sysinclude') {
-                        sysincludes.push(name);
-                    } else {
-                        inputs.push(name);
-                    }
-                });
-
-                let ret = {
-                    desvars: designVariables,
-                    objectives: objectives,
-                    constraints: constraints,
-                    sysincludes: sysincludes,
-                    inputs: inputs
-                };
-
-                resolve(ret);
-            });
+        let data = await self.dataInterface.getAllDriverVars();
+        let designVariables = [];
+        let objectives = [];
+        let constraints = [];
+        let sysincludes = [];
+        let inputs = [];
+        data.forEach(element => {
+            let name = element['name'];
+            let type = element['type'];
+            if (type === 'desvar') {
+                designVariables.push(name);
+            } else if (type === 'objective') {
+                objectives.push(name);
+            } else if (type === 'constraint') {
+                constraints.push(name);
+            } else if (type === 'sysinclude') {
+                sysincludes.push(name);
+            } else {
+                inputs.push(name);
+            }
         });
+
+        let ret = {
+            desvars: designVariables,
+            objectives: objectives,
+            constraints: constraints,
+            sysincludes: sysincludes,
+            inputs: inputs
+        };
+
+        return ret;
+        // return new Promise(function(resolve, reject) {
+        // ipc.getAllDriverVars(data => {
+
+        //     resolve(ret);
+        // });
+        // });
         // http.server_get(
         //     'allvars',
         //     function(result) {
@@ -114,17 +129,25 @@ function Server() {
      * @param {Number} maxCount - the current max iteration count, if you only want newest data
      */
     this.getVariable_DriverIteration = async function(name, maxCount = -1) {
-        return new Promise(function(resolve, reject) {
-            if (maxCount >= 0) {
-                ipc.getDriverIterationCount(name, maxCount, data => {
-                    resolve(data);
-                });
-            } else {
-                ipc.getDriverIterationData(name, data => {
-                    resolve(data);
-                });
-            }
-        });
+        if (maxCount >= 0) {
+            return self.dataInterface.getDriverIterationsBasedOnCount(
+                name,
+                maxCount
+            );
+        } else {
+            return self.dataInterface.getDriverIterationData(name);
+        }
+        // return new Promise(function(resolve, reject) {
+        //     if (maxCount >= 0) {
+        //         ipc.getDriverIterationCount(name, maxCount, data => {
+        //             resolve(data);
+        //         });
+        //     } else {
+        //         ipc.getDriverIterationData(name, data => {
+        //             resolve(data);
+        //         });
+        //     }
+        // });
         // If we have a maxCount, set the header
         // let headers = [];
         // if (maxCount > 0) {
@@ -150,12 +173,13 @@ function Server() {
      * Get the layout from the server
      *
      */
-    this.getLayout = function() {
-        return new Promise(function(resolve, reject) {
-            ipc.getLayout(data => {
-                resolve(data);
-            });
-        });
+    this.getLayout = async function() {
+        return self.dataInterface.getLayout();
+        // return new Promise(function(resolve, reject) {
+        //     ipc.getLayout(data => {
+        //         resolve(data);
+        //     });
+        // });
         // http.server_get(
         //     'layout',
         //     function(ret) {
@@ -169,9 +193,9 @@ function Server() {
      * Get the driver metadata from the server
      *
      */
-    this.getDriverMetadata = function() {
+    this.getDriverMetadata = async function() {
         return new Promise(function(resolve, reject) {
-            ipc.getModelViewerData(data => {
+            self.dataInterface.getModelViewerData().then(data => {
                 resolve(data[0]);
             });
         });
@@ -191,10 +215,10 @@ function Server() {
      * @param {JSON} layout - the layout to be saved
      */
     this.saveLayout = function(layout) {
-        return new Promise(function(resolve, reject) {
-            let state = JSON.stringify(layout);
-            ipc.updateLayout({ layout: state });
-        });
+        let state = JSON.stringify(layout);
+        self.dataInterface.updateLayout({ layout: state });
+
+        // return new Promise(function(resolve, reject) {});
 
         // let body = {
         //     layout: state

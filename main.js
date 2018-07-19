@@ -179,6 +179,10 @@ ipcMain.on('getFilename', (event, arg) => {
     event.sender.send('filenameReply', fns[fns.length - 1]);
 });
 
+ipcMain.on('getFilenameFull', (event, arg) => {
+    event.sender.send('fullFilenameReply', filename);
+});
+
 // Renderer telling main process to install the update
 ipcMain.on('installUpdate', (event, arg) => {
     if (updateReady) {

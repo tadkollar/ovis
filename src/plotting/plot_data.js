@@ -174,7 +174,7 @@ function PlotVariables(data, name, selected) {
         if (self.selected.indexOf(name) < 0) {
             self.selected.push(name);
         }
-        server.getVariable_DriverIteration(name, result => {
+        server.getVariable_DriverIteration(name).then(result => {
             callback(result, name);
         });
     };

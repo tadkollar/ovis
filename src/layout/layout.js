@@ -322,6 +322,7 @@ function Layout() {
     initialize();
 }
 
-// Arbitrary case ID at the moment because it isn't used by the server
-// at this time (vestigial).
-const layout = new Layout();
+var layout = null;
+setTimeout(() => {
+    layout = new Layout();
+}, 100);
