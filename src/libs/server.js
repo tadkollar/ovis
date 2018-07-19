@@ -1,6 +1,11 @@
 'use strict';
 
+//Logs stored at:
+//  Linux:   ~/.config/OVis/log.log
+//  OS X:    ~/Library/Logs/OVis/log.log
+//  Windows: %USERPROFILE%\AppData\Roaming\OVis\log.log
 const logger = require('electron-log');
+// NOTE: this require is relative to vis_index.html
 const DataInterface = require('./src/data_server/presentation/DataInterface');
 
 /**
@@ -24,23 +29,6 @@ function Server() {
      */
     this.getMetadata = async function() {
         return self.dataInterface.getMetadata();
-        // return new Promise(function(resolve, reject) {
-        //     ipc.getMetadata(data => {
-        //         resolve(data);
-        //     });
-        // });
-        // http.server_get(
-        //     'metadata',
-        //     function(result) {
-        //         if (result !== '[]' && result !== 'null') {
-        //             result = JSON.parse(result);
-        //             callback(result.abs2prom, result.prom2abs);
-        //         } else {
-        //             callback(null, null);
-        //         }
-        //     },
-        //     error
-        // );
     };
 
     /**
@@ -78,47 +66,6 @@ function Server() {
         };
 
         return ret;
-        // return new Promise(function(resolve, reject) {
-        // ipc.getAllDriverVars(data => {
-
-        //     resolve(ret);
-        // });
-        // });
-        // http.server_get(
-        //     'allvars',
-        //     function(result) {
-        //         result = JSON.parse(result);
-        //         let designVariables = [];
-        //         let objectives = [];
-        //         let constraints = [];
-        //         let sysincludes = [];
-        //         let inputs = [];
-        //         // Separate into types
-        //         result.forEach(element => {
-        //             let name = element['name'];
-        //             let type = element['type'];
-        //             if (type === 'desvar') {
-        //                 designVariables.push(name);
-        //             } else if (type === 'objective') {
-        //                 objectives.push(name);
-        //             } else if (type === 'sysinclude') {
-        //                 sysincludes.push(name);
-        //             } else if (type === 'input') {
-        //                 inputs.push(name);
-        //             } else {
-        //                 constraints.push(name);
-        //             }
-        //         });
-        //         callback(
-        //             designVariables,
-        //             objectives,
-        //             constraints,
-        //             sysincludes,
-        //             inputs
-        //         );
-        //     },
-        //     error
-        // );
     };
 
     /**
@@ -137,36 +84,6 @@ function Server() {
         } else {
             return self.dataInterface.getDriverIterationData(name);
         }
-        // return new Promise(function(resolve, reject) {
-        //     if (maxCount >= 0) {
-        //         ipc.getDriverIterationCount(name, maxCount, data => {
-        //             resolve(data);
-        //         });
-        //     } else {
-        //         ipc.getDriverIterationData(name, data => {
-        //             resolve(data);
-        //         });
-        //     }
-        // });
-        // If we have a maxCount, set the header
-        // let headers = [];
-        // if (maxCount > 0) {
-        //     headers = [
-        //         {
-        //             name: 'cur_max_count',
-        //             value: maxCount
-        //         }
-        //     ];
-        // }
-
-        // http.server_get(
-        //     'driver_iterations/' + name,
-        //     function(result) {
-        //         callback(JSON.parse(result));
-        //     },
-        //     error,
-        //     headers
-        // );
     };
 
     /**
@@ -175,18 +92,6 @@ function Server() {
      */
     this.getLayout = async function() {
         return self.dataInterface.getLayout();
-        // return new Promise(function(resolve, reject) {
-        //     ipc.getLayout(data => {
-        //         resolve(data);
-        //     });
-        // });
-        // http.server_get(
-        //     'layout',
-        //     function(ret) {
-        //         callback(JSON.parse(ret));
-        //     },
-        //     error
-        // );
     };
 
     /**
@@ -199,14 +104,6 @@ function Server() {
                 resolve(data[0]);
             });
         });
-        // http.server_get(
-        //     'driver_metadata',
-        //     function(response) {
-        //         var data = JSON.parse(response)[0];
-        //         callback(data);
-        //     },
-        //     error
-        // );
     };
 
     /**
@@ -217,13 +114,6 @@ function Server() {
     this.saveLayout = function(layout) {
         let state = JSON.stringify(layout);
         self.dataInterface.updateLayout({ layout: state });
-
-        // return new Promise(function(resolve, reject) {});
-
-        // let body = {
-        //     layout: state
-        // };
-        // http.server_post('layout', body, callback, error);
     };
 }
 

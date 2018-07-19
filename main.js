@@ -16,7 +16,6 @@ const path = require('path');
 const url = require('url');
 const is = require('electron-is');
 const { autoUpdater } = require('electron-updater');
-const DataInterface = require('./src/data_server/presentation/DataInterface');
 const {
     app,
     Menu,
@@ -38,7 +37,6 @@ autoUpdater.logger = logger;
 let updateReady = false;
 let server = null;
 let filename = 'No file selected';
-let dataInterface = new DataInterface(logger);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -89,17 +87,7 @@ function openFile(fName) {
         return;
     }
 
-    // Connect to DB
-    logger.info('Connect to: ' + filename);
-    dataInterface
-        .connect(fName)
-        .then(() => {
-            logger.info('Successfully connected');
-            loadVisPage();
-        })
-        .catch(err => {
-            logger.error('Could not connect to DB. Error: ' + err.toString());
-        });
+    loadVisPage();
 }
 
 /**
@@ -196,46 +184,6 @@ ipcMain.on('checkUpdateReady', (event, arg) => {
     if (updateReady) {
         event.sender.send('updateReady');
     }
-});
-
-ipcMain.on('getMetadata', (event, arg) => {
-    dataInterface.getMetadata().then(data => {
-        event.sender.send('metadataReply', data);
-    });
-});
-
-ipcMain.on('updateLayout', (event, arg) => {
-    dataInterface.updateLayout(arg);
-});
-
-ipcMain.on('getLayout', (event, arg) => {
-    dataInterface.getLayout().then(layout => {
-        event.sender.send('layoutReply', layout);
-    });
-});
-
-ipcMain.on('getDriverIterationData', (event, arg) => {
-    dataInterface.getDriverIterationData(arg).then(data => {
-        event.sender.send('driverIterationReply', data);
-    });
-});
-
-ipcMain.on('getDriverIterationsBasedOnCount', (event, varname, count) => {
-    dataInterface.getDriverIterationsBasedOnCount(varname, count).then(data => {
-        event.sender.send('driverIterationCountReply', data);
-    });
-});
-
-ipcMain.on('getModelViewerData', (event, arg) => {
-    dataInterface.getModelViewerData().then(data => {
-        event.sender.send('modelViewerDataReply', data);
-    });
-});
-
-ipcMain.on('getAllDriverVars', (event, arg) => {
-    dataInterface.getAllDriverVars().then(data => {
-        event.sender.send('allDriverVarsReply', data);
-    });
 });
 
 // Callback when an update is downloaded

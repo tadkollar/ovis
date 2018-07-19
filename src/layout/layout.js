@@ -322,6 +322,11 @@ function Layout() {
     initialize();
 }
 
+// NOTE: this waits 100 ms before creating the layout
+// so that our server has time to connect to the DB in server.js
+// this is required because using DataInterface exclusively in the
+// main process leads to ultra convulted code because the IPCs
+// cannot directly respond with data.
 var layout = null;
 setTimeout(() => {
     layout = new Layout();
