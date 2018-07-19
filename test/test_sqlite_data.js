@@ -9,6 +9,7 @@ const {
 } = require('./test_helper');
 const assert = chai.assert;
 const fs = require('fs');
+const sqlite3 = require('sqlite3');
 
 const timeoutTime = 30000;
 logger.transports.file.level = false;
@@ -44,7 +45,7 @@ describe('Test SQLite data layer', () => {
 
         for (let i = 0; i < databases.length; ++i) {
             let db = databases[i];
-            // fs.unlinkSync(db);
+            fs.unlinkSync(db);
         }
         databases = [];
     });
@@ -99,16 +100,27 @@ describe('Test SQLite data layer', () => {
             });
     });
 
-    it('Verify layout table added to DB', () => {
-        assert.fail('', '', 'Test not implemented');
+    it('Verify layout table added to DB', done => {
+        createNewDB().then(fn => {
+            data.connect(fn).then(() => {
+                let db = new sqlite3.Database(fn, sqlite3.OPEN_READONLY, () => {
+                    db.get(
+                        'SELECT name FROM sqlite_master WHERE type="table" AND name="layouts"',
+                        (err, row) => {
+                            assert.isNotNull(row);
+                            done();
+                        }
+                    );
+                });
+            });
+        });
     });
 
     it('Verify do not connect to bad DB', done => {
-        assert.fail('', '', 'Test not implemented');
-    });
-
-    it('Verify connect to basic DB', done => {
-        assert.fail('', '', 'Test not implemented');
+        data.connect('bad filename').catch(err => {
+            assert.isNull(data._db);
+            done();
+        });
     });
 
     it('Verify getLayout fails when not connected', done => {
@@ -148,16 +160,21 @@ describe('Test SQLite data layer', () => {
             });
     });
 
-    it('Verify getLayout fails when DB does not have table', () => {
-        assert.fail('', '', 'Test not implemented');
-    });
-
-    it('Verify getLayout succeeds on basic DB', () => {
-        assert.fail('', '', 'Test not implemented');
-    });
-
-    it('Verify getLayout succeeds after update', () => {
-        assert.fail('', '', 'Test not implemented');
+    it('Verify getLayout succeeds after update', done => {
+        createNewDB()
+            .then(fn => {
+                return data.connect(fn);
+            })
+            .then(() => {
+                return data.updateLayout('{"test": true}');
+            })
+            .then(() => {
+                return data.getLayout();
+            })
+            .then(layout => {
+                assert.deepEqual(layout[0], { test: true });
+                done();
+            });
     });
 
     it('Verify getMetadata fails without DB', done => {
@@ -209,8 +226,20 @@ describe('Test SQLite data layer', () => {
             });
     });
 
-    it('Verify getMetadata throws error on new database', () => {
-        assert.fail('', '', 'Test not implemented');
+    it('Verify getMetadata returns null on new database', done => {
+        createNewDB()
+            .then(fn => {
+                return data.connect(fn);
+            })
+            .then(() => {
+                return data.getMetadata();
+            })
+            .then(metadata => {
+                assert.isNull(metadata['abs2prom']);
+                assert.isNull(metadata['prom2abs']);
+                assert.isNull(metadata['abs2meta']);
+                done();
+            });
     });
 
     it('Verify getDriverIterationData fails without connection', done => {
