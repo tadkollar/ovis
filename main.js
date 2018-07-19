@@ -147,10 +147,6 @@ app.on('window-all-closed', function() {
     }
 });
 
-app.on('will-quit', () => {
-    this.dataInterface.disconnect();
-});
-
 // On openFile open up file dialog
 ipcMain.on('openFile', (event, arg) => {
     logger.info('Received IPC in main to open file');
