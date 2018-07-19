@@ -70,7 +70,6 @@
     "dist:l": "build -l --x64",
     "dist:m": "build -m --x64",
     "dist:w": "build -w --x64",
-    "build": "./build_electron.sh",
     "test": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/mocha tests",
     "test:data": "./node_modules/mocha/bin/mocha test/test_sqlite_data.js",
     "test:logic": "./node_modules/mocha/bin/mocha test/test_logic.js"
