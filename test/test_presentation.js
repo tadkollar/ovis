@@ -1,6 +1,6 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
-const Logic = require('../src/data_server/logic/logic');
+const DataInterface = require('../src/data_server/presentation/DataInterface');
 const logger = require('electron-log');
 const {
     length,
@@ -23,7 +23,7 @@ global.before(function() {
     chai.use(chaiAsPromised);
 });
 
-var logic = null;
+var presentation = null;
 var databases = [];
 
 async function createNewDB() {
@@ -33,16 +33,16 @@ async function createNewDB() {
     return fname;
 }
 
-describe('Test logic layer', () => {
+describe('Test presentation layer', () => {
     beforeEach(function() {
         this.timeout(timeoutTime);
-        logic = new Logic(logger);
+        presentation = new DataInterface(logger);
     });
 
     afterEach(function() {
         this.timeout(timeoutTime);
-        logic.disconnect();
-        logic = null;
+        presentation.disconnect();
+        presentation = null;
 
         for (let i = 0; i < databases.length; ++i) {
             let db = databases[i];
@@ -52,30 +52,30 @@ describe('Test logic layer', () => {
     });
 
     it('Verify sellar connect', done => {
-        logic.connect(sellarLocation).then(() => {
-            assert.isNotNull(logic._data._db);
+        presentation.connect(sellarLocation).then(() => {
+            assert.isNotNull(presentation._logic._data._db);
             done();
         });
     });
 
     it('Verify sellar disconnect', done => {
-        logic.connect(sellarLocation).then(() => {
-            assert.isNotNull(logic._data._db);
-            logic.disconnect();
-            assert.isNull(logic._data._db);
+        presentation.connect(sellarLocation).then(() => {
+            assert.isNotNull(presentation._logic._data._db);
+            presentation.disconnect();
+            assert.isNull(presentation._logic._data._db);
             done();
         });
     });
 
     it('Verify basic fail connect', done => {
-        logic.connect('bad filename').catch(e => {
-            assert.isNull(logic._data._db);
+        presentation.connect('bad filename').catch(e => {
+            assert.isNull(presentation._logic._data._db);
             done();
         });
     });
 
     it('Verify getLayout fails when not connected', done => {
-        logic
+        presentation
             .getLayout()
             .then(() => {
                 assert.fail(
@@ -84,16 +84,16 @@ describe('Test logic layer', () => {
                 done();
             })
             .catch(e => {
-                assert.isNull(logic._data._db);
+                assert.isNull(presentation._logic._data._db);
                 done();
             });
     });
 
     it('Verify getLayout succeeds on sellar', done => {
-        logic
+        presentation
             .connect(sellarLocation)
             .then(() => {
-                return logic.getLayout();
+                return presentation.getLayout();
             })
             .then(layout => {
                 let l_layout = JSON.parse(layout[0]['layout']);
@@ -114,7 +114,7 @@ describe('Test logic layer', () => {
     });
 
     it('Verify getMetadata fails without DB', done => {
-        logic
+        presentation
             .getMetadata()
             .then(() => {
                 assert.fail(
@@ -125,16 +125,16 @@ describe('Test logic layer', () => {
                 done();
             })
             .catch(e => {
-                assert.isNull(logic._data._db);
+                assert.isNull(presentation._logic._data._db);
                 done();
             });
     });
 
     it('Verify getMetadata works on sellar', done => {
-        logic
+        presentation
             .connect(sellarLocation)
             .then(() => {
-                return logic.getMetadata();
+                return presentation.getMetadata();
             })
             .then(metadata => {
                 // make sure it isn't none
@@ -163,21 +163,21 @@ describe('Test logic layer', () => {
     });
 
     it('Verify getDriverIterationData fails without connection', done => {
-        logic
+        presentation
             .getDriverIterationData('test')
             .then(() => {
                 assert.fail('', '', 'Should have failed');
                 done();
             })
             .catch(err => {
-                assert.isNull(logic._data._db);
+                assert.isNull(presentation._logic._data._db);
                 done();
             });
     });
 
     it('Verify getDriverIterationData works for sellar', done => {
-        logic.connect(sellarLocation).then(() => {
-            return logic
+        presentation.connect(sellarLocation).then(() => {
+            return presentation
                 .getDriverIterationData('con_cmp1.con1')
                 .then(data => {
                     assert.equal(data.length, 7);
@@ -196,10 +196,10 @@ describe('Test logic layer', () => {
     });
 
     it('Verify getDriverItionData data correct on Sellar', done => {
-        logic
+        presentation
             .connect(sellarLocation)
             .then(() => {
-                return logic.getDriverIterationData('con_cmp1.con1');
+                return presentation.getDriverIterationData('con_cmp1.con1');
             })
             .then(data => {
                 let shouldBe = [
@@ -271,17 +271,19 @@ describe('Test logic layer', () => {
     it('Verify update layout on new DB', done => {
         createNewDB()
             .then(fn => {
-                logic
+                presentation
                     .connect(fn)
                     .then(() => {
-                        return logic.getLayout();
+                        return presentation.getLayout();
                     })
                     .then(layout => {
                         assert.equal(layout.length, 0);
-                        return logic.updateLayout({ layout: { test: true } });
+                        return presentation.updateLayout({
+                            layout: { test: true }
+                        });
                     })
                     .then(() => {
-                        return logic.getLayout();
+                        return presentation.getLayout();
                     })
                     .then(layout => {
                         assert.deepEqual(layout[0]['layout'], { test: true });
@@ -299,8 +301,8 @@ describe('Test logic layer', () => {
     });
 
     it('Verify getModelViewerData reject without connect', done => {
-        logic.getModelViewerData().catch(err => {
-            assert.isNull(logic._data._db);
+        presentation.getModelViewerData().catch(err => {
+            assert.isNull(presentation._logic._data._db);
             done();
         });
     });
@@ -308,10 +310,10 @@ describe('Test logic layer', () => {
     it('Verify getModelViewerData reject no data', done => {
         createNewDB()
             .then(fn => {
-                return logic.connect(fn);
+                return presentation.connect(fn);
             })
             .then(() => {
-                return logic.getModelViewerData();
+                return presentation.getModelViewerData();
             })
             .then(data => {
                 assert.equal(data.length, 0);
@@ -328,10 +330,10 @@ describe('Test logic layer', () => {
     });
 
     it('Verify getModelViewerData on sellar', done => {
-        logic
+        presentation
             .connect(sellarLocation)
             .then(() => {
-                return logic.getModelViewerData();
+                return presentation.getModelViewerData();
             })
             .then(data => {
                 let mvd = data[0];
@@ -355,8 +357,8 @@ describe('Test logic layer', () => {
     });
 
     it('Verify getDriverIterationsBasedOnCount rejects without db', done => {
-        logic.getDriverIterationsBasedOnCount('test', 0).catch(err => {
-            assert.isNull(logic._data._db);
+        presentation.getDriverIterationsBasedOnCount('test', 0).catch(err => {
+            assert.isNull(presentation._logic._data._db);
             done();
         });
     });
@@ -364,10 +366,10 @@ describe('Test logic layer', () => {
     it('Verify getDriverIterationsBasedOnCount false when db empty', done => {
         createNewDB()
             .then(fn => {
-                return logic.connect(fn);
+                return presentation.connect(fn);
             })
             .then(() => {
-                return logic.getDriverIterationsBasedOnCount(
+                return presentation.getDriverIterationsBasedOnCount(
                     'con_cmp1.con1',
                     -1
                 );
@@ -379,10 +381,10 @@ describe('Test logic layer', () => {
     });
 
     it('Verify getDriverIterationsBasedOnCount ret false on sellar', done => {
-        logic
+        presentation
             .connect(sellarLocation)
             .then(() => {
-                return logic.getDriverIterationsBasedOnCount(
+                return presentation.getDriverIterationsBasedOnCount(
                     'con_cmp1.con1',
                     100
                 );
@@ -394,10 +396,10 @@ describe('Test logic layer', () => {
     });
 
     it('Verify getDriverIterationsBasedOnCount ret true on sellar', done => {
-        logic
+        presentation
             .connect(sellarLocation)
             .then(() => {
-                return logic.getDriverIterationsBasedOnCount(
+                return presentation.getDriverIterationsBasedOnCount(
                     'con_cmp1.con1',
                     0
                 );
@@ -409,10 +411,10 @@ describe('Test logic layer', () => {
     });
 
     it('Verify getDriverIterationsBasedOnCount ret empty on equal', done => {
-        logic
+        presentation
             .connect(sellarLocation)
             .then(() => {
-                return logic.getDriverIterationsBasedOnCount(
+                return presentation.getDriverIterationsBasedOnCount(
                     'con_cmp1.con1',
                     14
                 );
@@ -424,7 +426,7 @@ describe('Test logic layer', () => {
     });
 
     it('Verify getAllDriverVars without connection', done => {
-        logic.getAllDriverVars().then(ret => {
+        presentation.getAllDriverVars().then(ret => {
             assert.equal(ret.desvars.length, 0);
             assert.equal(ret.objectives.length, 0);
             assert.equal(ret.constraints.length, 0);
@@ -437,10 +439,10 @@ describe('Test logic layer', () => {
     it('Verify getAllDriverVars empty with empty DB', done => {
         createNewDB()
             .then(fn => {
-                return logic.connect(fn);
+                return presentation.connect(fn);
             })
             .then(() => {
-                return logic.getAllDriverVars();
+                return presentation.getAllDriverVars();
             })
             .then(ret => {
                 assert.equal(ret.desvars.length, 0);
@@ -453,10 +455,10 @@ describe('Test logic layer', () => {
     });
 
     it('Verify getDriverIterationData desvar', done => {
-        logic
+        presentation
             .connect(sellarLocation)
             .then(() => {
-                return logic.getDriverIterationData('pz.z');
+                return presentation.getDriverIterationData('pz.z');
             })
             .then(data => {
                 assert.equal(data[0]['name'], 'pz.z');
@@ -466,10 +468,10 @@ describe('Test logic layer', () => {
     });
 
     it('Verify getDriverIterationData objective', done => {
-        logic
+        presentation
             .connect(sellarLocation)
             .then(() => {
-                return logic.getDriverIterationData('obj_cmp.obj');
+                return presentation.getDriverIterationData('obj_cmp.obj');
             })
             .then(data => {
                 assert.equal(data[0]['name'], 'obj_cmp.obj');
@@ -479,10 +481,10 @@ describe('Test logic layer', () => {
     });
 
     it('Verify getDriverIterationData constraint', done => {
-        logic
+        presentation
             .connect(sellarLocation)
             .then(() => {
-                return logic.getDriverIterationData('con_cmp2.con2');
+                return presentation.getDriverIterationData('con_cmp2.con2');
             })
             .then(data => {
                 assert.equal(data[0]['name'], 'con_cmp2.con2');
@@ -492,10 +494,10 @@ describe('Test logic layer', () => {
     });
 
     it('Verify getDriverIterationData sysinclude', done => {
-        logic
+        presentation
             .connect(sellarLocation)
             .then(() => {
-                return logic.getDriverIterationData('mda.d2.y2');
+                return presentation.getDriverIterationData('mda.d2.y2');
             })
             .then(data => {
                 assert.equal(data[0]['name'], 'mda.d2.y2');
@@ -505,10 +507,10 @@ describe('Test logic layer', () => {
     });
 
     it('Verify getDriverIterationData input', done => {
-        logic
+        presentation
             .connect(sellarLocation)
             .then(() => {
-                return logic.getDriverIterationData('obj_cmp.y1');
+                return presentation.getDriverIterationData('obj_cmp.y1');
             })
             .then(data => {
                 assert.equal(data[0]['name'], 'obj_cmp.y1');
@@ -518,10 +520,10 @@ describe('Test logic layer', () => {
     });
 
     it('verify getAllDriverVars values with sellar', done => {
-        logic
+        presentation
             .connect(sellarLocation)
             .then(() => {
-                return logic.getAllDriverVars();
+                return presentation.getAllDriverVars();
             })
             .then(ret => {
                 let expected = {

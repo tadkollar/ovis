@@ -188,59 +188,56 @@ class Logic {
      */
     async getAllDriverVars() {
         let dat = [];
+        let ret = {
+            desvars: [],
+            objectives: [],
+            constraints: [],
+            sysincludes: [],
+            inputs: []
+        };
+
         try {
             dat = await this._data.getDriverIterationData();
         } catch (e) {
-            return [];
+            return ret;
         }
 
-        let ret = [];
         let cache = [];
         let self = this;
         dat.forEach(i => {
             i['desvars'].forEach(v => {
-                if (!cache.includes(v['name'])) {
-                    ret.push({
-                        name: v['name'],
-                        type: 'desvar'
-                    });
-                    cache.push(v['name']);
+                let name = v['name'];
+                if (!cache.includes(name)) {
+                    ret.desvars.push(name);
+                    cache.push(name);
                 }
             });
             i['objectives'].forEach(v => {
-                if (!cache.includes(v['name'])) {
-                    ret.push({
-                        name: v['name'],
-                        type: 'objective'
-                    });
-                    cache.push(v['name']);
+                let name = v['name'];
+                if (!cache.includes(name)) {
+                    ret.objectives.push(name);
+                    cache.push(name);
                 }
             });
             i['constraints'].forEach(v => {
-                if (!cache.includes(v['name'])) {
-                    ret.push({
-                        name: v['name'],
-                        type: 'constraint'
-                    });
-                    cache.push(v['name']);
+                let name = v['name'];
+                if (!cache.includes(name)) {
+                    ret.constraints.push(name);
+                    cache.push(name);
                 }
             });
             i['sysincludes'].forEach(v => {
-                if (!cache.includes(v['name'])) {
-                    ret.push({
-                        name: v['name'],
-                        type: 'sysinclude'
-                    });
-                    cache.push(v['name']);
+                let name = v['name'];
+                if (!cache.includes(name)) {
+                    ret.sysincludes.push(name);
+                    cache.push(name);
                 }
             });
             i['inputs'].forEach(v => {
-                if (!cache.includes(v['name'])) {
-                    ret.push({
-                        name: v['name'],
-                        type: 'input'
-                    });
-                    cache.push(v['name']);
+                let name = v['name'];
+                if (!cache.includes(name)) {
+                    ret.inputs.push(name);
+                    cache.push(name);
                 }
             });
         });

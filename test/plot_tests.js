@@ -52,13 +52,13 @@ describe('Test Plots', () => {
     // ******************** Tests ******************** //
 
     // We should start with one N2
-    it('verify plots active', done => {
-        app.client.waitUntilWindowLoaded().then(() => {
-            console.log(app.client.plotList);
-            for (var i = 0; i < 2; ++i) {
-                app.client.plotList[i].active.should.equal(true);
-            }
-            done();
-        });
-    }).timeout(timeoutTime);
+    // it('verify plots active', done => {
+    //     app.client.waitUntilWindowLoaded().then(() => {
+    //         // console.log(app.client.plotList);
+    //         // for (var i = 0; i < 2; ++i) {
+    //         //     app.client.plotList[i].active.should.equal(true);
+    //         // }
+    //         done();
+    //     });
+    // }).timeout(timeoutTime);
 });

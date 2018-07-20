@@ -35,37 +35,7 @@ function Server() {
      * Get the set names of variables for which we have data
      */
     this.getVars = async function() {
-        let data = await self.dataInterface.getAllDriverVars();
-        let designVariables = [];
-        let objectives = [];
-        let constraints = [];
-        let sysincludes = [];
-        let inputs = [];
-        data.forEach(element => {
-            let name = element['name'];
-            let type = element['type'];
-            if (type === 'desvar') {
-                designVariables.push(name);
-            } else if (type === 'objective') {
-                objectives.push(name);
-            } else if (type === 'constraint') {
-                constraints.push(name);
-            } else if (type === 'sysinclude') {
-                sysincludes.push(name);
-            } else {
-                inputs.push(name);
-            }
-        });
-
-        let ret = {
-            desvars: designVariables,
-            objectives: objectives,
-            constraints: constraints,
-            sysincludes: sysincludes,
-            inputs: inputs
-        };
-
-        return ret;
+        return self.dataInterface.getAllDriverVars();
     };
 
     /**
