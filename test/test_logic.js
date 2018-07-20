@@ -10,6 +10,7 @@ const {
 const assert = chai.assert;
 const expect = chai.expect;
 const fs = require('fs');
+const crypto = require('crypto');
 
 const timeoutTime = 30000;
 logger.transports.file.level = false;
@@ -26,7 +27,7 @@ var logic = null;
 var databases = [];
 
 async function createNewDB() {
-    let id = databases.length;
+    let id = crypto.randomBytes(16).toString('hex');
     let fname = await createNewDatabase(id);
     databases.push(fname);
     return fname;
@@ -45,7 +46,7 @@ describe('Test logic layer', () => {
 
         for (let i = 0; i < databases.length; ++i) {
             let db = databases[i];
-            // fs.unlinkSync(db);
+            fs.unlinkSync(db);
         }
         databases = [];
     });
@@ -439,6 +440,71 @@ describe('Test logic layer', () => {
             })
             .then(ret => {
                 assert.equal(ret.length, 0);
+                done();
+            });
+    });
+
+    it('Verify getDriverIterationData desvar', done => {
+        logic
+            .connect(sellarLocation)
+            .then(() => {
+                return logic.getDriverIterationData('pz.z');
+            })
+            .then(data => {
+                assert.equal(data[0]['name'], 'pz.z');
+                assert.equal(data[0]['type'], 'desvar');
+                done();
+            });
+    });
+
+    it('Verify getDriverIterationData objective', done => {
+        logic
+            .connect(sellarLocation)
+            .then(() => {
+                return logic.getDriverIterationData('obj_cmp.obj');
+            })
+            .then(data => {
+                assert.equal(data[0]['name'], 'obj_cmp.obj');
+                assert.equal(data[0]['type'], 'objective');
+                done();
+            });
+    });
+
+    it('Verify getDriverIterationData constraint', done => {
+        logic
+            .connect(sellarLocation)
+            .then(() => {
+                return logic.getDriverIterationData('con_cmp2.con2');
+            })
+            .then(data => {
+                assert.equal(data[0]['name'], 'con_cmp2.con2');
+                assert.equal(data[0]['type'], 'constraint');
+                done();
+            });
+    });
+
+    it('Verify getDriverIterationData sysinclude', done => {
+        logic
+            .connect(sellarLocation)
+            .then(() => {
+                return logic.getDriverIterationData('mda.d2.y2');
+            })
+            .then(data => {
+                assert.equal(data[0]['name'], 'mda.d2.y2');
+                assert.equal(data[0]['type'], 'sysinclude');
+                done();
+            });
+    });
+
+    it('Verify getDriverIterationData input', done => {
+        logic
+            .connect(sellarLocation)
+            .then(() => {
+                return logic.getDriverIterationData('obj_cmp.y1');
+            })
+            .then(data => {
+                assert.equal(data[0]['name'], 'obj_cmp.y1');
+                assert.equal(data[0]['type'], 'input');
                 done();
             });
     });

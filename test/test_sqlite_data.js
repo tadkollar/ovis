@@ -10,6 +10,7 @@ const {
 const assert = chai.assert;
 const fs = require('fs');
 const sqlite3 = require('sqlite3');
+const crypto = require('crypto');
 
 const timeoutTime = 30000;
 logger.transports.file.level = false;
@@ -26,7 +27,7 @@ var data = null;
 var databases = [];
 
 async function createNewDB() {
-    let id = databases.length;
+    let id = crypto.randomBytes(16).toString('hex');
     let fname = await createNewDatabase(id);
     databases.push(fname);
     return fname;
@@ -175,6 +176,13 @@ describe('Test SQLite data layer', () => {
                 assert.deepEqual(layout[0], { test: true });
                 done();
             });
+    });
+
+    it('Verify updateLayout fails without connect', done => {
+        data.updateLayout('{test: true}').catch(err => {
+            assert.isNotNull(err);
+            done();
+        });
     });
 
     it('Verify getMetadata fails without DB', done => {
