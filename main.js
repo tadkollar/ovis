@@ -119,19 +119,8 @@ function startApp() {
 
     // NOTE: See note at top of file for explanation of "process.env.RUNNING_IN_VIS_INDEX_TESTS"
     if (process.env.RUNNING_IN_VIS_INDEX_TESTS) {
-        // If we're running a test, block process for a time so the server can start
-        // TODO: This is truly awful and should be replaced
-        let waitTill = new Date(new Date().getTime() + 1000);
-        while (waitTill > new Date()) {}
-
-        // Immediately load up the test DB
         console.log('Running in spectron, running findFile');
         findFile();
-
-        // Give server time to connect to DB
-        // TODO: This is truly awful and should be replaced
-        waitTill = new Date(new Date().getTime() + 1000);
-        while (waitTill > new Date()) {}
     }
     mainWindow.loadURL(mainWindowUrl);
 }
