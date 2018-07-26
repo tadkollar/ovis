@@ -97,9 +97,23 @@ Building OVis is as simple as running `npm run build`. This command
 builds the installers and associated files for all supported
 operating systems and stores them in the _dist_ folder.
 
+If you intend to build a Windows installer on macOS or Linux, make
+sure you install [Wine](https://www.winehq.org) first. You may also
+need to install the Wine dependency [XQuartz](https://www.xquartz.org/)
+if you're building on a mac.
+
 * To build for **macOS** only: `npm run build:m`
 * To build for **Windows** only: `npm run build:w`
 * To build for **Ubuntu** only: `npm run build:l`
+
+**Note:** Due to a bug in _electron-builder_, the AppImage produced
+on Windows and macOS will fail. The Ubuntu AppImage must be produced
+on a Linux machine.
+
+**Note:** macOS requires that the installer be signed using verified
+certificates. If the certificates are imported into the keychain on
+your mac, _electron-builder_ will automatically sign the application
+as a part of the build process.
 
 #### Release
 
