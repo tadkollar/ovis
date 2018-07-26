@@ -32,8 +32,8 @@ should be able to run the OVis executable.
 
 OVis is written in a combination of Node.js, JavaScript,
 HTML, and CSS using the Electron framework. Testing uses
-Mocha, Chai, and spectron with babel-node
-and isparta for code coverage. To begin developing OVis:
+_Mocha_, _Chai_, and _Spectron_ with _babel-node_
+and _isparta_ for code coverage. To begin developing OVis:
 
 1. Install [Node.js and npm](https://nodejs.org/en/download/package-manager/)
 2. Run `git clone https://github.com/OpenMDAO/zune.git`
@@ -85,7 +85,7 @@ tests.
 
 To ensure that new test files are run with the testing command, add them directly or in a sub-directory of the _test_ folder.
 
-### Build, Release, and Updating
+### Release Process
 
 OVis takes advantage of the built-in _electron-builder_ and
 _electron-updater_ for build and updating, respectively, and GitHub's
