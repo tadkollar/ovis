@@ -5,7 +5,7 @@
  *
  * NOTE: Logic is contained within this file that uses "process.env.RUNNING_IN_VIS_INDEX_TESTS".
  *  This variable indicates that we're running vis_index tests, which require
- *  that we immediately start the server and go to the vis_index page.
+ *  that we immediately go to the vis_index page.
  *  While it is bad practice to alter the logic in this file for testing, this is
  *  an unfortunate requirement due to a hanging bug in Spectron that we run into
  *  when we run 'loadURL'. Once that bug is fixed, this logic should be replaced.
@@ -119,6 +119,7 @@ function startApp() {
 
     // NOTE: See note at top of file for explanation of "process.env.RUNNING_IN_VIS_INDEX_TESTS"
     if (process.env.RUNNING_IN_VIS_INDEX_TESTS) {
+        // Immediately load up test DB
         console.log('Running in spectron, running findFile');
         findFile();
     }
