@@ -57,7 +57,7 @@ application startup, file selection, and automatic updating. The
 renderer process handles plotting, N<sup>2</sup> diagram logic,
 layout, and interfacing with the SQLite file.
 
-![header image](../blob/master/images/Architecture.png)
+![header image](../master/images/Architecture.png)
 
 The renderer process can be
 split into the HTML/CSS/JavaScript frontend and a Node.js backend
