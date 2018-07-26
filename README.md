@@ -2,9 +2,9 @@
 ------------------------------
 
 OVis is a desktop application that allows you to visualize the
-data you've recorded using [OpenMDAO's](http://www.openmdao.org) SQLite recorder. To use,
-simply open OVis, select your SQLite database file, and use the
-N<sup>2</sup> diagram to view model hierarchy and plots
+data you've recorded using [OpenMDAO's](http://www.openmdao.org) SQLite
+recorder. To use, simply open OVis, select your SQLite database file,
+and use the N<sup>2</sup> diagram to view model hierarchy and plots
 to see iteration history.
 
 ### Install
@@ -56,6 +56,8 @@ the main process can be found in _main.js_, which is responsible for
 application startup, file selection, and automatic updating. The
 renderer process handles plotting, N<sup>2</sup> diagram logic,
 layout, and interfacing with the SQLite file.
+
+![header image](../blob/master/images/Architecture.png)
 
 The renderer process can be
 split into the HTML/CSS/JavaScript frontend and a Node.js backend
