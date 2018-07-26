@@ -2,7 +2,7 @@
 ------------------------------
 
 OVis is a desktop application that allows you to visualize the
-data you've recorded using [OpenMDAO's](http://openmdao.org) SQLite recorder. To use,
+data you've recorded using [OpenMDAO's](http://www.openmdao.org) SQLite recorder. To use,
 simply open OVis, select your SQLite database file, and use the
 N<sup>2</sup> diagram to view model hierarchy and plots
 to see iteration history.
@@ -63,12 +63,16 @@ split into the HTML/CSS/JavaScript frontend and a Node.js backend
 'src/data_server' folder and implements an explicit three-tier
 architecture. The backend's data layer queries the database, the
 logic layer transforms the data into a more useful form, and the
-presentation layer presents an API for requesting data. The interface between the backend and frontend can be found in
+presentation layer presents an API for requesting data. The
+interface between the backend and frontend can be found in
 _server.js_.
 
 ### Test
 
-As mentioned above, this application uses the _Mocha_ JavaScript test framework with _Chai_ for assertions and _isparta/babel-node_ for code coverage. _Spectron_ is used in end-to-end testing to run the application.
+As mentioned above, this application uses the _Mocha_ JavaScript
+test framework with _Chai_ for assertions and _isparta/babel-node_
+for code coverage. _Spectron_ is used in end-to-end testing to run
+the application.
 
 * Run tests with `npm test`
 * Run tests and coverage with `npm run test-cov`
@@ -119,8 +123,8 @@ to make this work with each release. A python HTTP server (see
 pings GitHub every hour for new releases. If a new version is
 available, this server downloads it from GitHub. OVis pings this
 python server on startup to determine if a new version is available
-and, if there is, downloads the update in the background and installs
+and, if it is, downloads the update in the background and installs
 it when the application is closed. We use the HTTP server as a
 middle-man because Zune is a private repository and cannot be
-accessed from OVis without unless it is shipped with a GitHub token
+accessed from OVis unless it is shipped with a GitHub token
 (an obvious security concern).
