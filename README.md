@@ -59,15 +59,22 @@ layout, and interfacing with the SQLite file.
 
 ![header image](../master/images/Architecture.PNG)
 
-The renderer process can be
-split into the HTML/CSS/JavaScript frontend and a Node.js backend
-(formerly the python HTTP server). The backend can be found in the
-'src/data_server' folder and implements an explicit three-tier
-architecture. The backend's data layer queries the database, the
-logic layer transforms the data into a more useful form, and the
-presentation layer presents an API for requesting data. The
+**Note:** Direction of arrows indicate the direction of calls/requests
+(the presentation layer calls methods in the logic layer, the logic
+layer makes requests of the data layer, etc.)
+
+The renderer process can be split into a Node.js **backend** and the
+HTML/CSS/JavaScript **frontend** (formerly the python HTTP server).
+
+The backend - found in the src/data_server folder - implements an
+explicit three-tier architecture. The backend's data layer queries the
+database, the logic layer transforms the data into a more useful form,
+and the presentation layer presents an API for requesting data. The
 interface between the backend and frontend can be found in
 _server.js_.
+
+The frontend is primarily implemented in vanilla JavaScript and includes
+plotting, layout, and the N<sup>2</sup> diagram.
 
 ### Test
 
