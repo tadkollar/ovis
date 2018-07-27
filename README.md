@@ -141,7 +141,9 @@ that were generated when building
 
 OVis implements automatic updating so that users don't need to 
 manually download new versions. Nothing needs to be done
-to make this work with each release. A python HTTP server (see
+to make this work with each release.
+
+A python HTTP server (see
 [_github-release-http-server.py_](https://github.com/OpenMDAO/zune/blob/master/github-release-http-server.py)) running on WebFaction
 pings GitHub every hour for new releases. If a new version is
 available, this server downloads it from GitHub. OVis pings this
