@@ -63,7 +63,7 @@ layout, and interfacing with the SQLite file.
 (the presentation layer calls methods in the logic layer, the logic
 layer makes requests of the data layer, etc.)
 
-The renderer process can be split into a Node.js **backend** and the
+The renderer process can be split into a Node.js **backend** and a
 HTML/CSS/JavaScript **frontend** (formerly the python HTTP server).
 
 The backend - found in the src/data_server folder - implements an
@@ -118,6 +118,8 @@ if you're building on a mac.
 **Note:** Due to a bug in _electron-builder_, the AppImage produced
 on Windows and macOS will fail. The Ubuntu AppImage must be produced
 on a Linux machine.
+
+**Note:** Similar to installing on macOS, there can be problems building the sqlite3 module. If you run into this problem, try running the command again with python2 active.
 
 **Note:** macOS requires that the installer be signed using verified
 certificates. If the certificates are imported into the keychain on

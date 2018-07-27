@@ -42,9 +42,9 @@ function Layout() {
         //Create the initial golden layout dashboard
         server.getLayout().then(ret => {
             if (ret.length === 0) {
-                myLayout = createLayout(config);
+                myLayout = _createLayout(config);
             } else {
-                myLayout = createLayout(JSON.parse(ret[0]['layout']));
+                myLayout = _createLayout(JSON.parse(ret[0]['layout']));
             }
         });
 
@@ -94,8 +94,8 @@ function Layout() {
 
         lastLayout = lt;
         let state = lt.toConfig();
-        let componentStates = getComponentStates();
-        replaceComponentStates(state, componentStates);
+        let componentStates = _getComponentStates();
+        _replaceComponentStates(state, componentStates);
         server.saveLayout(state);
     };
 
@@ -105,7 +105,7 @@ function Layout() {
      */
     this.addNewPlot = function() {
         if (myLayout.root !== null && myLayout.root.contentItems.length > 0) {
-            myLayout.root.contentItems[0].addChild(getPlotConfig());
+            myLayout.root.contentItems[0].addChild(_getPlotConfig());
         } else {
             //Everything was deleted in the dashboard
             //Remove the previous layout
@@ -119,11 +119,11 @@ function Layout() {
                 content: [
                     {
                         type: 'row',
-                        content: [getPlotConfig()]
+                        content: [_getPlotConfig()]
                     }
                 ]
             };
-            myLayout = createLayout(newConfig);
+            myLayout = _createLayout(newConfig);
         }
     };
 
@@ -133,7 +133,7 @@ function Layout() {
      */
     this.addNewN2 = function() {
         if (myLayout.root !== null && myLayout.root.contentItems.length > 0) {
-            myLayout.root.contentItems[0].addChild(getN2Config());
+            myLayout.root.contentItems[0].addChild(_getN2Config());
         } else {
             //Remove the previous layout
             let n = document.getElementById('goldenLayout');
@@ -146,11 +146,11 @@ function Layout() {
                 content: [
                     {
                         type: 'row',
-                        content: [getN2Config()]
+                        content: [_getN2Config()]
                     }
                 ]
             };
-            myLayout = createLayout(newConfig);
+            myLayout = _createLayout(newConfig);
         }
     };
 
@@ -161,20 +161,20 @@ function Layout() {
      *
      * @returns {String} random number as string
      */
-    function getRand() {
+    function _getRand() {
         return Math.floor(Math.random() * 100000000).toString();
     }
 
     /**
      * Get a plot configuration
      */
-    function getPlotConfig() {
+    function _getPlotConfig() {
         //Golden Layout configuration for plots
         let plotConfig = {
             type: 'component',
             componentName: 'Variable vs. Iterations',
             componentState: {
-                label: getRand(),
+                label: _getRand(),
                 localscaleXVal: false,
                 localscaleYVal: false,
                 stackedPlotVal: false,
@@ -191,12 +191,12 @@ function Layout() {
     /**
      * Get an N2 configuration
      */
-    function getN2Config() {
+    function _getN2Config() {
         //Golden Layout configuration for N^2
         let n2Config = {
             type: 'component',
             componentName: 'Partition Tree and N<sup>2</sup>',
-            componentState: { label: getRand() }
+            componentState: { label: _getRand() }
         };
         return n2Config;
     }
@@ -207,10 +207,10 @@ function Layout() {
      *
      * @param {*} newConfig
      */
-    function createLayout(newConfig) {
+    function _createLayout(newConfig) {
         let lt = new GoldenLayout(newConfig);
-        registerN2(lt);
-        registerPlot(lt);
+        _registerN2(lt);
+        _registerPlot(lt);
         lt.container = '#goldenLayout';
         lt._isFullPage = true;
         lt.init();
@@ -226,7 +226,7 @@ function Layout() {
      *
      * @param {*} lt
      */
-    function registerN2(lt) {
+    function _registerN2(lt) {
         lt.registerComponent('Partition Tree and N<sup>2</sup>', function(
             container,
             componentState
@@ -253,7 +253,7 @@ function Layout() {
      *
      * @param {*} lt
      */
-    function registerPlot(lt) {
+    function _registerPlot(lt) {
         lt.registerComponent('Variable vs. Iterations', function(
             container,
             componentState
@@ -275,7 +275,7 @@ function Layout() {
      * @param {*} state
      * @param {*} componentStatesMap
      */
-    function replaceComponentStates(state, componentStatesMap) {
+    function _replaceComponentStates(state, componentStatesMap) {
         if (state.hasOwnProperty('componentState')) {
             let label = state.componentState.label;
             if (Number(label) in componentStatesMap) {
@@ -285,7 +285,7 @@ function Layout() {
 
         if (state.hasOwnProperty('content')) {
             for (let i = 0; i < state.content.length; ++i) {
-                replaceComponentStates(state.content[i], componentStatesMap);
+                _replaceComponentStates(state.content[i], componentStatesMap);
             }
         }
     }
@@ -294,7 +294,7 @@ function Layout() {
      * Grabs all componentStates from the configCallbacks array.
      * Returns a map from label to componentState
      */
-    function getComponentStates() {
+    function _getComponentStates() {
         let ret = {};
         for (let i = 0; i < configCallbacks.length; ++i) {
             let config = configCallbacks[i]();
@@ -311,10 +311,10 @@ function Layout() {
             {
                 type: 'row',
                 content: [
-                    getN2Config(),
+                    _getN2Config(),
                     {
                         type: 'column',
-                        content: [getPlotConfig(), getPlotConfig()]
+                        content: [_getPlotConfig(), _getPlotConfig()]
                     }
                 ]
             }
