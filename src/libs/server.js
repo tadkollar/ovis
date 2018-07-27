@@ -10,6 +10,12 @@ const DataInterface = require('./src/data_server/presentation/DataInterface');
 
 /**
  * Class Server - series of functions to interface with the data server
+ *
+ * NOTE: It may seem most intuitive to keep connection
+ * to the server in the Main process and then communicate
+ * via IPC; however, this leads to ulta-convoluted code
+ * because IPCs cannot directly respond with data,
+ * but call response IPCs.
  */
 function Server() {
     let self = this;

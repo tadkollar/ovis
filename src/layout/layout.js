@@ -8,6 +8,8 @@ var plotList = [];
 
 /**
  * Class Layout - Handles loading/saving/updating the layout
+ *
+ * Uses GoldenLayout (https://golden-layout.com/)
  */
 function Layout() {
     // ******************* Local Variables ******************* //
@@ -322,12 +324,22 @@ function Layout() {
     initialize();
 }
 
-// NOTE: this waits 100 ms before creating the layout
-// so that our server has time to connect to the DB in server.js
-// this is required because using DataInterface exclusively in the
-// main process leads to ultra convulted code because the IPCs
-// cannot directly respond with data.
+/**
+ * Wait until the server is noted to be connected, then create Layout.
+ * This is required because Layout immediately makes requests of the
+ * server, then produces the plot(s) and N^2 which also make requests.
+ * By waiting we avoid having to make a queue in server.js of actions
+ * to be taken once connection is complete
+ */
+function startWhenConnected() {
+    setTimeout(() => {
+        if (server.connected) {
+            layout = new Layout();
+        } else {
+            startWhenConnected();
+        }
+    }, 50);
+}
+
 var layout = null;
-setTimeout(() => {
-    layout = new Layout();
-}, 100);
+startWhenConnected();
