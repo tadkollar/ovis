@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "description": "A visualization tool for OpenMDAO",
   "main": "main.js",
-  "repository": "https://github.com/OpenMDAO/zune",
+  "repository": "https://github.com/OpenMDAO/ovis",
   "keywords": [
     "OpenMDAO",
     "Visualization"
