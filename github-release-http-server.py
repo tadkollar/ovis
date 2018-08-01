@@ -81,8 +81,8 @@ def update_release():
     print("Updating release files")
     ghname = os.environ['GHNAME']
     ghtoken = os.environ['GHTOKEN']
-    requests_url = 'https://api.github.com/repos/openmdao/zune/releases'
-    assets_url = 'https://api.github.com/repos/openmdao/zune/releases/assets/'
+    requests_url = 'https://api.github.com/repos/openmdao/ovis/releases'
+    assets_url = 'https://api.github.com/repos/openmdao/ovis/releases/assets/'
     asset_header = {'Accept': 'application/octet-stream'}
 
     release_req = requests.get(requests_url, auth=(ghname, ghtoken))
@@ -98,8 +98,8 @@ def update_release():
 
     ghname = os.environ['GHNAME']
     ghtoken = os.environ['GHTOKEN']
-    requests_url = 'https://api.github.com/repos/openmdao/zune/releases'
-    assets_url = 'https://api.github.com/repos/openmdao/zune/releases/assets/'
+    requests_url = 'https://api.github.com/repos/openmdao/ovis/releases'
+    assets_url = 'https://api.github.com/repos/openmdao/ovis/releases/assets/'
     asset_header = {'Accept': 'application/octet-stream'}
 
     release_req = requests.get(requests_url, auth=(ghname, ghtoken))

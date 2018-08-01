@@ -36,8 +36,8 @@ _Mocha_, _Chai_, and _Spectron_ with _babel-node_
 and _isparta_ for code coverage. To begin developing OVis:
 
 1. Install [Node.js and npm](https://nodejs.org/en/download/package-manager/)
-2. Run `git clone https://github.com/OpenMDAO/zune.git`
-3. Go to the cloned folder with `cd zune`
+2. Run `git clone https://github.com/OpenMDAO/ovis.git`
+3. Go to the cloned folder with `cd ovis`
 4. Run `npm install` to install all application dependencies.
     * **Note:** I've noticed there can be problems installing the
     _sqlite3_ library on macOS. If you run into this problem, try
@@ -131,7 +131,7 @@ as a part of the build process.
 Releases are handled on the OpenMDAO Zune repository's Releases on
 GitHub.
 
-1. Navigate to the Zune repository's [releases](https://github.com/openmdao/zune/releases)
+1. Navigate to the Zune repository's [releases](https://github.com/openmdao/ovis/releases)
 2. Click "_Draft a new release_"
 3. Add a tag version and attach the files in the _dist_ directory
 that were generated when building
@@ -146,7 +146,7 @@ manually download new versions. Nothing needs to be done
 to make this work with each release.
 
 A python HTTP server (see
-[_github-release-http-server.py_](https://github.com/OpenMDAO/zune/blob/master/github-release-http-server.py)) running on WebFaction
+[_github-release-http-server.py_](https://github.com/OpenMDAO/ovis/blob/master/github-release-http-server.py)) running on WebFaction
 pings GitHub every hour for new releases. If a new version is
 available, this server downloads it from GitHub. OVis pings this
 python server on startup to determine if a new version is available
