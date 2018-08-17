@@ -198,7 +198,7 @@ function PtN2Diagram(parentDiv, modelData) {
                     .selectAll(
                         'path.n2_hover_elements, circle.n2_hover_elements'
                     )
-                       .attr('class', newClassName);
+                    .attr('class', newClassName);
             }
             PrintConnects();
         })
@@ -243,7 +243,7 @@ function PtN2Diagram(parentDiv, modelData) {
             var lineWidth = Math.min(5, n2Dx * 0.5, n2Dy * 0.5);
             arrowMarker
                 .attr('markerWidth', lineWidth * 0.4)
-                       .attr('markerHeight', lineWidth * 0.4);
+                .attr('markerHeight', lineWidth * 0.4);
 
             var param = d3RightTextNodesArrayZoomed[c],
                 unknown = d3RightTextNodesArrayZoomed[r];
