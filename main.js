@@ -69,8 +69,10 @@ function findFile() {
             openFile(fileNames[0]);
         });
     } else {
-        logger.info('Opening sellar grouped in Spectron environment');
-        openFile(__dirname + '/test/sellar_grouped.db');
+        // the sellar_state_connection model is used here, it has a more
+        // interesting structure than sellar_grouped for checking tooltips
+        logger.info('Opening sellar state DB in Spectron environment');
+        openFile(__dirname + '/test/sellar_state.db');
     }
 }
 

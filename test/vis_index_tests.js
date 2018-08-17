@@ -133,7 +133,7 @@ describe('Test OVis Vis Page', () => {
     it('display db name', () => {
         return app.client.waitUntilTextExists(
             '#sidebarHeaderContent',
-            'sellar_grouped'
+            'sellar_state'
         );
     }).timeout(timeoutTime);
 

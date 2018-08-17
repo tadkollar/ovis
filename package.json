@@ -1,6 +1,6 @@
 {
   "name": "OVis",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "A visualization tool for OpenMDAO",
   "main": "main.js",
   "repository": "https://github.com/OpenMDAO/ovis",

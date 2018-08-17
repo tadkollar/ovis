@@ -151,7 +151,4 @@ pings GitHub every hour for new releases. If a new version is
 available, this server downloads it from GitHub. OVis pings this
 python server on startup to determine if a new version is available
 and, if it is, downloads the update in the background and installs
-it when the application is closed. We use the HTTP server as a
-middle-man because OVis is a private repository and cannot be
-accessed from OVis unless it is shipped with a GitHub token
-(an obvious security concern).
+it when the application is closed.

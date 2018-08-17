@@ -101,7 +101,7 @@ exports.getAddPlotButton = function(app) {
 /**
  * Assert that the "add plot" button is enabled
  * @param {Application} app
- * @return {Promise} reslves when assertion is complete
+ * @return {Promise} resolves when assertion is complete
  */
 exports.assertAddPlotButtonEnabled = function(app) {
     return new Promise(function(resolve, reject) {
