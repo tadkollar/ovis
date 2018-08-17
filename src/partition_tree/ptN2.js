@@ -11,10 +11,11 @@
 //  * draw.js
 //  * ptN2.js
 
-function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
-    var parentDiv = paramParentDiv;
-    var root = paramRootJson;
-    var conns = paramConnsJson;
+function PtN2Diagram(parentDiv, modelData) {
+    var root = modelData.tree;
+    var conns = modelData.connections_list;
+    var abs2prom = modelData.hasOwnProperty('abs2prom') ? modelData.abs2prom : undefined;
+
     var FONT_SIZE_PX = 11;
     var svgStyleElement = document.createElement('style');
     var outputNamingType = 'Absolute';
@@ -31,8 +32,13 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
         forwardButtonHistory = [];
     var chosenCollapseDepth = -1;
     var updateRecomputesAutoComplete = true; //default
+
     var katexInputDivElement = document.getElementById('katexInputDiv');
     var katexInputElement = document.getElementById('katexInput');
+
+    var tooltip = d3.select('body').append('div').attr('class', 'tool-tip')
+        .style('position', 'absolute')
+        .style('visibility', 'hidden');
 
     mouseOverOnDiagN2 = MouseoverOnDiagN2;
     mouseOverOffDiagN2 = MouseoverOffDiagN2;
@@ -192,7 +198,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
                     .selectAll(
                         'path.n2_hover_elements, circle.n2_hover_elements'
                     )
-                    .attr('class', newClassName);
+                       .attr('class', newClassName);
             }
             PrintConnects();
         })
@@ -237,7 +243,7 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             var lineWidth = Math.min(5, n2Dx * 0.5, n2Dy * 0.5);
             arrowMarker
                 .attr('markerWidth', lineWidth * 0.4)
-                .attr('markerHeight', lineWidth * 0.4);
+                       .attr('markerHeight', lineWidth * 0.4);
 
             var param = d3RightTextNodesArrayZoomed[c],
                 unknown = d3RightTextNodesArrayZoomed[r];
@@ -515,6 +521,29 @@ function PtN2Diagram(paramParentDiv, paramRootJson, paramConnsJson) {
             })
             .on('contextmenu', function(d) {
                 RightClick(d, this);
+            })
+            .on('mouseover', function (d) {
+                if (abs2prom != undefined) {
+                    if (d.type == 'param') {
+                        return tooltip.text(abs2prom.input[d.absPathName])
+                                      .style('visibility', 'visible');
+                    }
+                    if (d.type == 'unknown') {
+                        return tooltip.text(abs2prom.output[d.absPathName])
+                                      .style('visibility', 'visible');
+                    }
+                }
+            })
+            .on('mouseleave', function (d) {
+                if (abs2prom != undefined) {
+                    return tooltip.style('visibility', 'hidden');
+                }
+            })
+            .on('mousemove', function(){
+                if (abs2prom != undefined) {
+                    return tooltip.style('top', (d3.event.pageY-30)+'px')
+                                  .style('left',(d3.event.pageX+5)+'px');
+                }
             });
 
         nodeEnter
@@ -2214,11 +2243,7 @@ ptn2.resize = function() {
     }
 
     if (treeData !== null) {
-        PtN2Diagram(
-            lastLeftClickedElement,
-            treeData['tree'],
-            treeData['connections_list']
-        );
+        PtN2Diagram(lastLeftClickedElement, treeData);
     }
 };
 
