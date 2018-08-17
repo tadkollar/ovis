@@ -95,6 +95,11 @@ describe('Test OVis Vis Page', () => {
         });
     }).timeout(timeoutTime);
 
+    // Make sure that the tootip is correct for y2_actual
+    it('Tool tip is correct', done => {
+        helper.assertTooltipText(app).then(() => done());
+    }).timeout(timeoutTime);
+
     // Window should open automatically
     it('opens a window', () => {
         return app.client

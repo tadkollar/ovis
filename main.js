@@ -117,7 +117,12 @@ function startApp() {
     Menu.setApplicationMenu(menu);
     logger.info('Version: ' + app.getVersion());
 
-    mainWindow = new BrowserWindow({});
+    mainWindow = new BrowserWindow({
+        width: 1024,
+        height: 768,
+        minWidth: 1024,
+        minHeight: 768,
+    });
 
     // NOTE: See note at top of file for explanation of "process.env.RUNNING_IN_VIS_INDEX_TESTS"
     if (process.env.RUNNING_IN_VIS_INDEX_TESTS) {

@@ -201,6 +201,24 @@ exports.assertAddN2Disabled = function(app) {
 };
 
 /**
+ * Assert that the "state_eq.y2_actual" tool tip appears correctly
+ * @param {Application} app
+ * @return {Promise} resolves after assertion
+ */
+exports.assertTooltipText = function(app) {
+    return new Promise(function(resolve, reject) {
+        app.client.waitUntilWindowLoaded().then(() => {
+            app.client
+                .moveToObject('#svgId > g:nth-child(4) > g:nth-child(9) > rect')
+                .getText('.tool-tip').should.eventually.equal('state_eq.y2_actual')
+                .then(() => {
+                    resolve();
+                });
+        });
+    });
+};
+
+/**
  * Remove the N^2 diagram
  * @param {Application} app
  * @return {Promise} resolves after 'x' button is clicked
