@@ -205,12 +205,12 @@ exports.assertAddN2Disabled = function(app) {
  * @param {Application} app
  * @return {Promise} resolves after assertion
  */
-exports.assertTooltipText = function(app) {
+exports.assertTooltipText = function(app, path, text) {
     return new Promise(function(resolve, reject) {
         app.client.waitUntilWindowLoaded().then(() => {
             app.client
-                .moveToObject('#svgId > g:nth-child(4) > g:nth-child(9) > rect')
-                .getText('.tool-tip').should.eventually.equal('state_eq.y2_actual')
+                .moveToObject(path)
+                .getText('.tool-tip').should.eventually.equal(text)
                 .then(() => {
                     resolve();
                 });
