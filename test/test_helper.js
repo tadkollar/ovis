@@ -201,7 +201,7 @@ exports.assertAddN2Disabled = function(app) {
 };
 
 /**
- * Assert that the "state_eq.y2_actual" tool tip appears correctly
+ * Assert that the tool tip appears correctly
  * @param {Application} app
  * @return {Promise} resolves after assertion
  */
