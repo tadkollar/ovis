@@ -69,8 +69,10 @@ function findFile() {
             openFile(fileNames[0]);
         });
     } else {
-        logger.info('Opening sellar grouped in Spectron environment');
-        openFile(__dirname + '/test/sellar_grouped.db');
+        // the sellar_state_connection model is used here, it has a more
+        // interesting structure than sellar_grouped for checking tooltips
+        logger.info('Opening sellar state DB in Spectron environment');
+        openFile(__dirname + '/test/sellar_state.db');
     }
 }
 
@@ -115,7 +117,12 @@ function startApp() {
     Menu.setApplicationMenu(menu);
     logger.info('Version: ' + app.getVersion());
 
-    mainWindow = new BrowserWindow({});
+    mainWindow = new BrowserWindow({
+        width: 1024,
+        height: 768,
+        minWidth: 1024,
+        minHeight: 768,
+    });
 
     // NOTE: See note at top of file for explanation of "process.env.RUNNING_IN_VIS_INDEX_TESTS"
     if (process.env.RUNNING_IN_VIS_INDEX_TESTS) {

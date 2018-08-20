@@ -95,6 +95,26 @@ describe('Test OVis Vis Page', () => {
         });
     }).timeout(timeoutTime);
 
+    // Make sure that the tootip is correct
+    it('Tooltip is correct', done => {
+        // param
+        var path = '#svgId > g:nth-child(4) > g:nth-child(9) > rect',
+            text = 'state_eq.y2_actual';
+        helper.assertTooltipText(app, path, text).then(() => done());
+        // unconnected param
+        var path = '#svgId > g:nth-child(4) > g.partition_group.unconnected_param',
+            text = 'con_cmp2.y2';
+        helper.assertTooltipText(app, path, text).then(() => done());
+        // unknown
+        var path = '#svgId > g:nth-child(4) > g:nth-child(15)',
+            text = 'y1';
+        helper.assertTooltipText(app, path, text).then(() => done());
+        // implicit unknown
+        var path = '#svgId > g:nth-child(4) > g.partition_group.unknown_implicit',
+            text = 'state_eq.y2_command';
+        helper.assertTooltipText(app, path, text).then(() => done());
+    }).timeout(timeoutTime);
+
     // Window should open automatically
     it('opens a window', () => {
         return app.client
@@ -133,7 +153,7 @@ describe('Test OVis Vis Page', () => {
     it('display db name', () => {
         return app.client.waitUntilTextExists(
             '#sidebarHeaderContent',
-            'sellar_grouped'
+            'sellar_state'
         );
     }).timeout(timeoutTime);
 

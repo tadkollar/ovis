@@ -11,7 +11,7 @@ to see iteration history.
 
 OVis is available for Windows, Mac, and Ubuntu.
 
-1. Go to the OVis's [releases](https://github.com/OpenMDAO/Zune/releases)
+1. Go to the OVis's [releases](https://github.com/OpenMDAO/ovis/releases)
 and download the correct installer for your operating system from the most
 recent release.
 
@@ -128,10 +128,10 @@ as a part of the build process.
 
 #### Release
 
-Releases are handled on the OpenMDAO Zune repository's Releases on
+Releases are handled on the OpenMDAO OVis repository's Releases on
 GitHub.
 
-1. Navigate to the Zune repository's [releases](https://github.com/openmdao/ovis/releases)
+1. Navigate to the OVis repository's [releases](https://github.com/openmdao/ovis/releases)
 2. Click "_Draft a new release_"
 3. Add a tag version and attach the files in the _dist_ directory
 that were generated when building
@@ -151,7 +151,4 @@ pings GitHub every hour for new releases. If a new version is
 available, this server downloads it from GitHub. OVis pings this
 python server on startup to determine if a new version is available
 and, if it is, downloads the update in the background and installs
-it when the application is closed. We use the HTTP server as a
-middle-man because Zune is a private repository and cannot be
-accessed from OVis unless it is shipped with a GitHub token
-(an obvious security concern).
+it when the application is closed.

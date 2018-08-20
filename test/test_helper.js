@@ -101,7 +101,7 @@ exports.getAddPlotButton = function(app) {
 /**
  * Assert that the "add plot" button is enabled
  * @param {Application} app
- * @return {Promise} reslves when assertion is complete
+ * @return {Promise} resolves when assertion is complete
  */
 exports.assertAddPlotButtonEnabled = function(app) {
     return new Promise(function(resolve, reject) {
@@ -193,6 +193,24 @@ exports.assertAddN2Disabled = function(app) {
                 .element(n2ButtonID)
                 .isEnabled()
                 .should.eventually.equal(false)
+                .then(() => {
+                    resolve();
+                });
+        });
+    });
+};
+
+/**
+ * Assert that the tool tip appears correctly
+ * @param {Application} app
+ * @return {Promise} resolves after assertion
+ */
+exports.assertTooltipText = function(app, path, text) {
+    return new Promise(function(resolve, reject) {
+        app.client.waitUntilWindowLoaded().then(() => {
+            app.client
+                .moveToObject(path)
+                .getText('.tool-tip').should.eventually.equal(text)
                 .then(() => {
                     resolve();
                 });
