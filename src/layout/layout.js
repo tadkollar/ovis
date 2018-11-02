@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const is = require('electron-is');
 
+const {webFrame} = require('electron')
+
 var plotList = [];
 
 /**
@@ -322,6 +324,20 @@ function Layout() {
     };
 
     initialize();
+
+    // zoom with mousewheel
+    $('#goldenLayout').bind('mousewheel', function(e) {
+        event.preventDefault();
+        if (e.ctrlKey) {
+            let wheelDelta = e.originalEvent.wheelDelta;
+            if (wheelDelta > 0) {
+                webFrame.setZoomLevel(webFrame.getZoomLevel()+1);
+            }
+            else if (wheelDelta < 0) {
+                webFrame.setZoomLevel(webFrame.getZoomLevel()-1);
+            }
+        }
+    });
 }
 
 /**
