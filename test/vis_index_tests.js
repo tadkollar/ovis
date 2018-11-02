@@ -166,4 +166,32 @@ describe('Test OVis Vis Page', () => {
     it('initially enabled plot button', done => {
         helper.assertAddPlotButtonEnabled(app).then(() => done());
     }).timeout(timeoutTime);
+
+    it('resize n2 600px', done => {
+        helper.clickResizeN2(app, 600).then(() => {
+            helper.getN2height(app).then(height => {
+                // height.should.equal(600);
+                done();
+            });
+            helper.assertN2height(app, 600).then(() => {
+                done();
+            });
+        });
+    }).timeout(timeoutTime);
+
+    // // Resizing the N2 diagram should work properly
+    // it('resize n2', done => {
+    //     for (var i = 600; i <= 1000; i += 50) {
+    //         helper.clickResizeN2(app, i).then(() => {
+    //             helper.assertN2height(app, i).then(() => done());
+    //         });
+    //     }
+    //     done();
+    //     // for (var i = 2000; i <= 4000; i += 1000) {
+    //     //     helper.clickResizeN2(app, i).then(() => {
+    //     //         helper.assertN2height(app, i).then(() => done());
+    //     //     });
+    //     // }
+    // }).timeout(timeoutTime);
+
 });

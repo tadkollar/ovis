@@ -163,6 +163,62 @@ exports.clickAddN2Button = function(app) {
 };
 
 /**
+ * Click the "idVerticalResize???px" link, where ??? is the given height
+ * @param {Application} app
+ * @param {int} height
+ * @return {Promise} resolves after click
+ */
+exports.clickResizeN2 = function(app, height) {
+    return new Promise(function(resolve, reject) {
+        app.client.waitUntilWindowLoaded().then(() => {
+            var path = '//*[@id="n2Controls"]/div/div[4]/div/div[2]/button';
+            app.client
+                .moveToObject(path)
+                .element('#idVerticalResize'+height+'px')
+                .click()
+                .then(() => resolve());
+        });
+    });
+};
+
+/**
+ * Assert that the N2 diagram is the given height
+ * @param {Application} app
+ * @param {int} height
+ * @return {Promise} resolves after click
+ */
+exports.assertN2height = function(app, height) {
+    return new Promise(function(resolve, reject) {
+        app.client.waitUntilWindowLoaded().then(() => {
+            app.client
+                .element('#idVerticalResize'+height+'px')
+                .should.have.attribute('height', height+'px')
+                .then(() => {
+                    resolve();
+                });
+        });
+    });
+};
+
+/**
+ * Assert that the N2 diagram is the given height
+ * @param {Application} app
+ * @param {int} height
+ * @return {Promise} resolves after click
+ */
+exports.getN2height = function(app) {
+    return new Promise(function(resolve, reject) {
+        app.client.waitUntilWindowLoaded().then(() => {
+            app.client
+                .element(n2ID)
+                .then(e => {
+                    resolve(e.value.height);
+                });
+        });
+    });
+};
+
+/**
  * Assert that the "add N2" button is enabled
  * @param {Application} app
  * @return {Promise} resolves after assertion
