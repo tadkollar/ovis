@@ -22,6 +22,17 @@ const plotButtonID = '#addPlotButton';
 const n2ButtonID = '#addN2Button';
 
 /**
+ * Utility function to wait 2 seconds (e.g. for an animation).
+ */
+exports.resolveAfter2Seconds = function() {
+  return new Promise(resolve => {
+    setTimeout(function() {
+      resolve(20);
+    }, 2000);
+  });
+};
+
+/**
  * Get the first N^2 element found
  * @param {Application} app
  * @return {Promise} resolves to the N^2 element
@@ -158,6 +169,43 @@ exports.clickAddN2Button = function(app) {
                 .element(n2ButtonID)
                 .click()
                 .then(() => resolve());
+        });
+    });
+};
+
+/**
+ * Click the "idVerticalResize???px" link, where ??? is the given height
+ * @param {Application} app
+ * @param {int} height
+ * @return {Promise} resolves after click
+ */
+exports.clickResizeN2 = function(app, height) {
+    return new Promise(function(resolve, reject) {
+        app.client.waitUntilWindowLoaded().then(() => {
+            var path = '//*[@id="n2Controls"]/div/div[4]/div/div[2]/button';
+            app.client
+                .moveToObject(path)
+                .element('#idVerticalResize'+height+'px')
+                .click()
+                .then(() => resolve());
+        });
+    });
+};
+
+/**
+ * Assert that the N2 diagram is the given height
+ * @param {Application} app
+ * @param {int} height
+ * @return {Promise} resolves after assertion
+ */
+exports.assertN2height = function(app, height) {
+    return new Promise(function(resolve, reject) {
+        app.client.waitUntilWindowLoaded().then(() => {
+            app.client.getElementSize(n2ID+' .ptN2ChartClass', 'height')
+                .should.eventually.equal(height)
+                .then(() => {
+                    resolve();
+                })
         });
     });
 };

@@ -26,7 +26,9 @@ var app = new Application({
     env: { RUNNING_IN_VIS_INDEX_TESTS: '1' },
     path: electronPath,
     args: [appPath],
-    chromeDriverLogPath: 'chrome-driver.log'
+    chromeDriverLogPath: 'chrome-driver.log',
+    // TODO: 'moveToObject' is deprecated (used in helpers)
+    webdriverOptions: ({deprecationWarnings : false})
 });
 
 global.before(function() {
@@ -166,4 +168,36 @@ describe('Test OVis Vis Page', () => {
     it('initially enabled plot button', done => {
         helper.assertAddPlotButtonEnabled(app).then(() => done());
     }).timeout(timeoutTime);
+
+});
+
+// checking all of them is overkill... let's just pick a representative sample
+// var heights = [600, 650, 700, 750, 800, 850, 900, 950, 1000, 2000, 3000, 4000];
+var heights = [600, 750, 900, 1000, 2000, 4000];
+var border = 2;  // 1px border, top and bottom
+
+heights.forEach((height) => {
+    describe('Test Resizing N2 ' + height, () => {
+
+        beforeEach(function() {
+            this.timeout(timeoutTime);
+            return app.start();
+        });
+
+        afterEach(function() {
+            this.timeout(timeoutTime);
+            return app.stop();
+        });
+
+        it('should change height to ' + height + 'px', done => {
+            helper.clickResizeN2(app, height).then(() => {
+                // wait 2 seconds to allow animation to play out
+                helper.resolveAfter2Seconds().then(() => {
+                    helper.assertN2height(app, height+border).then(() => {
+                        done();
+                    });
+                })
+            });
+        }).timeout(timeoutTime);
+    });
 });
