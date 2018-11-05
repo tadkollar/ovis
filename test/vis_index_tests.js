@@ -26,7 +26,9 @@ var app = new Application({
     env: { RUNNING_IN_VIS_INDEX_TESTS: '1' },
     path: electronPath,
     args: [appPath],
-    chromeDriverLogPath: 'chrome-driver.log'
+    chromeDriverLogPath: 'chrome-driver.log',
+    // TODO: 'moveToObject' is deprecated (used in helpers)
+    webdriverOptions: ({deprecationWarnings : false})
 });
 
 global.before(function() {
@@ -167,31 +169,35 @@ describe('Test OVis Vis Page', () => {
         helper.assertAddPlotButtonEnabled(app).then(() => done());
     }).timeout(timeoutTime);
 
-    it('resize n2 600px', done => {
-        helper.clickResizeN2(app, 600).then(() => {
-            helper.getN2height(app).then(height => {
-                // height.should.equal(600);
-                done();
-            });
-            helper.assertN2height(app, 600).then(() => {
-                done();
-            });
+});
+
+// checking all of them is overkill... let's just pick a representative sample
+// var heights = [600, 650, 700, 750, 800, 850, 900, 950, 1000, 2000, 3000, 4000]
+var heights = [600, 750, 900, 1000, 2000, 4000]
+var border = 2;  // 1px border, top and bottom
+
+heights.forEach((height) => {
+    describe('Test Resizing N2 ' + height, () => {
+
+        beforeEach(function() {
+            this.timeout(timeoutTime);
+            return app.start();
         });
-    }).timeout(timeoutTime);
 
-    // // Resizing the N2 diagram should work properly
-    // it('resize n2', done => {
-    //     for (var i = 600; i <= 1000; i += 50) {
-    //         helper.clickResizeN2(app, i).then(() => {
-    //             helper.assertN2height(app, i).then(() => done());
-    //         });
-    //     }
-    //     done();
-    //     // for (var i = 2000; i <= 4000; i += 1000) {
-    //     //     helper.clickResizeN2(app, i).then(() => {
-    //     //         helper.assertN2height(app, i).then(() => done());
-    //     //     });
-    //     // }
-    // }).timeout(timeoutTime);
+        afterEach(function() {
+            this.timeout(timeoutTime);
+            return app.stop();
+        });
 
+        it('should change height to ' + height + 'px', done => {
+            helper.clickResizeN2(app, height).then(() => {
+                // wait 2 seconds to allow animation to play out
+                helper.resolveAfter2Seconds().then(() => {
+                    helper.assertN2height(app, height+border).then(() => {
+                        done();
+                    });
+                })
+            });
+        }).timeout(timeoutTime);
+    });
 });
