@@ -172,8 +172,8 @@ describe('Test OVis Vis Page', () => {
 });
 
 // checking all of them is overkill... let's just pick a representative sample
-// var heights = [600, 650, 700, 750, 800, 850, 900, 950, 1000, 2000, 3000, 4000]
-var heights = [600, 750, 900, 1000, 2000, 4000]
+// var heights = [600, 650, 700, 750, 800, 850, 900, 950, 1000, 2000, 3000, 4000];
+var heights = [600, 750, 900, 1000, 2000, 4000];
 var border = 2;  // 1px border, top and bottom
 
 heights.forEach((height) => {
