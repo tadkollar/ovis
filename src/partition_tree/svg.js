@@ -1,7 +1,7 @@
 
 function SaveSvg(parentDiv) {
     //get svg element.
-    var svgData = parentDiv.querySelector("#svgId").outerHTML;
+    let svgData = parentDiv.querySelector("#svgId").outerHTML;
 
     //add name spaces.
     if (!svgData.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
@@ -15,9 +15,9 @@ function SaveSvg(parentDiv) {
     svgData = '<?xml version="1.0" standalone="no"?>\r\n' + svgData;
 
     svgData = vkbeautify.xml(svgData);
-    var svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
-    var svgUrl = URL.createObjectURL(svgBlob);
-    var downloadLink = document.createElement("a");
+    let svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    let svgUrl = URL.createObjectURL(svgBlob);
+    let downloadLink = document.createElement("a");
     downloadLink.href = svgUrl;
     downloadLink.download = "partition_tree_n2.svg";
     document.body.appendChild(downloadLink);
@@ -26,7 +26,7 @@ function SaveSvg(parentDiv) {
 }
 
 function UpdateSvgCss(svgStyleElement, FONT_SIZE_PX){
-        var myCssText =
+        let myCssText =
         "rect { " +
         "    stroke: " + ptn2.PT_STROKE_COLOR + "; " +
         "} " +
