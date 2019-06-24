@@ -12,31 +12,31 @@
 //  * ptN2.js
 
 function PtN2Diagram(parentDiv, modelData) {
-    var root = modelData.tree;
-    var conns = modelData.connections_list;
-    var abs2prom = modelData.hasOwnProperty('abs2prom') ? modelData.abs2prom : undefined;
+    let root = modelData.tree;
+    let conns = modelData.connections_list;
+    let abs2prom = modelData.hasOwnProperty('abs2prom') ? modelData.abs2prom : undefined;
 
-    var FONT_SIZE_PX = 11;
-    var svgStyleElement = document.createElement('style');
-    var outputNamingType = 'Absolute';
-    var showPath = false; //default off
+    let FONT_SIZE_PX = 11;
+    let svgStyleElement = document.createElement('style');
+    let outputNamingType = 'Absolute';
+    let showPath = false; //default off
 
-    var DEFAULT_TRANSITION_START_DELAY = 100;
-    var transitionStartDelay = DEFAULT_TRANSITION_START_DELAY;
-    var idCounter = 0;
-    var maxDepth = 1;
-    var RIGHT_TEXT_MARGIN_PX = 8; // How much space in px (left and) right of text in partition tree
+    let DEFAULT_TRANSITION_START_DELAY = 100;
+    let transitionStartDelay = DEFAULT_TRANSITION_START_DELAY;
+    let idCounter = 0;
+    let maxDepth = 1;
+    let RIGHT_TEXT_MARGIN_PX = 8; // How much space in px (left and) right of text in partition tree
 
-    //N^2 vars
-    var backButtonHistory = [],
+    //N^2 lets
+    let backButtonHistory = [],
         forwardButtonHistory = [];
-    var chosenCollapseDepth = -1;
-    var updateRecomputesAutoComplete = true; //default
+    let chosenCollapseDepth = -1;
+    let updateRecomputesAutoComplete = true; //default
 
-    var katexInputDivElement = document.getElementById('katexInputDiv');
-    var katexInputElement = document.getElementById('katexInput');
+    let katexInputDivElement = document.getElementById('katexInputDiv');
+    let katexInputElement = document.getElementById('katexInput');
 
-    var tooltip = d3.select('body').append('div').attr('class', 'tool-tip')
+    let tooltip = d3.select('body').append('div').attr('class', 'tool-tip')
         .style('position', 'absolute')
         .style('visibility', 'hidden');
 
@@ -68,18 +68,18 @@ function PtN2Diagram(parentDiv, modelData) {
         .attr('class', 'arrowHead');
 
     setN2Group();
-    var pTreeGroup = svg.append('g');
+    let pTreeGroup = svg.append('g');
 
     function updateRootTypes() {
         if (!search.showParams) return;
 
-        var stack = [];
-        for (var i = 0; i < root.children.length; ++i) {
+        let stack = [];
+        for (let i = 0; i < root.children.length; ++i) {
             stack.push(root.children[i]);
         }
 
         while (stack.length > 0) {
-            var cur_ele = stack.pop();
+            let cur_ele = stack.pop();
             if (cur_ele.type === 'param') {
                 if (
                     !hasInputConnection(cur_ele.absPathName) &&
@@ -90,7 +90,7 @@ function PtN2Diagram(parentDiv, modelData) {
             }
 
             if (cur_ele.hasOwnProperty('children')) {
-                for (var j = 0; j < cur_ele.children.length; ++j) {
+                for (let j = 0; j < cur_ele.children.length; ++j) {
                     stack.push(cur_ele.children[j]);
                 }
             }
@@ -116,16 +116,16 @@ function PtN2Diagram(parentDiv, modelData) {
     }
     hasInputConn = hasInputConnection;
 
-    var n2BackgroundRectR0 = -1,
+    let n2BackgroundRectR0 = -1,
         n2BackgroundRectC0 = -1;
-    var newConnsDict = {};
+    let newConnsDict = {};
     function PrintConnects() {
-        var text = 'Connections:';
-        for (var key in newConnsDict) {
-            var d = newConnsDict[key];
-            var param = d3RightTextNodesArrayZoomed[d.c],
+        let text = 'Connections:';
+        for (let key in newConnsDict) {
+            let d = newConnsDict[key];
+            let param = d3RightTextNodesArrayZoomed[d.c],
                 unknown = d3RightTextNodesArrayZoomed[d.r];
-            var paramName =
+            let paramName =
                 zoomedElement.promotions &&
                 zoomedElement.promotions[param.absPathName] !== undefined
                     ? '<b>' +
@@ -136,7 +136,7 @@ function PtN2Diagram(parentDiv, modelData) {
                         : param.absPathName.slice(
                               zoomedElement.absPathName.length + 1
                           );
-            var unknownName =
+            let unknownName =
                 zoomedElement.promotions &&
                 zoomedElement.promotions[unknown.absPathName] !== undefined
                     ? '<b>' +
@@ -157,19 +157,19 @@ function PtN2Diagram(parentDiv, modelData) {
         }
         $('#connectionId')[0].innerHTML = text;
     }
-    var n2BackgroundRect = n2Group
+    let n2BackgroundRect = n2Group
         .append('rect')
         .attr('class', 'background')
         .attr('width', ptn2.WIDTH_N2_PX)
         .attr('height', ptn2.HEIGHT_PX)
         .on('click', function() {
             if (!search.showParams) return;
-            var coords = d3.mouse(this);
-            var c = Math.floor(
+            let coords = d3.mouse(this);
+            let c = Math.floor(
                 (coords[0] * d3RightTextNodesArrayZoomed.length) /
                     ptn2.WIDTH_N2_PX
             );
-            var r = Math.floor(
+            let r = Math.floor(
                 (coords[1] * d3RightTextNodesArrayZoomed.length) /
                     ptn2.HEIGHT_PX
             );
@@ -183,12 +183,12 @@ function PtN2Diagram(parentDiv, modelData) {
                 return;
             if (matrix[r + '_' + c] !== undefined) return;
 
-            var param = d3RightTextNodesArrayZoomed[c],
+            let param = d3RightTextNodesArrayZoomed[c],
                 unknown = d3RightTextNodesArrayZoomed[r];
             if (param.type !== 'param' && unknown.type !== 'unknown') return;
 
-            var newClassName = 'n2_hover_elements_' + r + '_' + c;
-            var selection = n2Group.selectAll('.' + newClassName);
+            let newClassName = 'n2_hover_elements_' + r + '_' + c;
+            let selection = n2Group.selectAll('.' + newClassName);
             if (selection.size() > 0) {
                 delete newConnsDict[r + '_' + c];
                 selection.remove();
@@ -216,12 +216,12 @@ function PtN2Diagram(parentDiv, modelData) {
         })
         .on('mousemove', function() {
             if (!search.showParams) return;
-            var coords = d3.mouse(this);
-            var c = Math.floor(
+            let coords = d3.mouse(this);
+            let c = Math.floor(
                 (coords[0] * d3RightTextNodesArrayZoomed.length) /
                     ptn2.WIDTH_N2_PX
             );
-            var r = Math.floor(
+            let r = Math.floor(
                 (coords[1] * d3RightTextNodesArrayZoomed.length) /
                     ptn2.HEIGHT_PX
             );
@@ -240,12 +240,12 @@ function PtN2Diagram(parentDiv, modelData) {
             n2BackgroundRectR0 = r;
             n2BackgroundRectC0 = c;
 
-            var lineWidth = Math.min(5, n2Dx * 0.5, n2Dy * 0.5);
+            let lineWidth = Math.min(5, n2Dx * 0.5, n2Dy * 0.5);
             arrowMarker
                 .attr('markerWidth', lineWidth * 0.4)
                 .attr('markerHeight', lineWidth * 0.4);
 
-            var param = d3RightTextNodesArrayZoomed[c],
+            let param = d3RightTextNodesArrayZoomed[c],
                 unknown = d3RightTextNodesArrayZoomed[r];
             if (param.type !== 'param' && unknown.type !== 'unknown') return;
             if (r > c) {
@@ -275,7 +275,7 @@ function PtN2Diagram(parentDiv, modelData) {
                     true
                 );
             }
-            var leftTextWidthR = d3RightTextNodesArrayZoomed[r].nameWidthPx,
+            let leftTextWidthR = d3RightTextNodesArrayZoomed[r].nameWidthPx,
                 leftTextWidthC = d3RightTextNodesArrayZoomed[c].nameWidthPx;
             DrawRect(
                 -leftTextWidthR - PTREE_N2_GAP_PX,
@@ -295,7 +295,7 @@ function PtN2Diagram(parentDiv, modelData) {
             PrintConnects();
 
             if (newConnsDict[r + '_' + c] === undefined) {
-                var paramName =
+                let paramName =
                     zoomedElement.promotions &&
                     zoomedElement.promotions[param.absPathName] !== undefined
                         ? '<b>' +
@@ -306,7 +306,7 @@ function PtN2Diagram(parentDiv, modelData) {
                             : param.absPathName.slice(
                                   zoomedElement.absPathName.length + 1
                               );
-                var unknownName =
+                let unknownName =
                     zoomedElement.promotions &&
                     zoomedElement.promotions[unknown.absPathName] !== undefined
                         ? '<b>' +
@@ -328,8 +328,8 @@ function PtN2Diagram(parentDiv, modelData) {
         });
 
     setN2ElementsGroup();
-    var zoomedElement0 = root;
-    var lastRightClickedElement = root;
+    let zoomedElement0 = root;
+    let lastRightClickedElement = root;
 
     ExpandColonVars(root);
     FlattenColonGroups(root);
@@ -339,16 +339,16 @@ function PtN2Diagram(parentDiv, modelData) {
     ComputeConnections();
     ComputeMatrixN2();
 
-    var collapseDepthElement = $('#idCollapseDepthDiv')[0];
+    let collapseDepthElement = $('#idCollapseDepthDiv')[0];
     while (collapseDepthElement.children.length > 0) {
         collapseDepthElement.removeChild(collapseDepthElement.children[0]);
     }
-    for (var i = 2; i <= maxDepth; ++i) {
-        var option = document.createElement('span');
+    for (let i = 2; i <= maxDepth; ++i) {
+        let option = document.createElement('span');
         option.className = 'fakeLink';
         option.id = 'idCollapseDepthOption' + i + '';
         option.innerHTML = '' + i + '';
-        var f = (function(idx) {
+        let f = (function(idx) {
             return function() {
                 CollapseToDepthSelectChange(idx);
             };
@@ -379,7 +379,7 @@ function PtN2Diagram(parentDiv, modelData) {
         ComputeLayout(); //updates d3NodesArray
         ComputeMatrixN2();
 
-        for (var i = 2; i <= maxDepth; ++i) {
+        for (let i = 2; i <= maxDepth; ++i) {
             $('#idCollapseDepthOption' + i + '')[0].style.display =
                 i <= zoomedElement.depth ? 'none' : 'block';
         }
@@ -495,13 +495,13 @@ function PtN2Diagram(parentDiv, modelData) {
             .attr('width', ptn2.WIDTH_N2_PX)
             .attr('height', ptn2.HEIGHT_PX);
 
-        var sel = pTreeGroup
+        let sel = pTreeGroup
             .selectAll('.partition_group')
             .data(d3NodesArray, function(d) {
                 return d.id;
             });
 
-        var nodeEnter = sel
+        let nodeEnter = sel
             .enter()
             .append('svg:g')
             .attr('class', function(d) {
@@ -560,8 +560,8 @@ function PtN2Diagram(parentDiv, modelData) {
             .attr('dy', '.35em')
             //.attr("text-anchor", "end")
             .attr('transform', function(d) {
-                var anchorX = d.width0 * ptn2.kx0 - RIGHT_TEXT_MARGIN_PX;
-                //var anchorX = -RIGHT_TEXT_MARGIN_PX;
+                let anchorX = d.width0 * ptn2.kx0 - RIGHT_TEXT_MARGIN_PX;
+                //let anchorX = -RIGHT_TEXT_MARGIN_PX;
                 return (
                     'translate(' +
                     anchorX +
@@ -576,7 +576,7 @@ function PtN2Diagram(parentDiv, modelData) {
             })
             .text(GetText);
 
-        var nodeUpdate = nodeEnter
+        let nodeUpdate = nodeEnter
             .merge(sel)
             .transition(sharedTransition)
             .attr('class', function(d) {
@@ -604,7 +604,7 @@ function PtN2Diagram(parentDiv, modelData) {
         nodeUpdate
             .select('text')
             .attr('transform', function(d) {
-                var anchorX = d.width * ptn2.kx - RIGHT_TEXT_MARGIN_PX;
+                let anchorX = d.width * ptn2.kx - RIGHT_TEXT_MARGIN_PX;
                 return (
                     'translate(' +
                     anchorX +
@@ -620,7 +620,7 @@ function PtN2Diagram(parentDiv, modelData) {
             .text(GetText);
 
         // Transition exiting nodes to the parent's new position.
-        var nodeExit = sel
+        let nodeExit = sel
             .exit()
             .transition(sharedTransition)
             .attr('transform', function(d) {
@@ -646,7 +646,7 @@ function PtN2Diagram(parentDiv, modelData) {
         nodeExit
             .select('text')
             .attr('transform', function(d) {
-                var anchorX = d.width * ptn2.kx - RIGHT_TEXT_MARGIN_PX;
+                let anchorX = d.width * ptn2.kx - RIGHT_TEXT_MARGIN_PX;
                 return (
                     'translate(' +
                     anchorX +
@@ -676,7 +676,7 @@ function PtN2Diagram(parentDiv, modelData) {
 
     function ExpandColonVars(d) {
         function findNameInIndex(arr, name) {
-            for (var i = 0; i < arr.length; ++i) {
+            for (let i = 0; i < arr.length; ++i) {
                 if (arr[i].name === name) return i;
             }
             return -1;
@@ -691,16 +691,16 @@ function PtN2Diagram(parentDiv, modelData) {
         ) {
             if (arrayOfNames.length == arrayOfNamesIndex) return;
 
-            var name = arrayOfNames[arrayOfNamesIndex];
+            let name = arrayOfNames[arrayOfNamesIndex];
 
             if (!parent.hasOwnProperty('children')) {
                 parent.children = [];
             }
 
-            var parentI = findNameInIndex(parent.children, name);
+            let parentI = findNameInIndex(parent.children, name);
             if (parentI == -1) {
                 //new name not found in parent, create new
-                var newObj = {
+                let newObj = {
                     name: name,
                     type: type,
                     splitByColon: true,
@@ -731,8 +731,8 @@ function PtN2Diagram(parentDiv, modelData) {
         }
 
         if (!d.children) return;
-        for (var i = 0; i < d.children.length; ++i) {
-            var splitArray = d.children[i].name.split(':');
+        for (let i = 0; i < d.children.length; ++i) {
+            let splitArray = d.children[i].name.split(':');
             if (splitArray.length > 1) {
                 if (
                     !d.hasOwnProperty('subsystem_type') ||
@@ -743,12 +743,12 @@ function PtN2Diagram(parentDiv, modelData) {
                     );
                     return;
                 }
-                var type = d.children[i].type;
+                let type = d.children[i].type;
                 d.children.splice(i--, 1);
                 addChildren(d, d, splitArray, 0, type);
             }
         }
-        for (var i = 0; i < d.children.length; ++i) {
+        for (let i = 0; i < d.children.length; ++i) {
             ExpandColonVars(d.children[i]);
         }
     }
@@ -762,7 +762,7 @@ function PtN2Diagram(parentDiv, modelData) {
             d.children[0].splitByColon
         ) {
             //alert("combine " + d.name + " " + d.children[0].name);
-            var child = d.children[0];
+            let child = d.children[0];
             d.name += ':' + child.name;
             d.children =
                 child.hasOwnProperty('children') && child.children.length >= 1
@@ -771,13 +771,13 @@ function PtN2Diagram(parentDiv, modelData) {
             if (d.children == null) delete d.children;
         }
         if (!d.children) return;
-        for (var i = 0; i < d.children.length; ++i) {
+        for (let i = 0; i < d.children.length; ++i) {
             FlattenColonGroups(d.children[i]);
         }
     }
 
     function GetText(d) {
-        var retVal = d.name;
+        let retVal = d.name;
         if (
             outputNamingType === 'Promoted' &&
             (d.type === 'unknown' ||
@@ -813,7 +813,7 @@ function PtN2Diagram(parentDiv, modelData) {
             d.type === 'param' ||
             d.type === 'unconnected_param'
         ) {
-            var parentComponent = d.originalParent
+            let parentComponent = d.originalParent
                 ? d.originalParent
                 : d.parent;
             if (
@@ -829,14 +829,14 @@ function PtN2Diagram(parentDiv, modelData) {
         }
         if (d.splitByColon) {
             d.colonName = d.name;
-            for (var obj = d.parent; obj.splitByColon; obj = obj.parent) {
+            for (let obj = d.parent; obj.splitByColon; obj = obj.parent) {
                 d.colonName = obj.name + ':' + d.colonName;
             }
         }
         maxDepth = Math.max(depth, maxDepth);
         if (d.children) {
-            for (var i = 0; i < d.children.length; ++i) {
-                var implicit = InitTree(d.children[i], d, depth + 1);
+            for (let i = 0; i < d.children.length; ++i) {
+                let implicit = InitTree(d.children[i], d, depth + 1);
                 if (implicit) {
                     d.implicit = true;
                 }
@@ -846,25 +846,25 @@ function PtN2Diagram(parentDiv, modelData) {
     }
 
     function ComputeLayout() {
-        var columnWidthsPx = new Array(maxDepth + 1).fill(0.0), // since depth is one based
+        let columnWidthsPx = new Array(maxDepth + 1).fill(0.0), // since depth is one based
             columnLocationsPx = new Array(maxDepth + 1).fill(0.0);
 
-        var textWidthGroup = svg
+        let textWidthGroup = svg
             .append('svg:g')
             .attr('class', 'partition_group');
-        var textWidthText = textWidthGroup
+        let textWidthText = textWidthGroup
             .append('svg:text')
             .text('')
             .attr('x', -50); // Put text off screen
-        var textWidthTextNode = textWidthText.node();
+        let textWidthTextNode = textWidthText.node();
 
-        var autoCompleteSetNames = {},
+        let autoCompleteSetNames = {},
             autoCompleteSetPathNames = {};
 
         function PopulateAutoCompleteList(d) {
             if (d.children && !d.isMinimized) {
                 //depth first, dont go into minimized children
-                for (var i = 0; i < d.children.length; ++i) {
+                for (let i = 0; i < d.children.length; ++i) {
                     PopulateAutoCompleteList(d.children[i]);
                 }
             }
@@ -875,7 +875,7 @@ function PtN2Diagram(parentDiv, modelData) {
             )
                 return;
 
-            var n = d.name;
+            let n = d.name;
             if (d.splitByColon && d.children && d.children.length > 0) n += ':';
             if (
                 d.type !== 'param' &&
@@ -883,7 +883,7 @@ function PtN2Diagram(parentDiv, modelData) {
                 d.type !== 'unknown'
             )
                 n += '.';
-            var namesToAdd = [n];
+            let namesToAdd = [n];
 
             if (d.splitByColon)
                 namesToAdd.push(
@@ -898,7 +898,7 @@ function PtN2Diagram(parentDiv, modelData) {
                 }
             });
 
-            var localPathName =
+            let localPathName =
                 zoomedElement === root
                     ? d.absPathName
                     : d.absPathName.slice(zoomedElement.absPathName.length + 1);
@@ -922,15 +922,15 @@ function PtN2Diagram(parentDiv, modelData) {
                 return;
             d.nameWidthPx = GetTextWidth(GetText(d)) + 2 * RIGHT_TEXT_MARGIN_PX;
             if (d.children) {
-                for (var i = 0; i < d.children.length; ++i) {
+                for (let i = 0; i < d.children.length; ++i) {
                     UpdateTextWidths(d.children[i]);
                 }
             }
         }
 
         function ComputeColumnWidths(d) {
-            var greatestDepth = 0;
-            var leafWidthsPx = new Array(maxDepth + 1).fill(0.0);
+            let greatestDepth = 0;
+            let leafWidthsPx = new Array(maxDepth + 1).fill(0.0);
 
             function DoComputeColumnWidths(d) {
                 if (
@@ -941,14 +941,14 @@ function PtN2Diagram(parentDiv, modelData) {
                 )
                     return;
 
-                var heightPx =
+                let heightPx =
                     (ptn2.HEIGHT_PX * d.numLeaves) / zoomedElement.numLeaves;
                 d.textOpacity0 = d.hasOwnProperty('textOpacity')
                     ? d.textOpacity
                     : 0;
                 d.textOpacity = heightPx > FONT_SIZE_PX ? 1 : 0;
-                var hasVisibleDetail = heightPx >= 2.0;
-                var widthPx = 1e-3;
+                let hasVisibleDetail = heightPx >= 2.0;
+                let widthPx = 1e-3;
                 if (hasVisibleDetail) widthPx = ptn2.MIN_COLUMN_WIDTH_PX;
                 if (d.textOpacity > 0.5) widthPx = d.nameWidthPx;
 
@@ -960,7 +960,7 @@ function PtN2Diagram(parentDiv, modelData) {
                         columnWidthsPx[d.depth],
                         widthPx
                     );
-                    for (var i = 0; i < d.children.length; ++i) {
+                    for (let i = 0; i < d.children.length; ++i) {
                         DoComputeColumnWidths(d.children[i]);
                     }
                 } else {
@@ -974,15 +974,15 @@ function PtN2Diagram(parentDiv, modelData) {
 
             DoComputeColumnWidths(d);
 
-            var sum = 0;
-            var lastColumnWidth = 0;
+            let sum = 0;
+            let lastColumnWidth = 0;
             for (
-                var i = leafWidthsPx.length - 1;
+                let i = leafWidthsPx.length - 1;
                 i >= zoomedElement.depth;
                 --i
             ) {
                 sum += columnWidthsPx[i];
-                var lastWidthNeeded = leafWidthsPx[i] - sum;
+                let lastWidthNeeded = leafWidthsPx[i] - sum;
                 lastColumnWidth = Math.max(lastWidthNeeded, lastColumnWidth);
             }
             columnWidthsPx[zoomedElement.depth - 1] = ptn2.PARENT_NODE_WIDTH_PX;
@@ -998,11 +998,11 @@ function PtN2Diagram(parentDiv, modelData) {
                 d.numLeaves = 0;
                 return;
             }
-            var doRecurse = d.children && !d.isMinimized;
+            let doRecurse = d.children && !d.isMinimized;
             d.numLeaves = doRecurse ? 0 : 1; //no children: init to 0 because will be added later
             if (!doRecurse) return;
 
-            for (var i = 0; i < d.children.length; ++i) {
+            for (let i = 0; i < d.children.length; ++i) {
                 ComputeLeaves(d.children[i]);
                 d.numLeaves += d.children[i].numLeaves;
             }
@@ -1035,7 +1035,7 @@ function PtN2Diagram(parentDiv, modelData) {
                     earliestMinimizedParent = d;
                 }
             }
-            var node = earliestMinimizedParent ? earliestMinimizedParent : d;
+            let node = earliestMinimizedParent ? earliestMinimizedParent : d;
             d.rootIndex0 = d.hasOwnProperty('rootIndex')
                 ? d.rootIndex
                 : leafCounter;
@@ -1066,7 +1066,7 @@ function PtN2Diagram(parentDiv, modelData) {
             }
 
             if (d.children) {
-                for (var i = 0; i < d.children.length; ++i) {
+                for (let i = 0; i < d.children.length; ++i) {
                     ComputeNormalizedPositions(
                         d.children[i],
                         leafCounter,
@@ -1091,7 +1091,7 @@ function PtN2Diagram(parentDiv, modelData) {
         // Now the column_width array is relative to the zoomedElement
         //    and the computation of the widths only includes visible items after the zoom
         ptn2.widthPTreePx = 0;
-        for (var depth = 1; depth <= maxDepth; ++depth) {
+        for (let depth = 1; depth <= maxDepth; ++depth) {
             columnLocationsPx[depth] = ptn2.widthPTreePx;
             ptn2.widthPTreePx += columnWidthsPx[depth];
         }
@@ -1123,13 +1123,13 @@ function PtN2Diagram(parentDiv, modelData) {
         textWidthGroup.remove();
     }
 
-    var lastLeftClickedEle;
-    var lastRightClickedEle;
-    var lastRightClickedObj;
+    let lastLeftClickedEle;
+    let lastRightClickedEle;
+    let lastRightClickedObj;
 
     //right click => collapse
     function RightClick(d, ele) {
-        var e = d3.event;
+        let e = d3.event;
         lastLeftClickedEle = d;
         lastRightClickedObj = d;
         lastRightClickedEle = ele;
@@ -1137,12 +1137,12 @@ function PtN2Diagram(parentDiv, modelData) {
         collapse();
     }
 
-    var menu = document.querySelector('#context-menu');
-    var menuState = 0;
-    var contextMenuActive = 'context-menu--active';
+    let menu = document.querySelector('#context-menu');
+    let menuState = 0;
+    let contextMenuActive = 'context-menu--active';
 
     function collapse() {
-        var d = lastLeftClickedEle;
+        let d = lastLeftClickedEle;
         if (!d.children) return;
         if (d.depth > zoomedElement.depth) {
             //dont allow minimizing on root node
@@ -1182,10 +1182,10 @@ function PtN2Diagram(parentDiv, modelData) {
 
     function BackButtonPressed() {
         if (backButtonHistory.length == 0) return;
-        var d = backButtonHistory.pop().el;
+        let d = backButtonHistory.pop().el;
         $('#backButtonId')[0].disabled =
             backButtonHistory.length == 0 ? 'disabled' : false;
-        for (var obj = d; obj != null; obj = obj.parent) {
+        for (let obj = d; obj != null; obj = obj.parent) {
             //make sure history item is not minimized
             if (obj.isMinimized) return;
         }
@@ -1196,10 +1196,10 @@ function PtN2Diagram(parentDiv, modelData) {
 
     function ForwardButtonPressed() {
         if (forwardButtonHistory.length == 0) return;
-        var d = forwardButtonHistory.pop().el;
+        let d = forwardButtonHistory.pop().el;
         $('#forwardButtonId')[0].disabled =
             forwardButtonHistory.length == 0 ? 'disabled' : false;
-        for (var obj = d; obj != null; obj = obj.parent) {
+        for (let obj = d; obj != null; obj = obj.parent) {
             //make sure history item is not minimized
             if (obj.isMinimized) return;
         }
@@ -1245,7 +1245,7 @@ function PtN2Diagram(parentDiv, modelData) {
                 return null;
             }
 
-            for (var i = 0; i < d.children.length; ++i) {
+            for (let i = 0; i < d.children.length; ++i) {
                 if (d.children[i].name === nameArray[nameIndex]) {
                     return GetObjectInTree(
                         d.children[i],
@@ -1253,13 +1253,13 @@ function PtN2Diagram(parentDiv, modelData) {
                         nameIndex + 1
                     );
                 } else {
-                    var numNames = d.children[i].name.split(':').length;
+                    let numNames = d.children[i].name.split(':').length;
                     if (
                         numNames >= 2 &&
                         nameIndex + numNames <= nameArray.length
                     ) {
-                        var mergedName = nameArray[nameIndex];
-                        for (var j = 1; j < numNames; ++j) {
+                        let mergedName = nameArray[nameIndex];
+                        for (let j = 1; j < numNames; ++j) {
                             mergedName += ':' + nameArray[nameIndex + j];
                         }
                         if (d.children[i].name === mergedName) {
@@ -1278,7 +1278,7 @@ function PtN2Diagram(parentDiv, modelData) {
         function RemoveDuplicates(d) {
             //remove redundant elements in every objects' sources and targets arrays
             if (d.children) {
-                for (var i = 0; i < d.children.length; ++i) {
+                for (let i = 0; i < d.children.length; ++i) {
                     RemoveDuplicates(d.children[i]);
                 }
             }
@@ -1289,13 +1289,13 @@ function PtN2Diagram(parentDiv, modelData) {
 
             if (d.targetsParamView) {
                 //numElementsBefore += d.targetsParamView.length;
-                var uniqueArray = d.targetsParamView.filter(unique);
+                let uniqueArray = d.targetsParamView.filter(unique);
                 d.targetsParamView = uniqueArray;
                 //numElementsAfter += d.targetsParamView.length;
             }
             if (d.targetsHideParams) {
                 //numElementsBefore += d.targetsHideParams.length;
-                var uniqueArray = d.targetsHideParams.filter(unique);
+                let uniqueArray = d.targetsHideParams.filter(unique);
                 d.targetsHideParams = uniqueArray;
                 //numElementsAfter += d.targetsHideParams.length;
             }
@@ -1306,7 +1306,7 @@ function PtN2Diagram(parentDiv, modelData) {
                 objArray.push(d);
             }
             if (d.children) {
-                for (var i = 0; i < d.children.length; ++i) {
+                for (let i = 0; i < d.children.length; ++i) {
                     AddLeaves(d.children[i], objArray);
                 }
             }
@@ -1316,7 +1316,7 @@ function PtN2Diagram(parentDiv, modelData) {
             d.targetsParamView = [];
             d.targetsHideParams = [];
             if (d.children) {
-                for (var i = 0; i < d.children.length; ++i) {
+                for (let i = 0; i < d.children.length; ++i) {
                     ClearConnections(d.children[i]);
                 }
             }
@@ -1324,14 +1324,14 @@ function PtN2Diagram(parentDiv, modelData) {
 
         ClearConnections(root);
 
-        for (var i = 0; i < conns.length; ++i) {
-            var srcSplitArray = conns[i].src.split(/\.|:/);
-            var srcObj = GetObjectInTree(root, srcSplitArray, 0);
+        for (let i = 0; i < conns.length; ++i) {
+            let srcSplitArray = conns[i].src.split(/\.|:/);
+            let srcObj = GetObjectInTree(root, srcSplitArray, 0);
             if (srcObj == null) {
                 alert('error: cannot find connection source ' + conns[i].src);
                 return;
             }
-            var srcObjArray = [srcObj];
+            let srcObjArray = [srcObj];
             if (srcObj.type !== 'unknown') {
                 //source obj must be unknown
                 alert('error: there is a source that is not an unknown.');
@@ -1342,18 +1342,18 @@ function PtN2Diagram(parentDiv, modelData) {
                 alert('error: there is a source that has children.');
                 return;
             }
-            for (var obj = srcObj.parent; obj != null; obj = obj.parent) {
+            for (let obj = srcObj.parent; obj != null; obj = obj.parent) {
                 srcObjArray.push(obj);
             }
 
-            var tgtSplitArray = conns[i].tgt.split(/\.|:/);
-            var tgtObj = GetObjectInTree(root, tgtSplitArray, 0);
+            let tgtSplitArray = conns[i].tgt.split(/\.|:/);
+            let tgtObj = GetObjectInTree(root, tgtSplitArray, 0);
             if (tgtObj == null) {
                 alert('error: cannot find connection target ' + conns[i].tgt);
                 return;
             }
-            var tgtObjArrayParamView = [tgtObj];
-            var tgtObjArrayHideParams = [tgtObj];
+            let tgtObjArrayParamView = [tgtObj];
+            let tgtObjArrayHideParams = [tgtObj];
             if (
                 tgtObj.type !== 'param' &&
                 tgtObj.type !== 'unconnected_param'
@@ -1367,12 +1367,12 @@ function PtN2Diagram(parentDiv, modelData) {
                 return;
             }
             AddLeaves(tgtObj.parentComponent, tgtObjArrayHideParams); //contaminate
-            for (var obj = tgtObj.parent; obj != null; obj = obj.parent) {
+            for (let obj = tgtObj.parent; obj != null; obj = obj.parent) {
                 tgtObjArrayParamView.push(obj);
                 tgtObjArrayHideParams.push(obj);
             }
 
-            for (var j = 0; j < srcObjArray.length; ++j) {
+            for (let j = 0; j < srcObjArray.length; ++j) {
                 if (!srcObjArray[j].hasOwnProperty('targetsParamView'))
                     srcObjArray[j].targetsParamView = [];
                 if (!srcObjArray[j].hasOwnProperty('targetsHideParams'))
@@ -1385,11 +1385,11 @@ function PtN2Diagram(parentDiv, modelData) {
                 ].targetsHideParams.concat(tgtObjArrayHideParams);
             }
 
-            var cycleArrowsArray = [];
+            let cycleArrowsArray = [];
             if (conns[i].cycle_arrows && conns[i].cycle_arrows.length > 0) {
-                var cycleArrows = conns[i].cycle_arrows;
-                for (var j = 0; j < cycleArrows.length; ++j) {
-                    var cycleArrowsSplitArray = cycleArrows[j].split(' ');
+                let cycleArrows = conns[i].cycle_arrows;
+                for (let j = 0; j < cycleArrows.length; ++j) {
+                    let cycleArrowsSplitArray = cycleArrows[j].split(' ');
                     if (cycleArrowsSplitArray.length != 2) {
                         alert(
                             'error: cycleArrowsSplitArray length not 2: got ' +
@@ -1397,8 +1397,8 @@ function PtN2Diagram(parentDiv, modelData) {
                         );
                         return;
                     }
-                    var splitArray = cycleArrowsSplitArray[0].split(/\.|:/);
-                    var arrowBeginObj = GetObjectInTree(root, splitArray, 0);
+                    let splitArray = cycleArrowsSplitArray[0].split(/\.|:/);
+                    let arrowBeginObj = GetObjectInTree(root, splitArray, 0);
                     if (arrowBeginObj == null) {
                         alert(
                             'error: cannot find cycle arrows begin object ' +
@@ -1407,7 +1407,7 @@ function PtN2Diagram(parentDiv, modelData) {
                         return;
                     }
                     splitArray = cycleArrowsSplitArray[1].split(/\.|:/);
-                    var arrowEndObj = GetObjectInTree(root, splitArray, 0);
+                    let arrowEndObj = GetObjectInTree(root, splitArray, 0);
                     if (arrowEndObj == null) {
                         alert(
                             'error: cannot find cycle arrows end object ' +
@@ -1439,20 +1439,20 @@ function PtN2Diagram(parentDiv, modelData) {
         if (
             d3RightTextNodesArrayZoomed.length < ptn2.LEVEL_OF_DETAIL_THRESHOLD
         ) {
-            for (var si = 0; si < d3RightTextNodesArrayZoomed.length; ++si) {
-                var srcObj = d3RightTextNodesArrayZoomed[si];
+            for (let si = 0; si < d3RightTextNodesArrayZoomed.length; ++si) {
+                let srcObj = d3RightTextNodesArrayZoomed[si];
                 matrix[si + '_' + si] = {
                     r: si,
                     c: si,
                     obj: srcObj,
                     id: srcObj.id + '_' + srcObj.id
                 };
-                var targets = search.showParams
+                let targets = search.showParams
                     ? srcObj.targetsParamView
                     : srcObj.targetsHideParams;
-                for (var j = 0; j < targets.length; ++j) {
-                    var tgtObj = targets[j];
-                    var ti = d3RightTextNodesArrayZoomed.indexOf(tgtObj);
+                for (let j = 0; j < targets.length; ++j) {
+                    let tgtObj = targets[j];
+                    let ti = d3RightTextNodesArrayZoomed.indexOf(tgtObj);
                     if (ti != -1) {
                         matrix[si + '_' + ti] = {
                             r: si,
@@ -1468,15 +1468,15 @@ function PtN2Diagram(parentDiv, modelData) {
                         srcObj.type === 'unconnected_param')
                 ) {
                     for (
-                        var j = si + 1;
+                        let j = si + 1;
                         j < d3RightTextNodesArrayZoomed.length;
                         ++j
                     ) {
-                        var tgtObj = d3RightTextNodesArrayZoomed[j];
+                        let tgtObj = d3RightTextNodesArrayZoomed[j];
                         if (srcObj.parentComponent !== tgtObj.parentComponent)
                             break;
                         if (tgtObj.type === 'unknown') {
-                            var ti = j;
+                            let ti = j;
                             matrix[si + '_' + ti] = {
                                 r: si,
                                 c: ti,
@@ -1507,9 +1507,9 @@ function PtN2Diagram(parentDiv, modelData) {
         symbols_groupVector = [];
         symbols_groupGroup = [];
 
-        for (var key in matrix) {
-            var d = matrix[key];
-            var tgtObj = d3RightTextNodesArrayZoomed[d.c],
+        for (let key in matrix) {
+            let d = matrix[key];
+            let tgtObj = d3RightTextNodesArrayZoomed[d.c],
                 srcObj = d3RightTextNodesArrayZoomed[d.r];
             //alert(tgtObj.name + " " + srcObj.name);
             if (d.c == d.r) {
@@ -1601,12 +1601,12 @@ function PtN2Diagram(parentDiv, modelData) {
             }
         }
 
-        var currentBox = { startI: 0, stopI: 0 };
+        let currentBox = { startI: 0, stopI: 0 };
         d3RightTextNodesArrayZoomedBoxInfo = [currentBox];
-        for (var ri = 1; ri < d3RightTextNodesArrayZoomed.length; ++ri) {
+        for (let ri = 1; ri < d3RightTextNodesArrayZoomed.length; ++ri) {
             //boxes
-            var el = d3RightTextNodesArrayZoomed[ri];
-            var startINode = d3RightTextNodesArrayZoomed[currentBox.startI];
+            let el = d3RightTextNodesArrayZoomed[ri];
+            let startINode = d3RightTextNodesArrayZoomed[currentBox.startI];
             if (
                 startINode.parentComponent &&
                 el.parentComponent &&
@@ -1620,11 +1620,11 @@ function PtN2Diagram(parentDiv, modelData) {
         }
 
         drawableN2ComponentBoxes = [];
-        for (var i = 0; i < d3RightTextNodesArrayZoomedBoxInfo.length; ++i) {
+        for (let i = 0; i < d3RightTextNodesArrayZoomedBoxInfo.length; ++i) {
             //draw grid lines last so that they will always be visible
-            var box = d3RightTextNodesArrayZoomedBoxInfo[i];
+            let box = d3RightTextNodesArrayZoomedBoxInfo[i];
             if (box.startI == box.stopI) continue;
-            var el = d3RightTextNodesArrayZoomed[box.startI];
+            let el = d3RightTextNodesArrayZoomed[box.startI];
             if (!el.parentComponent) alert('parent component not found in box'); //continue;
             box.obj = el.parentComponent;
             i = box.stopI;
@@ -1636,9 +1636,9 @@ function PtN2Diagram(parentDiv, modelData) {
         if (
             d3RightTextNodesArrayZoomed.length < ptn2.LEVEL_OF_DETAIL_THRESHOLD
         ) {
-            for (var i = 0; i < d3RightTextNodesArrayZoomed.length; ++i) {
-                var obj = d3RightTextNodesArrayZoomed[i];
-                var gl = { i: i, obj: obj };
+            for (let i = 0; i < d3RightTextNodesArrayZoomed.length; ++i) {
+                let obj = d3RightTextNodesArrayZoomed[i];
+                let gl = { i: i, obj: obj };
                 gridLines.push(gl);
             }
         }
@@ -1653,7 +1653,7 @@ function PtN2Diagram(parentDiv, modelData) {
     }
 
     function FindRootOfChangeForCollapseDepth(d) {
-        for (var obj = d; obj != null; obj = obj.parent) {
+        for (let obj = d; obj != null; obj = obj.parent) {
             //make sure history item is not minimized
             if (obj.depth == chosenCollapseDepth) return obj;
         }
@@ -1670,13 +1670,13 @@ function PtN2Diagram(parentDiv, modelData) {
                 arr.push(d);
             }
             if (d.children) {
-                for (var i = 0; i < d.children.length; ++i) {
+                for (let i = 0; i < d.children.length; ++i) {
                     GetObjectsInChildrenWithCycleArrows(d.children[i], arr);
                 }
             }
         }
         function GetObjectsWithCycleArrows(d, arr) {
-            for (var obj = d.parent; obj != null; obj = obj.parent) {
+            for (let obj = d.parent; obj != null; obj = obj.parent) {
                 //start with parent.. the children will get the current object to avoid duplicates
                 if (obj.cycleArrows) {
                     arr.push(obj);
@@ -1690,7 +1690,7 @@ function PtN2Diagram(parentDiv, modelData) {
                 return true;
             }
             if (d.children) {
-                for (var i = 0; i < d.children.length; ++i) {
+                for (let i = 0; i < d.children.length; ++i) {
                     if (HasObjectInChildren(d.children[i], toMatchObj)) {
                         return true;
                     }
@@ -1699,7 +1699,7 @@ function PtN2Diagram(parentDiv, modelData) {
             return false;
         }
         function HasObject(d, toMatchObj) {
-            for (var obj = d; obj != null; obj = obj.parent) {
+            for (let obj = d; obj != null; obj = obj.parent) {
                 if (obj === toMatchObj) {
                     return true;
                 }
@@ -1707,13 +1707,13 @@ function PtN2Diagram(parentDiv, modelData) {
             return HasObjectInChildren(d, toMatchObj);
         }
 
-        var lineWidth = Math.min(5, n2Dx * 0.5, n2Dy * 0.5);
+        let lineWidth = Math.min(5, n2Dx * 0.5, n2Dy * 0.5);
         arrowMarker
             .attr('markerWidth', lineWidth * 0.4)
             .attr('markerHeight', lineWidth * 0.4);
-        var src = d3RightTextNodesArrayZoomed[d.r];
-        var tgt = d3RightTextNodesArrayZoomed[d.c];
-        var boxEnd = d3RightTextNodesArrayZoomedBoxInfo[d.c];
+        let src = d3RightTextNodesArrayZoomed[d.r];
+        let tgt = d3RightTextNodesArrayZoomed[d.c];
+        let boxEnd = d3RightTextNodesArrayZoomedBoxInfo[d.c];
         if (d.r > d.c) {
             //bottom left
             DrawPathTwoLines(
@@ -1730,31 +1730,31 @@ function PtN2Diagram(parentDiv, modelData) {
                 true
             );
 
-            var targetsWithCycleArrows = [];
+            let targetsWithCycleArrows = [];
             GetObjectsWithCycleArrows(tgt, targetsWithCycleArrows);
-            for (var ti = 0; ti < targetsWithCycleArrows.length; ++ti) {
-                var arrows = targetsWithCycleArrows[ti].cycleArrows;
-                for (var ai = 0; ai < arrows.length; ++ai) {
+            for (let ti = 0; ti < targetsWithCycleArrows.length; ++ti) {
+                let arrows = targetsWithCycleArrows[ti].cycleArrows;
+                for (let ai = 0; ai < arrows.length; ++ai) {
                     if (HasObject(src, arrows[ai].src)) {
-                        var correspondingSrcArrows = arrows[ai].arrows;
+                        let correspondingSrcArrows = arrows[ai].arrows;
                         for (
-                            var si = 0;
+                            let si = 0;
                             si < correspondingSrcArrows.length;
                             ++si
                         ) {
-                            var beginObj = correspondingSrcArrows[si].begin;
-                            var endObj = correspondingSrcArrows[si].end;
+                            let beginObj = correspondingSrcArrows[si].begin;
+                            let endObj = correspondingSrcArrows[si].end;
                             //alert(beginObj.name + "->" + endObj.name);
-                            var firstBeginIndex = -1,
+                            let firstBeginIndex = -1,
                                 firstEndIndex = -1;
 
                             //find first begin index
                             for (
-                                var mi = 0;
+                                let mi = 0;
                                 mi < d3RightTextNodesArrayZoomed.length;
                                 ++mi
                             ) {
-                                var rtNode = d3RightTextNodesArrayZoomed[mi];
+                                let rtNode = d3RightTextNodesArrayZoomed[mi];
                                 if (HasObject(rtNode, beginObj)) {
                                     firstBeginIndex = mi;
                                     break;
@@ -1767,11 +1767,11 @@ function PtN2Diagram(parentDiv, modelData) {
 
                             //find first end index
                             for (
-                                var mi = 0;
+                                let mi = 0;
                                 mi < d3RightTextNodesArrayZoomed.length;
                                 ++mi
                             ) {
-                                var rtNode = d3RightTextNodesArrayZoomed[mi];
+                                let rtNode = d3RightTextNodesArrayZoomed[mi];
                                 if (HasObject(rtNode, endObj)) {
                                     firstEndIndex = mi;
                                     break;
@@ -1812,7 +1812,7 @@ function PtN2Diagram(parentDiv, modelData) {
                 true
             );
         }
-        var leftTextWidthR = d3RightTextNodesArrayZoomed[d.r].nameWidthPx,
+        let leftTextWidthR = d3RightTextNodesArrayZoomed[d.r].nameWidthPx,
             leftTextWidthC = d3RightTextNodesArrayZoomed[d.c].nameWidthPx;
         DrawRect(
             -leftTextWidthR - PTREE_N2_GAP_PX,
@@ -1832,12 +1832,12 @@ function PtN2Diagram(parentDiv, modelData) {
 
     function MouseoverOnDiagN2(d) {
         //d=hovered element
-        var hoveredIndexRC = d.c; //d.x == d.y == row == col
-        var leftTextWidthHovered =
+        let hoveredIndexRC = d.c; //d.x == d.y == row == col
+        let leftTextWidthHovered =
             d3RightTextNodesArrayZoomed[hoveredIndexRC].nameWidthPx;
 
         // Loop over all elements in the matrix looking for other cells in the same column as
-        var lineWidth = Math.min(5, n2Dx * 0.5, n2Dy * 0.5);
+        let lineWidth = Math.min(5, n2Dx * 0.5, n2Dy * 0.5);
         arrowMarker
             .attr('markerWidth', lineWidth * 0.4)
             .attr('markerHeight', lineWidth * 0.4);
@@ -1848,10 +1848,10 @@ function PtN2Diagram(parentDiv, modelData) {
             n2Dy,
             ptn2.HIGHLIGHT_HOVERED_COLOR
         ); //highlight hovered
-        for (var i = 0; i < d3RightTextNodesArrayZoomed.length; ++i) {
-            var leftTextWidthDependency =
+        for (let i = 0; i < d3RightTextNodesArrayZoomed.length; ++i) {
+            let leftTextWidthDependency =
                 d3RightTextNodesArrayZoomed[i].nameWidthPx;
-            var box = d3RightTextNodesArrayZoomedBoxInfo[i];
+            let box = d3RightTextNodesArrayZoomedBoxInfo[i];
             if (matrix[hoveredIndexRC + '_' + i] !== undefined) {
                 //if (matrix[hoveredIndexRC][i].z > 0) { //i is column here
                 if (i < hoveredIndexRC) {
@@ -1985,8 +1985,8 @@ function PtN2Diagram(parentDiv, modelData) {
     }
 
     function MouseClickN2(d) {
-        var newClassName = 'n2_hover_elements_' + d.r + '_' + d.c;
-        var selection = n2Group.selectAll('.' + newClassName);
+        let newClassName = 'n2_hover_elements_' + d.r + '_' + d.c;
+        let selection = n2Group.selectAll('.' + newClassName);
         if (selection.size() > 0) {
             selection.remove();
         } else {
@@ -2017,7 +2017,7 @@ function PtN2Diagram(parentDiv, modelData) {
                 d.isMinimized = true;
             }
             if (d.children) {
-                for (var i = 0; i < d.children.length; ++i) {
+                for (let i = 0; i < d.children.length; ++i) {
                     CollapseOutputs(d.children[i]);
                 }
             }
@@ -2035,7 +2035,7 @@ function PtN2Diagram(parentDiv, modelData) {
                 d.isMinimized = false;
             }
             if (d.children) {
-                for (var i = 0; i < d.children.length; ++i) {
+                for (let i = 0; i < d.children.length; ++i) {
                     Uncollapse(d.children[i]);
                 }
             }
@@ -2062,7 +2062,7 @@ function PtN2Diagram(parentDiv, modelData) {
                 d.isMinimized = true;
             }
             if (d.children) {
-                for (var i = 0; i < d.children.length; ++i) {
+                for (let i = 0; i < d.children.length; ++i) {
                     CollapseToDepth(d.children[i], depth);
                 }
             }
@@ -2079,8 +2079,8 @@ function PtN2Diagram(parentDiv, modelData) {
     }
 
     function FontSizeSelectChange(fontSize) {
-        for (var i = 8; i <= 14; ++i) {
-            var newText = i == fontSize ? '<b>' + i + 'px</b>' : i + 'px';
+        for (let i = 8; i <= 14; ++i) {
+            let newText = i == fontSize ? '<b>' + i + 'px</b>' : i + 'px';
             $('#idFontSize' + i + 'px')[0].innerHTML = newText;
         }
         FONT_SIZE_PX = fontSize;
@@ -2090,12 +2090,12 @@ function PtN2Diagram(parentDiv, modelData) {
     }
 
     function VerticalResize(height) {
-        for (var i = 600; i <= 1000; i += 50) {
-            var newText = i == height ? '<b>' + i + 'px</b>' : i + 'px';
+        for (let i = 600; i <= 1000; i += 50) {
+            let newText = i == height ? '<b>' + i + 'px</b>' : i + 'px';
             $('#idVerticalResize' + i + 'px')[0].innerHTML = newText;
         }
-        for (var i = 2000; i <= 4000; i += 1000) {
-            var newText = i == height ? '<b>' + i + 'px</b>' : i + 'px';
+        for (let i = 2000; i <= 4000; i += 1000) {
+            let newText = i == height ? '<b>' + i + 'px</b>' : i + 'px';
             $('#idVerticalResize' + i + 'px')[0].innerHTML = newText;
         }
         ClearArrowsAndConnects();
@@ -2148,7 +2148,7 @@ function PtN2Diagram(parentDiv, modelData) {
     }
 
     function CreateToolbar() {
-        var div = document.getElementById('toolbarDiv');
+        let div = document.getElementById('toolbarDiv');
         $('#returnToRootButtonId')[0].onclick = ReturnToRootButtonClick;
         $('#backButtonId')[0].onclick = BackButtonPressed;
         $('#forwardButtonId')[0].onclick = ForwardButtonPressed;
@@ -2172,8 +2172,8 @@ function PtN2Diagram(parentDiv, modelData) {
         $('#showLegendButtonId')[0].onclick = ToggleLegend;
         $('#showParamsButtonId')[0].onclick = ShowParamsCheckboxChange;
 
-        for (var i = 8; i <= 14; ++i) {
-            var f = (function(idx) {
+        for (let i = 8; i <= 14; ++i) {
+            let f = (function(idx) {
                 return function() {
                     FontSizeSelectChange(idx);
                 };
@@ -2181,16 +2181,16 @@ function PtN2Diagram(parentDiv, modelData) {
             $('#idFontSize' + i + 'px')[0].onclick = f;
         }
 
-        for (var i = 600; i <= 1000; i += 50) {
-            var f = (function(idx) {
+        for (let i = 600; i <= 1000; i += 50) {
+            let f = (function(idx) {
                 return function() {
                     VerticalResize(idx);
                 };
             })(i);
             $('#idVerticalResize' + i + 'px')[0].onclick = f;
         }
-        for (var i = 2000; i <= 4000; i += 1000) {
-            var f = (function(idx) {
+        for (let i = 2000; i <= 4000; i += 1000) {
+            let f = (function(idx) {
                 return function() {
                     VerticalResize(idx);
                 };
@@ -2217,22 +2217,22 @@ function PtN2Diagram(parentDiv, modelData) {
     };
 }
 
-var zoomedElement;
-var updateFunc;
-var mouseOverOffDiagN2;
-var mouseOverOnDiagN2;
-var mouseOutN2;
-var mouseClickN2;
-var hasInputConn;
-var treeData = null;
-var connectionList;
-var url = window.location.href;
-var url_split = url.split('/');
-var modal;
-var search;
+let zoomedElement;
+let updateFunc;
+let mouseOverOffDiagN2;
+let mouseOverOnDiagN2;
+let mouseOutN2;
+let mouseClickN2;
+let hasInputConn;
+let treeData = null;
+let connectionList;
+let url = window.location.href;
+let url_split = url.split('/');
+let modal;
+let search;
 
 ptn2.resize = function() {
-    var container = ptn2.container;
+    let container = ptn2.container;
     ptn2.HEIGHT_PX =
         container.width < container.height
             ? container.width * 0.75
@@ -2249,7 +2249,7 @@ ptn2.resize = function() {
     ptn2.LEVEL_OF_DETAIL_THRESHOLD = ptn2.HEIGHT_PX / 3; //3 pixels
 
     //Remove all other N^2 diagrams
-    var n2s = document.getElementsByClassName('ptN2ChartClass');
+    let n2s = document.getElementsByClassName('ptN2ChartClass');
     while (n2s[0]) {
         n2s[0].parentNode.removeChild(n2s[0]);
     }
