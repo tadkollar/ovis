@@ -1,17 +1,17 @@
-var showLegend = false; //default off
+let showLegend = false; //default off
 
 function SetupLegend(d3, d3ContentDiv) {
-    var numColumns = 2;
-    var elementSize = 30, xOffset = 10, columnWidth = 250;
-    var legendWidth = columnWidth * numColumns + 0, legendHeight = 360;
-    var u = elementSize * .5;
-    var v = u;
+    let numColumns = 2;
+    let elementSize = 30, xOffset = 10, columnWidth = 250;
+    let legendWidth = columnWidth * numColumns + 0, legendHeight = 360;
+    let u = elementSize * .5;
+    let v = u;
 
     d3.select(d3ContentDiv).select("div.ptN2LegendClass").remove();
 
     if (!showLegend) return;
 
-    var svg_legend = d3.select(d3ContentDiv).append("div")
+    let svg_legend = d3.select(d3ContentDiv).append("div")
         .attr("class", "ptN2LegendClass")
         .style("width", legendWidth + "px")
         .style("height", legendHeight + "px")
@@ -48,7 +48,7 @@ function SetupLegend(d3, d3ContentDiv) {
 
     //title LEGEND
     {
-        var el = svg_legend.append("g").attr("transform", "translate(" + (legendWidth * .5) + "," + (15) + ")");
+        let el = svg_legend.append("g").attr("transform", "translate(" + (legendWidth * .5) + "," + (15) + ")");
         el.append("svg:text")
             .attr("text-anchor", "middle")
             .attr("dy", ".35em")//.attr("dominant-baseline", "middle")//
@@ -60,9 +60,9 @@ function SetupLegend(d3, d3ContentDiv) {
 
     //COLUMN TITLES
     {
-        var text = ["Colors", "N^2 Symbols"];
-        for (var i = 0; i < text.length; ++i) {
-            var el = svg_legend.append("g").attr("transform", "translate(" + (columnWidth * i + xOffset) + "," + (60) + ")");
+        let text = ["Colors", "N^2 Symbols"];
+        for (let i = 0; i < text.length; ++i) {
+            let el = svg_legend.append("g").attr("transform", "translate(" + (columnWidth * i + xOffset) + "," + (60) + ")");
             el.append("svg:text")
                 .attr("dy", ".35em")//.attr("dominant-baseline", "middle")//
                 .attr("font-size", 24)
@@ -74,16 +74,16 @@ function SetupLegend(d3, d3ContentDiv) {
 
     //COLORS
     {
-        var text = ["Group", "Component", "Unknown Explicit", "Unknown Implicit", "Collapsed", "Connection"];
-        var colors = [ptn2.GROUP_COLOR, ptn2.COMPONENT_COLOR, ptn2.UNKNOWN_EXPLICIT_COLOR, ptn2.UNKNOWN_IMPLICIT_COLOR, ptn2.COLLAPSED_COLOR, ptn2.CONNECTION_COLOR];
+        let text = ["Group", "Component", "Unknown Explicit", "Unknown Implicit", "Collapsed", "Connection"];
+        let colors = [ptn2.GROUP_COLOR, ptn2.COMPONENT_COLOR, ptn2.UNKNOWN_EXPLICIT_COLOR, ptn2.UNKNOWN_IMPLICIT_COLOR, ptn2.COLLAPSED_COLOR, ptn2.CONNECTION_COLOR];
         if (searchObj.showParams) {
             text.splice(2, 0, "Param");
             colors.splice(2, 0, ptn2.PARAM_COLOR);
             text.splice(3, 0, "Unconnected Param")
             colors.splice(3, 0, ptn2.UNCONNECTED_PARAM_COLOR)
         }
-        for (var i = 0; i < text.length; ++i) {
-            var el = svg_legend.append("g").attr("transform", "translate(" + (columnWidth * 0 + xOffset + u) + "," + (80 + 40 * i + v) + ")");
+        for (let i = 0; i < text.length; ++i) {
+            let el = svg_legend.append("g").attr("transform", "translate(" + (columnWidth * 0 + xOffset + u) + "," + (80 + 40 * i + v) + ")");
             DrawLegendColor(el, u, v, colors[i], false);
             CreateText(el, text[i]);
         }
@@ -91,11 +91,11 @@ function SetupLegend(d3, d3ContentDiv) {
 
     //N2 SYMBOLS
     {
-        var text = ["Scalar", "Vector", "Group"];
-        var colors = [ptn2.UNKNOWN_EXPLICIT_COLOR, ptn2.UNKNOWN_EXPLICIT_COLOR, ptn2.UNKNOWN_EXPLICIT_COLOR];
-        var shapeFunctions = [DrawScalar, DrawVector, DrawGroup];
-        for (var i = 0; i < text.length; ++i) {
-            var el = svg_legend.append("g").attr("transform", "translate(" + (columnWidth * 1 + xOffset + u) + "," + (80 + 40 * i + v) + ")");
+        let text = ["Scalar", "Vector", "Group"];
+        let colors = [ptn2.UNKNOWN_EXPLICIT_COLOR, ptn2.UNKNOWN_EXPLICIT_COLOR, ptn2.UNKNOWN_EXPLICIT_COLOR];
+        let shapeFunctions = [DrawScalar, DrawVector, DrawGroup];
+        for (let i = 0; i < text.length; ++i) {
+            let el = svg_legend.append("g").attr("transform", "translate(" + (columnWidth * 1 + xOffset + u) + "," + (80 + 40 * i + v) + ")");
             shapeFunctions[i](el, u, v, colors[i], false);
             CreateElementBorder(el);
             CreateText(el, text[i]);
@@ -104,32 +104,32 @@ function SetupLegend(d3, d3ContentDiv) {
 }
 
 function DrawLegendColor(g, u, v, color, justUpdate) {
-    var shape = justUpdate ? g.select(".colorMid") : g.append("rect").attr("class", "colorMid").style("fill", color);
+    let shape = justUpdate ? g.select(".colorMid") : g.append("rect").attr("class", "colorMid").style("fill", color);
     return shape.attr("x", -u).attr("y", -v).attr("width", u * 2).attr("height", v * 2)
         .style("stroke-width", 0).style("fill-opacity", 1);
 }
 
 function DrawScalar(g, u, v, color, justUpdate) {
-    var shape = justUpdate ? g.select(".sMid") : g.append("ellipse").attr("class", "sMid").style("fill", color);
+    let shape = justUpdate ? g.select(".sMid") : g.append("ellipse").attr("class", "sMid").style("fill", color);
     return shape.attr("rx", u * .6).attr("ry", v * .6);
 }
 
 function DrawVector(g, u, v, color, justUpdate) {
-    var shape = justUpdate ? g.select(".vMid") : g.append("rect").attr("class", "vMid").style("fill", color);
+    let shape = justUpdate ? g.select(".vMid") : g.append("rect").attr("class", "vMid").style("fill", color);
     return shape.attr("x", -u * .6).attr("y", -v * .6).attr("width", u * 1.2).attr("height", v * 1.2);
 }
 
 function DrawGroup(g, u, v, color, justUpdate) {
     DrawBorder(g, u, v, color, justUpdate);
-    var shape = justUpdate ? g.select(".gMid") : g.append("rect").attr("class", "gMid").style("fill", color);
+    let shape = justUpdate ? g.select(".gMid") : g.append("rect").attr("class", "gMid").style("fill", color);
     return shape.attr("x", -u * .6).attr("y", -v * .6).attr("width", u * 1.2).attr("height", v * 1.2);
 }
 
 function DrawBorder(g, u, v, color, justUpdate) {
-    var shape1 = justUpdate ? g.select(".bordR1") : g.append("rect").attr("class", "bordR1").style("fill", color);
-    var shape2 = justUpdate ? g.select(".bordR2") : g.append("rect").attr("class", "bordR2").style("fill", color);
-    var shape3 = justUpdate ? g.select(".bordR3") : g.append("rect").attr("class", "bordR3").style("fill", color);
-    var shape4 = justUpdate ? g.select(".bordR4") : g.append("rect").attr("class", "bordR4").style("fill", color);
+    let shape1 = justUpdate ? g.select(".bordR1") : g.append("rect").attr("class", "bordR1").style("fill", color);
+    let shape2 = justUpdate ? g.select(".bordR2") : g.append("rect").attr("class", "bordR2").style("fill", color);
+    let shape3 = justUpdate ? g.select(".bordR3") : g.append("rect").attr("class", "bordR3").style("fill", color);
+    let shape4 = justUpdate ? g.select(".bordR4") : g.append("rect").attr("class", "bordR4").style("fill", color);
 
     shape1.attr("x", -u).attr("y", -v).attr("width", u * 2).attr("height", v * .2);
     shape2.attr("x", -u).attr("y", -v).attr("width", u * .2).attr("height", v * 2);
