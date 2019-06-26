@@ -1,19 +1,19 @@
-var d3ContentDiv, svgDiv, svg;
-var n2ElementsGroup, n2GridLinesGroup, n2ComponentBoxesGroup, n2ArrowsGroup, n2DotsGroup;
+let d3ContentDiv, svgDiv, svg;
+let n2ElementsGroup, n2GridLinesGroup, n2ComponentBoxesGroup, n2ArrowsGroup, n2DotsGroup;
 
-var n2Group;
-var arrowMarker;
+let n2Group;
+let arrowMarker;
 
-var WIDTH_N2_PX = ptn2.HEIGHT_PX;
-var PTREE_N2_GAP_PX = 10; //spacing between partition tree and n2 diagram
-var n2Dx = 0, n2Dy = 0, n2Dx0 = 0, n2Dy0 = 0;
-var d3NodesArray, d3RightTextNodesArrayZoomed = []
-var d3RightTextNodesArrayZoomedBoxInfo
-var drawableN2ComponentBoxes;
-var matrix;
+let WIDTH_N2_PX = ptn2.HEIGHT_PX;
+let PTREE_N2_GAP_PX = 10; //spacing between partition tree and n2 diagram
+let n2Dx = 0, n2Dy = 0, n2Dx0 = 0, n2Dy0 = 0;
+let d3NodesArray, d3RightTextNodesArrayZoomed = []
+let d3RightTextNodesArrayZoomedBoxInfo
+let drawableN2ComponentBoxes;
+let matrix;
 
-var gridLines;
-var symbols_scalar,
+let gridLines;
+let symbols_scalar,
     symbols_vector,
     symbols_group,
     symbols_scalarScalar,
@@ -26,18 +26,18 @@ var symbols_scalar,
     symbols_groupVector,
     symbols_groupGroup;
 
-var sharedTransition;
-var FindRootOfChangeFunction = null;
+let sharedTransition;
+let FindRootOfChangeFunction = null;
 
-var lastLeftClickedElement = document.getElementById("ptN2ContentDivId"),
+let lastLeftClickedElement = document.getElementById("ptN2ContentDivId"),
     leftClickIsForward = true,
     lastClickWasLeft = true;
 
-var enterIndex = 0,
+let enterIndex = 0,
     exitIndex = 0;
 
 function DrawPathTwoLines(x1, y1, x2, y2, x3, y3, color, width, useArrow) {
-    var path = n2ArrowsGroup.insert("path")
+    let path = n2ArrowsGroup.insert("path")
         .attr("class", "n2_hover_elements")
         .attr("d", "M" + x1 + " " + y1 + " L" + x2 + " " + y2 + " L" + x3 + " " + y3)
         .attr("fill", "none")
@@ -99,17 +99,17 @@ function DrawRect(x, y, width, height, fill) {
 }
 
 function DrawArrows(startIndex, endIndex) {
-    var lineWidth = Math.min(5, n2Dx * .5, n2Dy * .5);
+    let lineWidth = Math.min(5, n2Dx * .5, n2Dy * .5);
     arrowMarker.attr("markerWidth", lineWidth * .4)
         .attr("markerHeight", lineWidth * .4);
 
-    var boxStart = d3RightTextNodesArrayZoomedBoxInfo[startIndex];
-    var boxEnd = d3RightTextNodesArrayZoomedBoxInfo[endIndex];
+    let boxStart = d3RightTextNodesArrayZoomedBoxInfo[startIndex];
+    let boxEnd = d3RightTextNodesArrayZoomedBoxInfo[endIndex];
 
     //draw multiple horizontal lines but no more than one vertical line for box to box connections
-    var startIndices = [];
-    for (var startsI = boxStart.startI; startsI <= boxStart.stopI; ++startsI) {
-        for (var endsI = boxEnd.startI; endsI <= boxEnd.stopI; ++endsI) {
+    let startIndices = [];
+    for (let startsI = boxStart.startI; startsI <= boxStart.stopI; ++startsI) {
+        for (let endsI = boxEnd.startI; endsI <= boxEnd.stopI; ++endsI) {
             if (matrix[startsI + "_" + endsI] !== undefined) { //if(matrix[startsI][endsI].z > 0){
                 startIndices.push(startsI);
                 break;
@@ -117,29 +117,29 @@ function DrawArrows(startIndex, endIndex) {
         }
     }
 
-    for (var i = 0; i < startIndices.length; ++i) {
-        var startI = startIndices[i];
-        var boxEndDelta = boxEnd.stopI - boxEnd.startI;
+    for (let i = 0; i < startIndices.length; ++i) {
+        let startI = startIndices[i];
+        let boxEndDelta = boxEnd.stopI - boxEnd.startI;
 
         if (startIndex < endIndex) { //right down arrow
-            var x1 = (startI + 1) * n2Dx; //x1
-            var x2 = (endIndex + boxEndDelta * .5) * n2Dx + n2Dx * .5; //right x2
-            var x3 = x2; //down x3
+            let x1 = (startI + 1) * n2Dx; //x1
+            let x2 = (endIndex + boxEndDelta * .5) * n2Dx + n2Dx * .5; //right x2
+            let x3 = x2; //down x3
 
-            var y1 = startI * n2Dy + n2Dy * .5; //y1
-            var y2 = y1; //right y2
-            var y3 = endIndex * n2Dy; //down y3
+            let y1 = startI * n2Dy + n2Dy * .5; //y1
+            let y2 = y1; //right y2
+            let y3 = endIndex * n2Dy; //down y3
 
             DrawPathTwoLines(x1, y1, x2, y2, x3, y3, ptn2.GREEN_ARROW_COLOR, lineWidth, true);
         }
         else if (startIndex > endIndex) { //left up arrow
-            var x1 = startI * n2Dx; //x1
-            var x2 = (endIndex + boxEndDelta * .5) * n2Dx + n2Dx * .5; //left x2
-            var x3 = x2; //up x3
+            let x1 = startI * n2Dx; //x1
+            let x2 = (endIndex + boxEndDelta * .5) * n2Dx + n2Dx * .5; //left x2
+            let x3 = x2; //up x3
 
-            var y1 = startI * n2Dy + n2Dy * .5; //y1
-            var y2 = y1; //left y2
-            var y3 = (endIndex + boxEndDelta + 1) * n2Dy; //y1
+            let y1 = startI * n2Dy + n2Dy * .5; //y1
+            let y2 = y1; //left y2
+            let y3 = (endIndex + boxEndDelta + 1) * n2Dy; //y1
 
             DrawPathTwoLines(x1, y1, x2, y2, x3, y3, ptn2.RED_ARROW_COLOR, lineWidth, true);
         }
@@ -147,17 +147,17 @@ function DrawArrows(startIndex, endIndex) {
 }
 
 function DrawArrowsParamView(startIndex, endIndex) {
-    var lineWidth = Math.min(5, n2Dx * .5, n2Dy * .5);
+    let lineWidth = Math.min(5, n2Dx * .5, n2Dy * .5);
     arrowMarker.attr("markerWidth", lineWidth * .4)
         .attr("markerHeight", lineWidth * .4);
 
-    var boxStart = d3RightTextNodesArrayZoomedBoxInfo[startIndex];
-    var boxEnd = d3RightTextNodesArrayZoomedBoxInfo[endIndex];
+    let boxStart = d3RightTextNodesArrayZoomedBoxInfo[startIndex];
+    let boxEnd = d3RightTextNodesArrayZoomedBoxInfo[endIndex];
 
     //draw multiple horizontal lines but no more than one vertical line for box to box connections
-    var startIndices = [], endIndices = [];
-    for (var startsI = boxStart.startI; startsI <= boxStart.stopI; ++startsI) {
-        for (var endsI = boxEnd.startI; endsI <= boxEnd.stopI; ++endsI) {
+    let startIndices = [], endIndices = [];
+    for (let startsI = boxStart.startI; startsI <= boxStart.stopI; ++startsI) {
+        for (let endsI = boxEnd.startI; endsI <= boxEnd.stopI; ++endsI) {
             if (matrix[startsI + "_" + endsI] !== undefined) { //if(matrix[startsI][endsI].z > 0){
                 startIndices.push(startsI);
                 endIndices.push(endsI);
@@ -165,30 +165,30 @@ function DrawArrowsParamView(startIndex, endIndex) {
         }
     }
 
-    for (var i = 0; i < startIndices.length; ++i) {
-        var startI = startIndices[i];
-        var endI = endIndices[i];
+    for (let i = 0; i < startIndices.length; ++i) {
+        let startI = startIndices[i];
+        let endI = endIndices[i];
 
         if (startIndex < endIndex) { //right down arrow
-            var x1 = (startI + 1) * n2Dx; //x1
-            var x2 = (endI + .5) * n2Dx; //right x2
-            var x3 = x2; //down x3
+            let x1 = (startI + 1) * n2Dx; //x1
+            let x2 = (endI + .5) * n2Dx; //right x2
+            let x3 = x2; //down x3
 
-            var y1 = (startI + .5) * n2Dy; //y1
-            var y2 = y1; //right y2
-            var y3 = endI * n2Dy; //down y3
+            let y1 = (startI + .5) * n2Dy; //y1
+            let y2 = y1; //right y2
+            let y3 = endI * n2Dy; //down y3
 
             DrawPathTwoLines(x1, y1, x2, y2, x3, y3, ptn2.GREEN_ARROW_COLOR, lineWidth, true);
         }
         else if (startIndex > endIndex) { //left up arrow
             //alert("yes");
-            var x1 = startI * n2Dx; //x1
-            var x2 = (endI + .5) * n2Dx; //left x2
-            var x3 = x2; //up x3
+            let x1 = startI * n2Dx; //x1
+            let x2 = (endI + .5) * n2Dx; //left x2
+            let x3 = x2; //up x3
 
-            var y1 = (startI + .5) * n2Dy; //y1
-            var y2 = y1; //left y2
-            var y3 = (endI + 1) * n2Dy; //y1
+            let y1 = (startI + .5) * n2Dy; //y1
+            let y2 = y1; //left y2
+            let y3 = (endI + 1) * n2Dy; //y1
 
             DrawPathTwoLines(x1, y1, x2, y2, x3, y3, ptn2.RED_ARROW_COLOR, lineWidth, true);
         }
@@ -196,40 +196,40 @@ function DrawArrowsParamView(startIndex, endIndex) {
 }
 
 function DrawMatrix() {
-    var u0 = n2Dx0 * .5,
+    let u0 = n2Dx0 * .5,
         v0 = n2Dy0 * .5,
         u = n2Dx * .5,
         v = n2Dy * .5; //(0,0) = center of cell... (u,v) = bottom right of cell... (-u,-v) = top left of cell
 
     function GetOnDiagonalCellColor(d) {
-        var rt = d3RightTextNodesArrayZoomed[d.c];
+        let rt = d3RightTextNodesArrayZoomed[d.c];
         if (rt.isMinimized) return ptn2.COLLAPSED_COLOR;
         if (rt.type === "param") return ptn2.PARAM_COLOR;
         if (rt.type === "unconnected_param") return ptn2.UNCONNECTED_PARAM_COLOR
         return (rt.implicit) ? ptn2.UNKNOWN_IMPLICIT_COLOR : ptn2.UNKNOWN_EXPLICIT_COLOR;
     }
 
-    var classes = ["cell_scalar", "cell_vector", "cell_group", "cell_scalarScalar", "cell_scalarVector", "cell_vectorScalar",
+    let classes = ["cell_scalar", "cell_vector", "cell_group", "cell_scalarScalar", "cell_scalarVector", "cell_vectorScalar",
         "cell_vectorVector", "cell_scalarGroup", "cell_groupScalar", "cell_vectorGroup", "cell_groupVector", "cell_groupGroup"
     ];
-    var datas = [symbols_scalar, symbols_vector, symbols_group, symbols_scalarScalar, symbols_scalarVector, symbols_vectorScalar,
+    let datas = [symbols_scalar, symbols_vector, symbols_group, symbols_scalarScalar, symbols_scalarVector, symbols_vectorScalar,
         symbols_vectorVector, symbols_scalarGroup, symbols_groupScalar, symbols_vectorGroup, symbols_groupVector, symbols_groupGroup
     ];
-    var drawFunctions = [DrawScalar, DrawVector, DrawGroup, DrawScalar, DrawVector, DrawVector,
+    let drawFunctions = [DrawScalar, DrawVector, DrawGroup, DrawScalar, DrawVector, DrawVector,
         DrawVector, DrawGroup, DrawGroup, DrawGroup, DrawGroup, DrawGroup
     ];
-    for (var i = 0; i < classes.length; ++i) {
-        var sel = n2ElementsGroup.selectAll("." + classes[i])
+    for (let i = 0; i < classes.length; ++i) {
+        let sel = n2ElementsGroup.selectAll("." + classes[i])
             .data(datas[i], function (d) {
                 return d.id;
             });
-        var gEnter = sel.enter().append("g")
+        let gEnter = sel.enter().append("g")
             .attr("class", classes[i])
             .attr("transform", function (d) {
                 if (lastClickWasLeft) return "translate(" + (n2Dx0 * (d.c - enterIndex) + u0) + "," + (n2Dy0 * (d.r - enterIndex) + v0) + ")";
-                var roc = (d.obj && FindRootOfChangeFunction) ? FindRootOfChangeFunction(d.obj) : null;
+                let roc = (d.obj && FindRootOfChangeFunction) ? FindRootOfChangeFunction(d.obj) : null;
                 if (roc) {
-                    var index0 = roc.rootIndex0 - zoomedElement.rootIndex0;
+                    let index0 = roc.rootIndex0 - zoomedElement.rootIndex0;
                     return "translate(" + (n2Dx0 * index0 + u0) + "," + (n2Dy0 * index0 + v0) + ")";
                 }
                 alert("error: enter transform not found");
@@ -240,19 +240,19 @@ function DrawMatrix() {
             .on("click", mouseClickN2);
 
 
-        var gUpdate = gEnter.merge(sel).transition(sharedTransition)
+        let gUpdate = gEnter.merge(sel).transition(sharedTransition)
             .attr("transform", function (d) {
                 return "translate(" + (n2Dx * (d.c) + u) + "," + (n2Dy * (d.r) + v) + ")";
             });
         drawFunctions[i](gUpdate, u, v, (i < 3) ? GetOnDiagonalCellColor : ptn2.CONNECTION_COLOR, true);
 
 
-        var nodeExit = sel.exit().transition(sharedTransition)
+        let nodeExit = sel.exit().transition(sharedTransition)
             .attr("transform", function (d) {
                 if (lastClickWasLeft) return "translate(" + (n2Dx * (d.c - exitIndex) + u) + "," + (n2Dy * (d.r - exitIndex) + v) + ")";
-                var roc = (d.obj && FindRootOfChangeFunction) ? FindRootOfChangeFunction(d.obj) : null;
+                let roc = (d.obj && FindRootOfChangeFunction) ? FindRootOfChangeFunction(d.obj) : null;
                 if (roc) {
-                    var index = roc.rootIndex - zoomedElement.rootIndex;
+                    let index = roc.rootIndex - zoomedElement.rootIndex;
                     return "translate(" + (n2Dx * index + u) + "," + (n2Dy * index + v) + ")";
                 }
                 alert("error: exit transform not found");
@@ -262,18 +262,18 @@ function DrawMatrix() {
     }
 
     {
-        var sel = n2GridLinesGroup.selectAll(".horiz_line")
+        let sel = n2GridLinesGroup.selectAll(".horiz_line")
             .data(gridLines, function (d) {
                 return d.obj.id;
             });
 
-        var gEnter = sel.enter().append("g")
+        let gEnter = sel.enter().append("g")
             .attr("class", "horiz_line")
             .attr("transform", function (d) {
                 if (lastClickWasLeft) return "translate(0," + (n2Dy0 * (d.i - enterIndex)) + ")";
-                var roc = (FindRootOfChangeFunction) ? FindRootOfChangeFunction(d.obj) : null;
+                let roc = (FindRootOfChangeFunction) ? FindRootOfChangeFunction(d.obj) : null;
                 if (roc) {
-                    var index0 = roc.rootIndex0 - zoomedElement.rootIndex0;
+                    let index0 = roc.rootIndex0 - zoomedElement.rootIndex0;
                     return "translate(0," + (n2Dy0 * index0) + ")";
                 }
                 alert("error: enter transform not found");
@@ -281,19 +281,19 @@ function DrawMatrix() {
         gEnter.append("line")
             .attr("x2", ptn2.WIDTH_N2_PX);
 
-        var gUpdate = gEnter.merge(sel).transition(sharedTransition)
+        let gUpdate = gEnter.merge(sel).transition(sharedTransition)
             .attr("transform", function (d) {
                 return "translate(0," + (n2Dy * d.i) + ")";
             });
         gUpdate.select("line")
             .attr("x2", ptn2.WIDTH_N2_PX);
 
-        var nodeExit = sel.exit().transition(sharedTransition)
+        let nodeExit = sel.exit().transition(sharedTransition)
             .attr("transform", function (d) {
                 if (lastClickWasLeft) return "translate(0," + (n2Dy * (d.i - exitIndex)) + ")";
-                var roc = (FindRootOfChangeFunction) ? FindRootOfChangeFunction(d.obj) : null;
+                let roc = (FindRootOfChangeFunction) ? FindRootOfChangeFunction(d.obj) : null;
                 if (roc) {
-                    var index = roc.rootIndex - zoomedElement.rootIndex;
+                    let index = roc.rootIndex - zoomedElement.rootIndex;
                     return "translate(0," + (n2Dy * index) + ")";
                 }
                 alert("error: exit transform not found");
@@ -302,17 +302,17 @@ function DrawMatrix() {
     }
 
     {
-        var sel = n2GridLinesGroup.selectAll(".vert_line")
+        let sel = n2GridLinesGroup.selectAll(".vert_line")
             .data(gridLines, function (d) {
                 return d.obj.id;
             });
-        var gEnter = sel.enter().append("g")
+        let gEnter = sel.enter().append("g")
             .attr("class", "vert_line")
             .attr("transform", function (d) {
                 if (lastClickWasLeft) return "translate(" + (n2Dx0 * (d.i - enterIndex)) + ")rotate(-90)";
-                var roc = (FindRootOfChangeFunction) ? FindRootOfChangeFunction(d.obj) : null;
+                let roc = (FindRootOfChangeFunction) ? FindRootOfChangeFunction(d.obj) : null;
                 if (roc) {
-                    var i0 = roc.rootIndex0 - zoomedElement.rootIndex0;
+                    let i0 = roc.rootIndex0 - zoomedElement.rootIndex0;
                     return "translate(" + (n2Dx0 * i0) + ")rotate(-90)";
                 }
                 alert("error: enter transform not found");
@@ -320,19 +320,19 @@ function DrawMatrix() {
         gEnter.append("line")
             .attr("x1", -ptn2.HEIGHT_PX);
 
-        var gUpdate = gEnter.merge(sel).transition(sharedTransition)
+        let gUpdate = gEnter.merge(sel).transition(sharedTransition)
             .attr("transform", function (d) {
                 return "translate(" + (n2Dx * d.i) + ")rotate(-90)";
             });
         gUpdate.select("line")
             .attr("x1", -ptn2.HEIGHT_PX);
 
-        var nodeExit = sel.exit().transition(sharedTransition)
+        let nodeExit = sel.exit().transition(sharedTransition)
             .attr("transform", function (d) {
                 if (lastClickWasLeft) return "translate(" + (n2Dx * (d.i - exitIndex)) + ")rotate(-90)";
-                var roc = (FindRootOfChangeFunction) ? FindRootOfChangeFunction(d.obj) : null;
+                let roc = (FindRootOfChangeFunction) ? FindRootOfChangeFunction(d.obj) : null;
                 if (roc) {
-                    var i = roc.rootIndex - zoomedElement.rootIndex;
+                    let i = roc.rootIndex - zoomedElement.rootIndex;
                     return "translate(" + (n2Dx * i) + ")rotate(-90)";
                 }
                 alert("error: exit transform not found");
@@ -341,17 +341,17 @@ function DrawMatrix() {
     }
 
     {
-        var sel = n2ComponentBoxesGroup.selectAll(".component_box")
+        let sel = n2ComponentBoxesGroup.selectAll(".component_box")
             .data(drawableN2ComponentBoxes, function (d) {
                 return d.obj.id;
             });
-        var gEnter = sel.enter().append("g")
+        let gEnter = sel.enter().append("g")
             .attr("class", "component_box")
             .attr("transform", function (d) {
                 if (lastClickWasLeft) return "translate(" + (n2Dx0 * (d.startI - enterIndex)) + "," + (n2Dy0 * (d.startI - enterIndex)) + ")";
-                var roc = (d.obj && FindRootOfChangeFunction) ? FindRootOfChangeFunction(d.obj) : null;
+                let roc = (d.obj && FindRootOfChangeFunction) ? FindRootOfChangeFunction(d.obj) : null;
                 if (roc) {
-                    var index0 = roc.rootIndex0 - zoomedElement.rootIndex0;
+                    let index0 = roc.rootIndex0 - zoomedElement.rootIndex0;
                     return "translate(" + (n2Dx0 * index0) + "," + (n2Dy0 * index0) + ")";
                 }
                 alert("error: enter transform not found");
@@ -367,7 +367,7 @@ function DrawMatrix() {
                 return n2Dy0;
             });
 
-        var gUpdate = gEnter.merge(sel).transition(sharedTransition)
+        let gUpdate = gEnter.merge(sel).transition(sharedTransition)
             .attr("transform", function (d) {
                 return "translate(" + (n2Dx * d.startI) + "," + (n2Dy * d.startI) + ")";
             });
@@ -381,12 +381,12 @@ function DrawMatrix() {
             });
 
 
-        var nodeExit = sel.exit().transition(sharedTransition)
+        let nodeExit = sel.exit().transition(sharedTransition)
             .attr("transform", function (d) {
                 if (lastClickWasLeft) return "translate(" + (n2Dx * (d.startI - exitIndex)) + "," + (n2Dy * (d.startI - exitIndex)) + ")";
-                var roc = (d.obj && FindRootOfChangeFunction) ? FindRootOfChangeFunction(d.obj) : null;
+                let roc = (d.obj && FindRootOfChangeFunction) ? FindRootOfChangeFunction(d.obj) : null;
                 if (roc) {
-                    var index = roc.rootIndex - zoomedElement.rootIndex;
+                    let index = roc.rootIndex - zoomedElement.rootIndex;
                     return "translate(" + (n2Dx * index) + "," + (n2Dy * index) + ")";
                 }
                 alert("error: exit transform not found");

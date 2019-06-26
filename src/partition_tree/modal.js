@@ -1,9 +1,9 @@
 ///////////////////////////
 //Modal Help Dialog Stuff
 ///////////////////////////
-var modalObj = {};
+let modalObj = {};
 
-var newModal = function () {
+let newModal = function () {
     modalObj.parentDiv = document.getElementById("ptN2ContentDivId");
     modalObj.modal = parentDiv.querySelector("#myModal");
 

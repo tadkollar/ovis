@@ -1,6 +1,6 @@
-var searchObj = {};
+let searchObj = {};
 
-var newSearchObj = function () {
+let newSearchObj = function () {
     searchObj.filteredWordForAutoCompleteSuggestions = "";
     searchObj.filteredWordForAutoCompleteSuggestionsContainsDot = false;
     searchObj.filteredWordForAutoCompleteSuggestionsBaseName = "";
@@ -26,9 +26,9 @@ var newSearchObj = function () {
 
     searchObj.numMatches = 0;
     searchObj.DoSearch = function (d, regexMatch, undoList) {
-        var didMatch = false;
+        let didMatch = false;
         if (d.children && !d.isMinimized) { //depth first, dont go into minimized children
-            for (var i = 0; i < d.children.length; ++i) {
+            for (let i = 0; i < d.children.length; ++i) {
                 if (searchObj.DoSearch(d.children[i], regexMatch, undoList)) didMatch = true;
             }
         }
@@ -82,7 +82,7 @@ var newSearchObj = function () {
     }
 
     searchObj.GetSearchRegExp = function (searchValsArray) {
-        var regexStr = "(^" + searchValsArray.join("$|^") + "$)"; //^ starts at beginning of string   $ is end of string
+        let regexStr = "(^" + searchValsArray.join("$|^") + "$)"; //^ starts at beginning of string   $ is end of string
         regexStr = regexStr.replace(/\./g, "\\."); //convert . to regex
         regexStr = regexStr.replace(/\?/g, "."); //convert ? to regex
         regexStr = regexStr.replace(/\*/g, ".*?"); //convert * to regex
@@ -91,9 +91,9 @@ var newSearchObj = function () {
     }
 
     searchObj.SearchInputEventListener = function (e) {
-        var target = e.target;
+        let target = e.target;
         if (target.id === "awesompleteId") {
-            var newVal = target.value.replace(/([^a-zA-Z0-9:_\?\*\s\.])/g, ""); //valid characters AlphaNumeric : _ ? * space .
+            let newVal = target.value.replace(/([^a-zA-Z0-9:_\?\*\s\.])/g, ""); //valid characters AlphaNumeric : _ ? * space .
             if (newVal !== target.value) {
                 //e.stopPropagation();
                 target.value = newVal; //won't trigger new event
@@ -104,21 +104,21 @@ var newSearchObj = function () {
             function isValid(value) {
                 return value.length > 0;
             }
-            var filtered = searchObj.searchVals0.filter(isValid);
+            let filtered = searchObj.searchVals0.filter(isValid);
             searchObj.searchVals0 = filtered;
 
-            var lastLetterTypedIndex = target.selectionStart - 1;
+            let lastLetterTypedIndex = target.selectionStart - 1;
 
-            var endIndex = target.value.indexOf(" ", lastLetterTypedIndex);
+            let endIndex = target.value.indexOf(" ", lastLetterTypedIndex);
             if (endIndex == -1) endIndex = target.value.length;
-            var startIndex = target.value.lastIndexOf(" ", lastLetterTypedIndex);
+            let startIndex = target.value.lastIndexOf(" ", lastLetterTypedIndex);
             if (startIndex == -1) startIndex = 0;
-            var sub = target.value.substring(startIndex, endIndex).trim();
+            let sub = target.value.substring(startIndex, endIndex).trim();
             searchObj.filteredWordForAutoCompleteSuggestions = sub.replace(/([^a-zA-Z0-9:_\.])/g, ""); //valid openmdao character types: AlphaNumeric : _ .
 
 
 
-            for (var i = 0; i < searchObj.searchVals0.length; ++i) {
+            for (let i = 0; i < searchObj.searchVals0.length; ++i) {
                 if (searchObj.searchVals0[i].replace(/([^a-zA-Z0-9:_\.])/g, "") === searchObj.filteredWordForAutoCompleteSuggestions) {
                     searchObj.wordIndex = i;
                     break;
@@ -136,9 +136,9 @@ var newSearchObj = function () {
     window.addEventListener('input', searchObj.SearchInputEventListener, true);//Use Capture not bubble so that this will be the first input event
 
     searchObj.SearchEnterKeyUpEventListener = function (e) {
-        var target = e.target;
+        let target = e.target;
         if (target.id === "awesompleteId") {
-            var key = e.which || e.keyCode;
+            let key = e.which || e.keyCode;
             if (key === 13) { // 13 is enter
                 if (searchObj.callSearchFromEnterKeyPressed) {
                     searchObj.SearchButtonClicked();
@@ -149,9 +149,9 @@ var newSearchObj = function () {
     window.addEventListener('keyup', searchObj.SearchEnterKeyUpEventListener, true);//keyup so it will be after the input and awesomplete-selectcomplete event listeners
 
     searchObj.SearchEnterKeyDownEventListener = function (e) {
-        var target = e.target;
+        let target = e.target;
         if (target.id === "awesompleteId") {
-            var key = e.which || e.keyCode;
+            let key = e.which || e.keyCode;
             if (key === 13) { // 13 is enter
                 searchObj.callSearchFromEnterKeyPressed = true;
             }
@@ -179,9 +179,9 @@ var newSearchObj = function () {
             return Awesomplete.ITEM(text, searchObj.filteredWordForAutoCompleteSuggestions);
         },
         "replace": function (text) {
-            var newVal = "";
-            var cursorPos = 0;
-            for (var i = 0; i < searchObj.searchVals0.length; ++i) {
+            let newVal = "";
+            let cursorPos = 0;
+            for (let i = 0; i < searchObj.searchVals0.length; ++i) {
                 newVal += ((i == searchObj.wordIndex) ? text : searchObj.searchVals0[i]) + " ";
                 if (i == searchObj.wordIndex) cursorPos = newVal.length - 1;
             }
@@ -191,7 +191,7 @@ var newSearchObj = function () {
         "data": function (item/*, input*/) {
             searchObj.inDataFunction = true;
             if (searchObj.filteredWordForAutoCompleteSuggestionsContainsDot) {
-                var baseIndex = item.toLowerCase().indexOf("." + searchObj.filteredWordForAutoCompleteSuggestionsBaseName.toLowerCase() + ".");
+                let baseIndex = item.toLowerCase().indexOf("." + searchObj.filteredWordForAutoCompleteSuggestionsBaseName.toLowerCase() + ".");
                 if (baseIndex > 0) return item.slice(baseIndex + 1);
             }
             return item;
@@ -199,8 +199,8 @@ var newSearchObj = function () {
     });
 
     searchObj.FindRootOfChangeForSearch = function (d) {
-        var earliestObj = d;
-        for (var obj = d; obj != null; obj = obj.parent) {
+        let earliestObj = d;
+        for (let obj = d; obj != null; obj = obj.parent) {
             if (obj.isMinimized) earliestObj = obj;
         }
         return earliestObj;
@@ -208,17 +208,17 @@ var newSearchObj = function () {
 
     searchObj.PopulateAutoCompleteList = function (d) {
         if (d.children && !d.isMinimized) { //depth first, dont go into minimized children
-            for (var i = 0; i < d.children.length; ++i) {
+            for (let i = 0; i < d.children.length; ++i) {
                 PopulateAutoCompleteList(d.children[i]);
             }
         }
         if (d === zoomedElement) return;
         if (!searchObj.showParams && (d.type === "param" || d.type === "unconnected_param")) return;
 
-        var n = d.name;
+        let n = d.name;
         if (d.splitByColon && d.children && d.children.length > 0) n += ":";
         if (d.type !== "param" && d.type !== "unknown" && d.type !== "unconnected_param") n += ".";
-        var namesToAdd = [n];
+        let namesToAdd = [n];
 
         if (d.splitByColon) namesToAdd.push(d.colonName + ((d.children && d.children.length > 0) ? ":" : ""));
 
@@ -229,7 +229,7 @@ var newSearchObj = function () {
             }
         });
 
-        var localPathName = (zoomedElement === root) ? d.absPathName : d.absPathName.slice(zoomedElement.absPathName.length + 1);
+        let localPathName = (zoomedElement === root) ? d.absPathName : d.absPathName.slice(zoomedElement.absPathName.length + 1);
         if (!searchObj.autoCompleteSetPathNames.hasOwnProperty(localPathName)) {
             searchObj.autoCompleteSetPathNames[localPathName] = true;
             searchObj.autoCompleteListPathNames.push(localPathName);
