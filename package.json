@@ -26,15 +26,26 @@
     "spectron": "^3.8.0"
   },
   "dependencies": {
+    "awesomplete": "^1.1.5",
     "electron-is": "^2.4.1",
     "electron-log": "^2.2.14",
     "electron-updater": "^3.0.3",
     "eslint": "^6.0.0",
-    "is-electron": "^2.1.0",
+    "is-electron": "^2.2.0",
     "promise": "^8.0.1",
     "request": "^2.87.0",
-    "sqlite3": "^4.0.2",
-    "wine": "^0.9.8"
+    "sqlite3": "^5.0.0",
+    "wine": "^0.9.8",
+    "jquery": "^3.5.1",
+    "jquery-ui": "^1.12.1",
+    "jquery-mousewheel": "jquery/jquery-mousewheel.git",
+    "plotly.js-dist": "^1",
+    "d3": "^5.16.0",
+    "popper.js": "^1.16.1",
+    "bootstrap": "^4.5.2",
+    "golden-layout": "^1.5.9",
+    "bootstrap-select": "^1.13.14",
+    "pako": "^1.0.11"
   },
   "build": {
     "appId": "nasa.grc.ovis",

@@ -59,21 +59,16 @@ const mainWindowUrl = url.format({
  * Open the file dialog for users to select their DB
  */
 function findFile() {
-    // NOTE: See note at top of file for explanation of "process.env.RUNNING_IN_VIS_INDEX_TESTS"
-    if (!process.env.RUNNING_IN_VIS_INDEX_TESTS) {
-        logger.info('Opening file dialog');
-        dialog.showOpenDialog(mainWindow, null, fileNames => {
-            if (fileNames == null || fileNames.length === 0) {
-                return;
-            }
-            openFile(fileNames[0]);
-        });
-    } else {
-        // the sellar_state_connection model is used here, it has a more
-        // interesting structure than sellar_grouped for checking tooltips
-        logger.info('Opening sellar state DB in Spectron environment');
-        openFile(__dirname + '/test/sellar_state.db');
-    }
+    logger.info('Opening file dialog');
+
+    dialog.showOpenDialog(mainWindow, {
+        properties: ['openFile'],
+        filters: [{ name: 'Recorder Files', extensions: ['sql'] }]
+    }).then(result => {
+        if (!result.canceled) openFile(result.filePaths[0]);
+    }).catch(err => {
+        console.log(err)
+    })
 }
 
 /**
@@ -118,25 +113,23 @@ function startApp() {
     logger.info('Version: ' + app.getVersion());
 
     mainWindow = new BrowserWindow({
-        width: 1280,
+        width: 1600,
         height: 1024,
-        minWidth: 1280,
+        minWidth: 1600,
         minHeight: 1024,
+        webPreferences: {
+            'nodeIntegration': true,
+            'worldSafeExecuteJavaScript': true
+        }
     });
 
-    // NOTE: See note at top of file for explanation of "process.env.RUNNING_IN_VIS_INDEX_TESTS"
-    if (process.env.RUNNING_IN_VIS_INDEX_TESTS) {
-        // Immediately load up test DB
-        console.log('Running in spectron, running findFile');
-        findFile();
-    }
     mainWindow.loadURL(mainWindowUrl);
 }
 
 // ******************* Events ******************* //
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function() {
+app.on('window-all-closed', function () {
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform !== 'darwin') {

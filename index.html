@@ -3,11 +3,40 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' *; 
+img-src 'self' data:; script-src 'self' 'unsafe-inline' *; 
+style-src  'self' 'unsafe-inline' *">
     <title>OpenMDAO Visualization</title>
 </head>
 
-<body>
+<style nonce="eelohGaep4ie">
+    button#installButton {
+        display: none;
+    }
 
+    div#div1 {
+        background-color: #dddddd;
+        color: #525252;
+    }
+
+    div#div2 {
+        padding-left: 5%;
+    }
+
+    div#div2>h1 {
+        padding-top: 6%;
+        color: #3a3a3a;
+        font-size: 3.25em;
+    }
+
+    button#openButton {
+        font-size: 2em;
+        background: #adadad;
+        color: #3a3a3a;
+    }
+</style>
+
+<body>
     <div class="wrapper">
         <div id="leftbar">
             <button id='addPlotButton' class="btn navbar-btn btn" onclick="addNewPlot()" disabled>
@@ -17,7 +46,7 @@
                 <span class="glyphicon glyphicon-th"></span>
             </button>
 
-            <button title="Install Update" class="btn navbar-btn btn" id="installButton" onclick="ipc.installUpdate()" style="display: none">
+            <button title="Install Update" class="btn navbar-btn btn" id="installButton">
                 <span class="glyphicon glyphicon-download"></span>
             </button>
         </div>
@@ -26,17 +55,16 @@
                 <h1>No File Selected</h1>
             </div>
         </div>
-        <div style="background-color: #dddddd; color: #525252">
-            <div style="padding-left: 5%">
-                <h1 style='padding-top: 6%; color: #3a3a3a; font-size: 3.25em'>No recording selected</h1>
+        <div id='div1'>
+            <div id='div2'>
+                <h1>No recording selected</h1>
                 <h2>Click the button below (or
                     <strong>Cmd/Ctrl + O</strong>) to select your recording file</h2>
 
-                <br/>
-                <br/>
+                <br />
+                <br />
 
-                <button id='openButton' type='button' class='btn btn-secondary btn-large' style='font-size: 2em; background: #adadad; color: #3a3a3a'
-                    onclick="ipc.openFile()">
+                <button id='openButton' type='button' class='btn btn-secondary btn-large'>
                     <span class="glyphicon glyphicon-folder-open"></span>&emsp;Open
                 </button>
             </div>
@@ -44,28 +72,16 @@
     </div>
 </body>
 
-<script>if (typeof module === 'object') { window.module = module; module = undefined; }</script>
-
-<link rel="stylesheet" type="text/css" href="style/awesomplete.css">
-<link rel="stylesheet" type="text/css" href="style/partition_tree.css">
-<link rel="stylesheet" type="text/css" href="style/dashboard.css">
-<link rel="stylesheet" type="text/css" href="style/goldenlayout-base.css" />
-<link rel="stylesheet" type="text/css" href="style/goldenlayout-light-theme.css" />
-<link rel="stylesheet" type="text/css" href="style/bootstrap-glyphicons.css">
-<link rel="stylesheet" type="text/css" href="style/bootstrap-select.min.css">
-<link rel="stylesheet" type="text/css" href="style/font-awesome.min.css">
-<link rel="stylesheet" type="text/css" href="style/bootstrap.min.css">
-<script type="text/javascript" src="libs/jquery-1.11.1.min.js"></script>
-<script type="text/javascript" src="libs/bootstrap.min.js"></script>
-<script type="text/javascript" src="libs/bootstrap-select.min.js"></script>
-<script type="text/javascript" src="libs/goldenlayout.min.js"></script>
-<script type="text/javascript" src="libs/plotly-latest.min.js"></script>
-<script type="text/javascript" src="libs/d3.v4.min.js"></script>
-<script type="text/javascript" src="libs/awesomplete.js"></script>
-<script type="text/javascript" src="libs/vkBeautify.js"></script>
-<script type="text/javascript" src="src/libs/http.js"></script>
-<script type="text/javascript" src="src/libs/ipc.js"></script>
-
-<script>if (window.module) module = window.module;</script>
+<link rel="stylesheet" href="style/partition_tree.css">
+<link rel="stylesheet" href="style/dashboard.css">
+<link rel="stylesheet" href="style/font-awesome.min.css">
+<link rel="stylesheet" href="style/goldenlayout-base.css">
+<link rel="stylesheet" href="style/goldenlayout-light-theme.css">
+<link rel="stylesheet" href="style/bootstrap-glyphicons.css">
+<link rel="stylesheet" href="style/bootstrap-select.min.css">
+<link rel="stylesheet" href="style/bootstrap.min.css">
+<script src="src/libs/setup.js"></script>
+<script src="libs/vkBeautify.js"></script>
+<script src="src/libs/ipc.js"></script>
 
 </html>
