@@ -64,7 +64,7 @@ class Server {
     /** Get the driver metadata from the server */
     async getDriverMetadata() {
         let self = this;
-        return new Promise(function (resolve, reject) {
+        return new Promise(function (resolve) {
             self.dataInterface.getModelViewerData().then(data => { resolve(data[0]); });
         });
     }
