@@ -76,7 +76,7 @@
     ]
   },
   "scripts": {
-    "postinstall": "install-app-deps",
+    "postinstall": "electron-builder install-app-deps",
     "start": "electron .",
     "dev": "NODE_ENV='development' npm run start",
     "build": "build -mwl --x64",

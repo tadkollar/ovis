@@ -1,12 +1,27 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="Content-Security-Policy" content="default-src *; 
 img-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; 
 style-src  'self' 'unsafe-inline' *">
     <title>OpenMDAO Visualization</title>
+    <link rel="stylesheet" href="style/awesomplete.css">
+    <link rel="stylesheet" href="style/dashboard.css">
+    <link rel="stylesheet" href="style/goldenlayout-base.css">
+    <link rel="stylesheet" href="style/goldenlayout-light-theme.css">
+    <link rel="stylesheet" href="style/bootstrap.min.css">
+    <link rel="stylesheet" href="style/bootstrap-select.min.css">
+    <link rel="stylesheet" href="style/jquery-ui.css">
+    <link rel="stylesheet" href="style/partition_tree.css">
+    <link rel="stylesheet" href="style/icon.css">
+    <link rel="stylesheet" href="style/legend.css">
+    <link rel="stylesheet" href="style/nodedata.css">
+    <link rel="stylesheet" href="style/toolbar.css">
+    <link rel="stylesheet" href="style/all.min.css">
 </head>
 
 <style>
@@ -20,7 +35,7 @@ style-src  'self' 'unsafe-inline' *">
     }
 
     div#plotControls {
-        display: none;
+        display: block;
     }
 </style>
 
@@ -28,15 +43,14 @@ style-src  'self' 'unsafe-inline' *">
 
     <div class="wrapper">
         <div id="leftbar">
-            <button id='addPlotButton' class="btn navbar-btn btn" onclick="layout.addNewPlot()">
-                <span class="glyphicon glyphicon-stats"></span>
+            <button id='addPlotButton' class="btn btn-light" onclick="layout.addNewPlot()">
+                <span class="fas fa-chart-line"></span>
             </button>
-            <button id='addN2Button' class="btn navbar-btn btn" id="addN2Button" onclick="layout.addNewN2()">
-                <span class="glyphicon glyphicon-th">
+            <button id='addN2Button' class="btn btn-light" id="addN2Button" onclick="layout.addNewN2()">
+                <span class="fas fa-th"></span>
             </button>
-
-            <button title="Install Update" class="btn navbar-btn btn" id="installButton" onclick="ipc.installUpdate()">
-                <span class="glyphicon glyphicon-download"></span>
+            <button title="Install Update" class="btn btn-light" id="installButton" onclick="ipc.installUpdate()">
+                <span class="fas fa-cloud-download-alt"></span>
             </button>
         </div>
         <div id="sidebar">
@@ -114,9 +128,9 @@ style-src  'self' 'unsafe-inline' *">
     </div>
 
     <!-- Indices Help Modal -->
+    <!--
     <div id="selectIndicesModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
-            <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -141,23 +155,11 @@ style-src  'self' 'unsafe-inline' *">
 
         </div>
     </div>
+-->
     </div>
 </body>
 
-<link rel="stylesheet" href="style/awesomplete.css">
-<link rel="stylesheet" href="style/dashboard.css">
-<link rel="stylesheet" href="style/goldenlayout-base.css">
-<link rel="stylesheet" href="style/goldenlayout-light-theme.css">
-<link rel="stylesheet" href="style/bootstrap-glyphicons.css">
-<link rel="stylesheet" href="style/bootstrap-select.min.css">
-<link rel="stylesheet" href="style/font-awesome.min.css">
-<link rel="stylesheet" href="style/bootstrap.min.css">
-<link rel="stylesheet" href="style/jquery-ui.css">
-<link rel="stylesheet" href="style/partition_tree.css">
-<link rel="stylesheet" href="style/icon.css">
-<link rel="stylesheet" href="style/legend.css">
-<link rel="stylesheet" href="style/nodedata.css">
-<link rel="stylesheet" href="style/toolbar.css">
+
 <script src="src/libs/vis.js"></script>
 <script src="libs/vkBeautify.js"></script>
 <script src="src/libs/math.js"></script>
@@ -185,4 +187,5 @@ style-src  'self' 'unsafe-inline' *">
 <script src="src/n2/N2UserInterface.js"></script>
 <script src="src/n2/N2Diagram.js"></script>
 <script src="src/n2/ptN2.js"></script>
+
 </html>

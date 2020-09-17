@@ -119,7 +119,8 @@ function startApp() {
         minHeight: 1024,
         webPreferences: {
             'nodeIntegration': true,
-            'worldSafeExecuteJavaScript': true
+            'worldSafeExecuteJavaScript': true,
+            'nodeIntegrationInSubFrames': true
         }
     });
 

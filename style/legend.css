@@ -1,6 +1,6 @@
 /******************* Legend styling *******************/
 
-#legend-div {
+#n2-legend-div {
     position: absolute;
     left: 50px;
     bottom: 10px;
@@ -14,27 +14,31 @@
     box-shadow: 3px 3px 3px 1px rgba(0, 0, 0, 0.2);
 }
 
-.legend-box-container {
+#n2-legend-div p {
+    margin-top: auto;
+}
+
+.n2-legend-box-container {
     display: flex;
     align-items: center;
     margin-left: 15px;
 }
 
-.legend-box-container p {
+.n2-legend-box-container p {
     display: flex;
     font-size: 14px;
     margin-left: 4px;
     white-space: nowrap;
 }
 
-.legend-box {
+.n2-legend-box {
     display: flex;
     width: 12px;
     height: 12px;
     border-radius: 2px;
 }
 
-.legend-title-container {
+.n2-legend-title-container {
     height: 100%;
     width: 40px;
     display: inline-block;
@@ -42,10 +46,11 @@
     overflow: visible;
 }
 
-.legend-title {
+.n2-legend-title {
     text-align: center;
     font-weight: bold;
     vertical-align: middle;
+    margin: 50% 50% 50% 50%;
     width: 90px;
     height: 40px;
     font-size: 14px;
@@ -55,13 +60,13 @@
     transform: rotate(-90deg) translate(-77px, 3px);
 }
 
-.sys-var-container::-webkit-scrollbar, .linear-solvers-container::-webkit-scrollbar, .n2-symbols-container::-webkit-scrollbar {
+.n2-sys-var-container::-webkit-scrollbar, .n2-linear-solvers-container::-webkit-scrollbar, .n2-symbols-container::-webkit-scrollbar {
     display: none;
 }
 
 /* Systems and Varaibles Container */
 
-.sys-var-container {
+.n2-sys-var-container {
     height: 90px;
     border-radius: 15px;
     border: 1px solid #98daba;
@@ -72,7 +77,7 @@
     overflow-y: scroll;
 }
 
-#sys-var-legend {
+#n2-sys-var-legend {
     height: 90px;
     display: flex;
     flex-wrap: wrap;
@@ -97,27 +102,27 @@
     margin-left: -20px;
 }
 
-#symbols-legend {
+#n2-symbols-legend {
     display: flex;
     width: auto;
     flex-direction: column;
     padding-left: 8px;
 }
 
-.symbol {
+.n2-symbol {
     display: flex;
     align-items: center;
     margin: 2px 0;
 }
 
-.symbol p {
+.n2-symbol p {
     font-size: 14px;
     margin: 0;
     margin-left: 8px;
     white-space: nowrap;
 }
 
-.symbol-outer {
+.n2-symbol-outer {
     position: relative;
     display: flex;
     justify-content: center;
@@ -126,37 +131,37 @@
     height: 18px;
 }
 
-.symbol-inner {
+.n2-symbol-inner {
     position: absolute;
     margin: 0 auto;
 }
 
-.scalar {
+.n2-scalar {
     border: 2px solid #cecece;
 }
 
-.scalar .symbol-inner {
+.n2-scalar .n2-symbol-inner {
     width: 14px;
     height: 14px;
     border-radius: 50%;
     background-color: #9fc4c6;
 }
 
-.vector {
+.n2-vector {
     border: 2px solid #cecece;
 }
 
-.vector .symbol-inner {
+.n2-vector .n2-symbol-inner {
     width: 12px;
     height: 12px;
     background-color: #9fc4c6;
 }
 
-.collapsed {
+.n2-collapsed {
     border: 2px solid #9fc4c6;
 }
 
-.collapsed .symbol-inner {
+.n2-collapsed .n2-symbol-inner {
     width: 12px;
     height: 12px;
     background-color: #9fc4c6;
@@ -164,7 +169,7 @@
 
 /* Linear Solvers Group */
 
-.linear-solvers-container {
+.n2-linear-solvers-container {
     height: 90px;
     border-radius: 15px;
     border: 1px solid #42926b;
@@ -177,7 +182,7 @@
     overflow-y: scroll;
 }
 
-#solvers-legend {
+#n2-solvers-legend {
     height: 90px;
     display: flex;
     flex-wrap: wrap;
@@ -186,7 +191,7 @@
     overflow-x: hidden;
 }
 
-.draggable {
+.n2-draggable {
     position: absolute;
     width: 100px;
     height: 20px;
@@ -200,17 +205,17 @@
     transform: translate(-50%, -20px)
 }
 
-.draggable>.icon-key {
+.n2-draggable>.icon-key {
     color: white;
 }
 
-#draggable-legend-dots p {
+#n2-draggable-legend-dots p {
     color: white;
     padding-left: 5px;
     padding-right: 5px;
 }
 
-#close-legend {
+#n2-close-legend {
     position: absolute;
     top: -20px;
     right: -18px;
@@ -223,11 +228,11 @@
     cursor: default;
 }
 
-#close-legend p::before {
+#n2-close-legend p::before {
     content: '\2715'
 }
 
-#close-legend p {
+#n2-close-legend p {
     color: black;
     font-weight: bold;
     font-size: 20px;
@@ -238,6 +243,6 @@
     height: 20px;
 }
 
-p.legend-dots::before {
+p.n2-legend-dots::before {
     content: '\A789\A789\A789\A789\A789\A789';
 }

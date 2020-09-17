@@ -293,7 +293,7 @@ class N2Toolbar {
             e => { n2ui.toggleSolverNamesCheckboxChange(); }
         );
 
-        new N2ToolbarButtonToggle('#legend-button', tooltipBox,
+        new N2ToolbarButtonToggle('#n2-legend-button', tooltipBox,
             ["Show legend", "Hide legend"],
             pred => { return n2ui.legend.hidden; },
             e => { n2ui.toggleLegend(); }

@@ -2,11 +2,13 @@ input:focus, select:focus, textarea:focus, button:focus {
     outline: none;
 }
 
-body {
+#all_pt_n2_content_div {
     position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+
     top: 0;
-    width: 100vw;
-    height: 100vh;
     overflow: hidden;
     font-family: helvetica, sans-serif;
     margin: 0;
@@ -14,21 +16,16 @@ body {
     background-color: white;
 }
 
-#all_pt_n2_content_div {
-    position: absolute;
-    width: 100vw;
-    z-index: 5;
-}
-
 #ptN2ContentDivId {
     display: flex;
     flex: 0 0 auto;
+    height: 100%;
 }
 
 #d3_content_div {
     display: flex;
     flex: auto;
-    height: 100vh;
+    height: 100%;
     align-items: flex-start;
     justify-content: baseline;
     overflow: auto;
@@ -122,12 +119,12 @@ body {
     padding: 1px 5px 1px 5px;
 }
 
-/* The Modal (background) */
+/* The Help Modal (background) */
 
-.modal {
+.n2-help-modal {
     display: none;
     /* Hidden by default */
-    position: fixed;
+    position: absolute;
     /* Stay in place */
     z-index: 9999;
     /* Sit on top */
@@ -149,7 +146,7 @@ body {
 
 /* Modal Content */
 
-.modal-content {
+.n2-help-modal-content {
     font-family: helvetica, sans-serif;
     font-size: 14px;
     position: relative;
@@ -233,20 +230,20 @@ div.offgrid {
 
 /* The Close Button */
 
-.close {
+.n2-help-close {
     color: white;
     float: right;
     font-size: 28px;
     font-weight: bold;
 }
 
-.close:hover, .close:focus {
+.n2-help-close:hover, .n2-help-close:focus {
     color: #000;
     text-decoration: none;
     cursor: pointer;
 }
 
-.modal-header {
+.n2-help-modal-header {
     font-family: helvetica, sans-serif;
     font-size: 20px;
     padding: 2px 16px;
@@ -256,11 +253,11 @@ div.offgrid {
     padding: 10px;
 }
 
-.modal-body {
+.n2-help-modal-body {
     padding: 2px 16px;
 }
 
-.modal-footer {
+.n2-help-modal-footer {
     font-family: helvetica, sans-serif;
     font-size: 12px;
     padding: 2px 16px;
@@ -270,13 +267,13 @@ div.offgrid {
     padding: 10px;
 }
 
-.modal-section-header {
+.n2-help-modal-section-header {
     font-size: 30px;
     font-weight: bold;
     padding: 0px 20px;
 }
 
-.toolbar-help {
+.n2-toolbar-help {
     width: auto;
     height: auto;
     padding: 0px 20px;

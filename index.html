@@ -2,11 +2,19 @@
 <html>
 
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' *; 
 img-src 'self' data:; script-src 'self' 'unsafe-inline' *; 
 style-src  'self' 'unsafe-inline' *">
     <title>OpenMDAO Visualization</title>
+    <link rel="stylesheet" href="style/all.min.css">
+    <link rel="stylesheet" href="style/dashboard.css">
+    <link rel="stylesheet" href="style/goldenlayout-base.css">
+    <link rel="stylesheet" href="style/goldenlayout-light-theme.css">
+    <link rel="stylesheet" href="style/bootstrap.min.css">
+    <link rel="stylesheet" href="style/bootstrap-select.min.css">
 </head>
 
 <style nonce="eelohGaep4ie">
@@ -40,14 +48,14 @@ style-src  'self' 'unsafe-inline' *">
     <div class="wrapper">
         <div id="leftbar">
             <button id='addPlotButton' class="btn navbar-btn btn" onclick="addNewPlot()" disabled>
-                <span class="glyphicon glyphicon-stats"></span>
+                <span class="fas fa-chart-line"></span>
             </button>
             <button class="btn navbar-btn btn" id="addN2Button" onclick="addNewN2()" disabled>
-                <span class="glyphicon glyphicon-th"></span>
+                <span class="fas fa-th"></span>
             </button>
 
             <button title="Install Update" class="btn navbar-btn btn" id="installButton">
-                <span class="glyphicon glyphicon-download"></span>
+                <span class="fas fa-cloud-download-alt"></span>
             </button>
         </div>
         <div id="sidebar">
@@ -65,21 +73,14 @@ style-src  'self' 'unsafe-inline' *">
                 <br />
 
                 <button id='openButton' type='button' class='btn btn-secondary btn-large'>
-                    <span class="glyphicon glyphicon-folder-open"></span>&emsp;Open
+                    <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&emsp;Open
                 </button>
             </div>
         </div>
     </div>
 </body>
 
-<link rel="stylesheet" href="style/partition_tree.css">
-<link rel="stylesheet" href="style/dashboard.css">
-<link rel="stylesheet" href="style/font-awesome.min.css">
-<link rel="stylesheet" href="style/goldenlayout-base.css">
-<link rel="stylesheet" href="style/goldenlayout-light-theme.css">
-<link rel="stylesheet" href="style/bootstrap-glyphicons.css">
-<link rel="stylesheet" href="style/bootstrap-select.min.css">
-<link rel="stylesheet" href="style/bootstrap.min.css">
+
 <script src="src/libs/setup.js"></script>
 <script src="libs/vkBeautify.js"></script>
 <script src="src/libs/ipc.js"></script>

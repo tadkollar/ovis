@@ -131,8 +131,6 @@ function ControlPanel() {
             );
         }
 
-        // Stop displaying N^2 controls and start displaying plot controls
-        document.getElementById('n2Controls').style.display = 'none';
         document.getElementById('plotControls').style.display = 'block';
     };
 
@@ -162,7 +160,7 @@ function ControlPanel() {
             "'><br/>\r\n<div class='form-group' style='padding-right: 25px'>\r\n" +
             "<div class='sidebarBodyPlots reduceWidth'> " +
             name +
-            " Indices <button type='button' class='btn btn-sm btn-primary' data-toggle='modal' data-target='#selectIndicesModal'><span class='glyphicon glyphicon-info-sign'></span></button></div>\r\n" +
+            " Indices <button type='button' class='btn btn-sm btn-primary' data-toggle='modal' data-target='#selectIndicesModal'><span class='fas fa-info-circle'></span></button></div>\r\n" +
             "<input type='text' class='form-control varname reducedWidth' style='width: 60%' value=\"" +
             curIndices +
             '" id=\'var_' +

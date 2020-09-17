@@ -33,6 +33,7 @@ class Layout {
             this.plot_loc = path.join(__dirname, 'components/plot.html');
         }
         this.ptn2_file = fs.readFileSync(this.ptn2_loc);
+        // this.ptn2_file = "<html><head><style>iframe { height: 100%; width: 100%; }</style></head><body><iframe src='n2embed.html'></iframe></html>";
         this.plot_file = fs.readFileSync(this.plot_loc);
 
         //Initial configuration. 2 plots next to an N^2

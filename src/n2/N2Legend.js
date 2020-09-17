@@ -9,7 +9,7 @@ class N2Legend {
      * @param {ModelData} modelData Symbols are only displayed if they're in the model
      */
     constructor(modelData) {
-        this._div = d3.select("#legend-div");
+        this._div = d3.select("#n2-legend-div");
 
         // TODO: The legend should't have to search through modelData itself,
         // this info can be collected as modelData is built.
@@ -61,7 +61,7 @@ class N2Legend {
         this._setupDrag();
 
         let self = this;
-        this.closeDiv = d3.select('#close-legend');
+        this.closeDiv = d3.select('#n2-close-legend');
         this.closeButton = this.closeDiv.select('p');
 
         this.closeDiv
@@ -70,7 +70,7 @@ class N2Legend {
             .on('click', e => { 
                 self.hide(); 
                 self.closeButton.style('color', 'black');
-                d3.select('#legend-button').attr('class', 'fas icon-key');
+                d3.select('#n2-legend-button').attr('class', 'fas icon-key');
             })
     }
 
@@ -177,10 +177,10 @@ class N2Legend {
     _addItem(item, container) {
         const newDiv = container
             .append('div')
-            .attr('class', 'legend-box-container');
+            .attr('class', 'n2-legend-box-container');
 
         newDiv.append('div')
-            .attr('class', 'legend-box')
+            .attr('class', 'n2-legend-box')
             .style('background-color', item.color);
 
         newDiv.append('p')
@@ -189,12 +189,12 @@ class N2Legend {
 
     /** Add symbols for all of the items that were discovered */
     _setupContents() {
-        const sysVarContainer = d3.select('#sys-var-legend');
+        const sysVarContainer = d3.select('#n2-sys-var-legend');
         for (let item of this.sysAndVar) this._addItem(item, sysVarContainer);
 
         sysVarContainer.style('width', sysVarContainer.node().scrollWidth + 'px')
 
-        const solversLegend = d3.select('#solvers-legend')
+        const solversLegend = d3.select('#n2-solvers-legend')
         for (let item of this.linearSolvers) this._addItem(item, solversLegend);
 
         solversLegend.style('width', solversLegend.node().scrollWidth + 'px');
@@ -248,10 +248,10 @@ class N2Legend {
      */
     toggleSolvers(linear) {
 
-        const solversLegendTitle = d3.select('#solvers-legend-title');
+        const solversLegendTitle = d3.select('#n2-solvers-legend-title');
         solversLegendTitle.text(linear ? "Linear Solvers" : "Non-Linear Solvers");
 
-        const solversLegend = d3.select('#solvers-legend');
+        const solversLegend = d3.select('#n2-solvers-legend');
         solversLegend.html('');
 
         const solvers = linear ? this.linearSolvers : this.nonLinearSolvers;
@@ -260,12 +260,8 @@ class N2Legend {
         solversLegend.style('width', solversLegend.node().scrollWidth + 'px');
     }
 
-    /**
-     * If legend is shown, hide it; if it's hidden, show it.
-     * @param {Boolean} showLinearSolverNames Determines solver name type displayed.
-     * @param {Object} solverStyles Solver names, types, and styles including color.
-     */
-    toggle(showLinearSolverNames, solverStyles) {
+    /** If legend is shown, hide it; if it's hidden, show it. */
+    toggle() {
         if (this.hidden) this.show();
         else this.hide();
     }
